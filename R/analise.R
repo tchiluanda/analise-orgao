@@ -5,6 +5,7 @@ library(tidyverse)
 library(readxl)
 library(networkD3)
 library(igraph)
+library(collapsibleTree)
 
 
 
@@ -103,7 +104,17 @@ forceNetwork(
   opacity = 0.8)
 
 data_graph <- ploa_ME_clean_agrup_acao %>%
-  select(agregador, acao_completa)
+  mutate(acao_completa = str_sub(acao_completa, 1, 4)) %>%
+  select(agregador, acao_completa, valor)
+
+collapsibleTree::collapsibleTreeSummary(
+  data_graph, 
+  hierarchy = c("agregador", "acao_completa"), 
+  root = "PLOA",
+  width = 800,
+  height = 800,
+  attribute = "valor")
+
 
 teste <- igraph::graph_from_data_frame(links, vertices = nodes)
 
