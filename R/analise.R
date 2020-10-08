@@ -4,6 +4,7 @@
 library(tidyverse)
 library(readxl)
 library(networkD3)
+library(igraph)
 
 
 
@@ -57,6 +58,10 @@ write.csv2(acoes_ME_sem_agregadores,
            fileEncoding = "UTF-8"
            )
 
+
+
+# estrutura dados para grafo ----------------------------------------------
+
 ploa_ME_clean <- ploa_ME %>%
   filter(!is.na(agregador))
 
@@ -64,3 +69,55 @@ ploa_ME_clean_agrup_acao <- ploa_ME_clean %>%
   mutate(acao_completa = paste(acao, tituloacao)) %>%
   group_by(agregador, acao_completa) %>%
   summarise(valor = sum(valor))
+
+nodes <- data.frame(
+  nomes = c(
+    unique(ploa_ME_clean_agrup_acao$agregador),
+    unique(ploa_ME_clean_agrup_acao$acao_completa)
+  ),
+  tipo = c(
+    rep("agregador", length(unique(ploa_ME_clean_agrup_acao$agregador))),
+    rep("acao"     , length(unique(ploa_ME_clean_agrup_acao$acao_completa)))
+  )) %>%
+  mutate(
+    id = row_number() -1
+    ) %>%
+  select(id, nomes, tipo)
+
+links <- ploa_ME_clean_agrup_acao %>%
+  ungroup() %>%
+  left_join(nodes %>% select(-tipo), by = c("agregador" = "nomes")) %>%
+  rename(target = id) %>%
+  left_join(nodes %>% select(-tipo), by = c("acao_completa" = "nomes")) %>%
+  rename(source = id) %>%
+  select(source, target, value = valor)
+  
+forceNetwork(
+  Links = links,
+  Nodes = nodes,
+  Source = "source",
+  Target = "target",
+  Value = 1,
+  NodeID = "nomes",
+  Group = "tipo",
+  opacity = 0.8)
+
+data_graph <- ploa_ME_clean_agrup_acao %>%
+  select(agregador, acao_completa)
+
+teste <- igraph::graph_from_data_frame(links, vertices = nodes)
+
+tsa <- igraph_to_networkD3(teste)
+
+radialNetwork(List = teste, fontSize = 10, opacity = 0.9)
+
+URL <- paste0(
+  "https://raw.githubusercontent.com/christophergandrud/networkD3/",
+  "master/JSONdata/flare.json")
+
+## Convert to list format
+Flare <- jsonlite::fromJSON(URL, simplifyDataFrame = FALSE)
+
+Flare$children = Flare$children[1:3]
+
+diagonalNetwork(List = Flare, fontSize = 10, opacity = 0.9)
