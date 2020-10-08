@@ -3,6 +3,7 @@
 
 library(tidyverse)
 library(readxl)
+library(networkD3)
 
 
 
@@ -34,8 +35,14 @@ agrupadores <- readxl::read_excel("./dados/dados_originais/Novos Agregadores Min
 # reúne informações na tabela ---------------------------------------------
 
 ploa <- ploa_raw %>%
+  rename(valor = `PLOA 2020 Mensagem Modificativa`) %>%
+  mutate(tipo_valor = "PLOA") %>%
   left_join(orgaos) %>%
   left_join(agrupadores, by = "acao")
+
+
+
+# limita escopo ao ME -----------------------------------------------------
 
 ploa_ME <- ploa %>%
   filter(orgao_decreto == "25000")
@@ -50,4 +57,10 @@ write.csv2(acoes_ME_sem_agregadores,
            fileEncoding = "UTF-8"
            )
 
+ploa_ME_clean <- ploa_ME %>%
+  filter(!is.na(agregador))
 
+ploa_ME_clean_agrup_acao <- ploa_ME_clean %>%
+  mutate(acao_completa = paste(acao, tituloacao)) %>%
+  group_by(agregador, acao_completa) %>%
+  summarise(valor = sum(valor))
