@@ -132,3 +132,52 @@ Flare <- jsonlite::fromJSON(URL, simplifyDataFrame = FALSE)
 Flare$children = Flare$children[1:3]
 
 diagonalNetwork(List = Flare, fontSize = 10, opacity = 0.9)
+
+
+library(d3r)
+library(sunburstR)
+
+tree <- d3_nest(ploa_ME_clean_agrup_acao, value_cols = "valor")
+
+sb1 <- sunburst(tree, width="100%", height=400)
+
+
+teste_json <- jsonlite::fromJSON(tree, simplifyDataFrame = FALSE)
+jsonlite::write_json(teste_json, "teste.json")
+
+# agora com a estrutura hierárquica funcionou...
+networkD3::diagonalNetwork(List = teste_json, fontSize = 10, opacity = 0.9)
+networkD3::radialNetwork(List = teste_json, fontSize = 0, opacity = 0.9)
+sunburst(teste_json, width="100%", height=400)
+sunburst(
+  tree,
+  legend = FALSE,
+  width = "100%",
+  height = 400
+)
+
+# sem benefícios
+ploa_hierarquia <- ploa_ME_clean_agrup_acao %>% 
+  filter(agregador != "Benefícios Previdenciários") %>%
+  rename(value = valor) %>%
+  d3_nest(value_cols = "value")
+
+jsonlite::write_json(
+  jsonlite::fromJSON(ploa_hierarquia, simplifyDataFrame = FALSE), 
+  "ploa.json")
+
+
+# comparação entre os agrupadores
+
+scatter <- ploa_ME_clean_agrup_acao %>% 
+  filter(agregador != "Benefícios Previdenciários") %>%
+  group_by(agregador) %>%
+  summarise(soma = sum(valor),
+            qde  = n())
+
+ggplot(scatter, aes(x = soma, y = qde, color = qde == 1)) + 
+  geom_point() +
+  scale_x_log10() +
+  labs(title = "Quantidade de ações e valor total no PLOA de cada agrupador")
+
+catter %>% count(qde)
