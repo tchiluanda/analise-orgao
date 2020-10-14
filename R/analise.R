@@ -66,10 +66,12 @@ write.csv2(acoes_ME_sem_agregadores,
 ploa_ME_clean <- ploa_ME %>%
   filter(!is.na(agregador))
 
-ploa_ME_clean_agrup_acao <- ploa_ME_clean %>%
+ploa_ME_clean_agrup_acao <- ploa_ME %>% #_clean %>%
   mutate(acao_completa = paste(acao, tituloacao)) %>%
   group_by(agregador, acao_completa) %>%
   summarise(valor = sum(valor))
+
+write.csv(ploa_ME_clean_agrup_acao, "./dados/dados_intermediarios/agrup_acao.csv")
 
 nodes <- data.frame(
   nomes = c(
