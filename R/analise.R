@@ -13,6 +13,10 @@ library(collapsibleTree)
 
 ploa_raw <- readxl::read_excel("./dados/dados_originais/SOF_PLOA_2021_STN_ajustada_gepla.xlsx", sheet = "ajustada")
 
+tab_funcao <- readxl::read_excel("./dados/dados_originais/tabela_funcao.xlsx") %>%
+  select(subfuncao = cod_subfuncao,
+         funcao_tipica = Funcao)
+
 orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin.xlsx", skip = 5) %>%
   select(uo = `uo Código`,
          orgao = `orgao Código`,
@@ -40,9 +44,25 @@ ploa <- ploa_raw %>%
   rename(valor = `PLOA 2020 Mensagem Modificativa`) %>%
   mutate(tipo_valor = "PLOA") %>%
   left_join(orgaos) %>%
-  left_join(agrupadores, by = "acao")
+  left_join(agrupadores, by = "acao") %>%
+  left_join(tab_funcao)
 
 
+
+
+# exploracao por funcao tipica --------------------------------------------
+
+ploa_funcao_tipica <- ploa %>%
+  mutate(Orgao = paste(orgao, nomeorgao, sep = " - ")) %>%
+  group_by(Orgao, funcao_tipica) %>%
+  summarise(valor = sum(valor))
+
+# nas <- ploa %>% filter(is.na(funcao_tipica))
+
+ggplot(ploa_funcao_tipica) +
+  geom_col(aes(x = valor, y = reorder(funcao_tipica, valor),
+               fill = funcao_tipica)) +
+  facet_wrap(~Orgao, scales = "free")
 
 # limita escopo ao ME -----------------------------------------------------
 
