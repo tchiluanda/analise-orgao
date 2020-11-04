@@ -52,4 +52,99 @@ A Etapa 1 deste projeto está com previsão de conclusão em dezembro de 2020.
 | Etapa 2 - Ampliação do estudo estatístico para outros órgãos	| A Definir	| |
 | Etapa 3 - Avaliação da execução dos órgãos, e previsões mensais de despesas |	A Definir	| |
 
- 
+
+## To-do
+
+Ver arquivo sobre Make do Mike Bostock para estruturar
+https://bost.ocks.org/mike/make/
+
+## Journal
+
+Às vezes, um projeto está bem nebuloso e indefinido, e você acaba evitando trabalhar nele. Não te traz uma coisa boa. Aí, numa conversa, numa reunião, algo surge que provoca uma epifania, e os objetivos do projeto ficam mais claros, uma solução surge e tudo flui. Isso aconteceu na reunião de 3/11/2020 com o Gabriel.
+
+O desafio vai ser construir algo como diz o Moritz:
+
+> Where is the middle ground of domain-specific, purposefully crafted user interfaces that would truly enable us to see beyond the numbers and data and actually investigate interesting phenomena?
+
+Moritz também inspira com:
+
+> You will often hear these days, that data visualization is great for “telling stories”, to “make the complex simple” or to “make boring facts exciting”.
+> While this all true to some degree, I think it misses the greatest quality of data visualization today: to provide us with new kinds of “glasses” to see the world. [...]
+> We have this device now on our hands: data science and data visualization. It provides with new kinds of “glasses” to look at the world, a body extension that gives us the superpower to change the realities we are looking at, beyond the physical world.
+
+Para isso, vislumbro usar algo como definido pela Susie Lu:
+
+> When done well, exploratory data visualizations do have a story. It's a choose your own adventure story, a branching narrative. [...]
+> In explanatory scrollytelling you see much more success in using storytelling devices such as setting the scene, introducing concepts bit by bit, providing strong contrast, and directing the narrative to a climax in the story. While directing the narrative is difficult in an exploratory mode, we can still learn from the other aspects of telling a story to design dashboards more effectively. [...]
+> Scrollytelling is optimized for a single visit by a general audience member, while dashboards are optimized for multiple visits by many types of users. This affords two ways of approaching narrative.
+
+Aqui principalmente: 
+
+**"Branch the narrative based on the type of goal you have in mind. Different users will be interested in different types of insights."**
+
+![](./other/img/susie.png)
+
+> Even if you don't know what the data will show over time, you can optimize the type of visualization, color choices, style, and annotations to design for specific goals.
+
+> The second type of branching results from dynamic data in dashboards. Framing dashboards as storytelling allows you to turn this into an opportunity to change the narrative depending on the data instead of using the same chart type and annotations on a visualization that is no longer the best suited design.
+
+**"Branch the narrative based on the type of data you have. Optimize your visualizations for different data scenarios."**
+
+> With dashboards, you want to make the user so delighted with their experience that they come back whenever they need to answer a question with your data.
+
+> The perspective of thinking of dashboards as a choose your own adventure story allows us to not only lean on devices from novels but also game design. This analogy gives a mental model for us to look at how we can improve our work on dashboards.
+
+![](./other/img/mental-model.png)
+
+> DESIGN FOR MULTIPLE VISITS / QUICKLY RECOGNIZED FEATURES
+> From a game design perspective this applies to clearly marking what your user can interact with. 
+> You can also pull in the concept from game design of using a Heads Up Display (HUD). These are items that stay in your player's view and provide additional information on the state of the game. A representation of that is using a sticky nav or sticky context in your dashboard to be thoughtful about what tools a user will need in different parts of your application.
+
+Então, é preciso definir bem esses objetivos da visualização.
+
+### Objetivos de informação
+
+#### Fornecer uma visão geral das despesas de um órgão
+
+* 
+
+#### Permitir a exploração e descoberta de ações inusitadas
+
+* que ações tiveram um maior crescimento?
+* que ações são novas?
+
+#### Permitir a obtenção de detalhes nas duas visões
+
+Na visão por agrupador, mostrar informações sobre o agrupador num card.
+
+Na visão por ação, a mesma coisa, em cards.
+
+#### Permitir busca textual de agrupadores, ações, descrições etc.
+
+
+### Os dados
+
+Precisamos ter dados de:
+
+* PLOA ano [i+1]
+* PLOA anos [i], [i-1]
+* Dotação Atualizada anos [i], [i-1]
+* Valor pago anos [i], [i-1]
+* RAP inscritos [i+1], [i]
+* RAP pagos
+
+Detalhados por:
+
+* Órgão (classificação Cofin)
+* Ação
+* Agrupador (a definir)
+* Subfunção
+* Função da subfunção
+* GND
+
+Para cada ação podemos calcular métricas como:
+
+* Execução / Dotação + RAP nos anos [i] e [i-1]
+* Aumento Dotação de [i-1] para [i]
+* Pagto RAP / Pagto Total
+* como conjugar aumento percentual com valor absoluto? (fazer gráfico de dispersão?)
