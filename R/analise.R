@@ -59,10 +59,17 @@ ploa_funcao_tipica <- ploa %>%
 
 # nas <- ploa %>% filter(is.na(funcao_tipica))
 
-ggplot(ploa_funcao_tipica) +
+ggplot(ploa_funcao_tipica %>% filter(str_sub(Orgao,1,1) == "2")) +
   geom_col(aes(x = valor, y = reorder(funcao_tipica, valor),
                fill = funcao_tipica)) +
   facet_wrap(~Orgao, scales = "free")
+
+ggplot(ploa_funcao_tipica %>% filter(str_sub(Orgao,1,1) %in% c("2","3"),
+                                     funcao_tipica != "09 - Previdência Social")) +
+  geom_col(aes(x = valor, y = reorder(funcao_tipica, valor),
+               fill = funcao_tipica)) +
+  facet_wrap(~Orgao, scales = "free") +
+  theme(legend.position = "none")
 
 # limita escopo ao ME -----------------------------------------------------
 
@@ -80,8 +87,8 @@ write.csv2(acoes_ME_sem_agregadores,
            )
 
 
+# dados alto nível para visualização --------------------------------------
 
-# estrutura dados para grafo ----------------------------------------------
 
 ploa_ME_clean <- ploa_ME %>%
   filter(!is.na(agregador))
@@ -91,7 +98,25 @@ ploa_ME_clean_agrup_acao <- ploa_ME %>% #_clean %>%
   group_by(agregador, acao_completa) %>%
   summarise(valor = sum(valor))
 
-write.csv(ploa_ME_clean_agrup_acao, "./dados/dados_intermediarios/agrup_acao.csv")
+# por funcao tipica
+
+ploa_ME_clean_agrup_funcao <- ploa_ME %>% #_clean %>%
+  mutate(agregador = ifelse(is.na(agregador), "Sem agregador", agregador)) %>%
+  group_by(agregador, funcao_tipica) %>%
+  #filter(agregador != "Benefícios Previdenciários") %>%
+  summarise(valor = sum(valor))
+
+write.csv(ploa_ME_clean_agrup_funcao, "./dados/dados_intermediarios/agrup_funcao_completa.csv")
+
+ploa_ME_clean_funcoes <- ploa_ME %>% #_clean %>%
+  group_by(descricaofuncao, funcao_tipica) %>%
+  filter(funcao_tipica != "09 - Previdência Social") %>%
+  summarise(valor = sum(valor))
+
+write.csv(ploa_ME_clean_funcoes, "./dados/dados_intermediarios/funcoes.csv")
+
+# estrutura dados para grafo ----------------------------------------------
+
 
 nodes <- data.frame(
   nomes = c(
