@@ -13,6 +13,30 @@ library(collapsibleTree)
 
 ploa_raw <- readxl::read_excel("./dados/dados_originais/SOF_PLOA_2021_STN_ajustada_gepla.xlsx", sheet = "ajustada")
 
+dados_adicionais_raw <- readxl::read_excel("./dados/dados_originais/d2019_ploa.xlsx", skip = 8)
+
+colnames(dados_adicionais_raw) <- c(
+  "exercicio", 
+  "orgao", "nomeorgao", 
+  "esfera", "descricaoesfera", 
+  "uo", "nomeuo", 
+  "funcao", "descricaofuncao", 
+  "subfuncao", "descricaosubfuncao", 
+  "programa", "tituloprograma", 
+  "acao", "tituloacao", 
+  "localizador", "descricaolocalizador", 
+  "iduso", "descricaoiduso", 
+  "gnd", "gnd_descricao",
+  "mod", "mod_descricao",
+  "elemento", "elemento_descricao",
+  "fonte", 
+  "resultadoprimario", "descricaoresultadoprimario", 
+  "resultadoprimariolei", "descricaoresultadoprimariolei", 
+  "credito", "credito_descricao",
+  "ied", 
+  "tipo_valor_cod", "tipo_valor",
+  "valor")
+
 tab_funcao <- readxl::read_excel("./dados/dados_originais/tabela_funcao.xlsx") %>%
   select(subfuncao = cod_subfuncao,
          funcao_tipica = Funcao)
@@ -38,16 +62,71 @@ agrupadores <- readxl::read_excel("./dados/dados_originais/Novos Agregadores Min
   )
 
 
-# reúne informações na tabela ---------------------------------------------
+# prepara tabelas com informacoes principais ------------------------------
 
 ploa <- ploa_raw %>%
   rename(valor = `PLOA 2020 Mensagem Modificativa`) %>%
+  mutate(tipo_valor = "PLOA",
+         gnd = str_sub(naturezadespesa,2,2),
+         mod = str_sub(naturezadespesa,3,4)) %>%
+  group_by(exercicio,
+         tipo_valor,
+         uo,
+         orgao,
+         nomeorgao,
+         acao,
+         tituloacao,
+         subfuncao,
+         gnd,
+         mod,
+         resultadoprimario,
+         credito,
+         ied) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup()
+
+dados_adicionais <- dados_adicionais_raw %>%
   mutate(tipo_valor = "PLOA") %>%
+  group_by(exercicio,
+           tipo_valor,
+           uo,
+           orgao,
+           nomeorgao,
+           acao,
+           tituloacao,
+           subfuncao,
+           gnd,
+           mod,
+           resultadoprimario,
+           credito,
+           ied) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup()
+
+# reúne informações na tabela ---------------------------------------------
+
+dados_combinados <-
+  bind_rows(
+    ploa,
+    dados_adicionais
+  )
+
+exercicio_ref <- 2021
+
+base <- dados_combinados %>%
   left_join(orgaos) %>%
   left_join(agrupadores, by = "acao") %>%
-  left_join(tab_funcao)
+  left_join(tab_funcao) %>%
+  mutate(
+    orgao_decreto = ifelse(is.na(orgao_decreto), orgao, orgao_decreto),
+    orgao_decreto_nome = ifelse(is.na(orgao_decreto_nome), nomeorgao, orgao_decreto_nome),
+    id_info = case_when(
+      tipo_valor == "PLOA" && exercicio == "2019" ~ "ploa_anterior",
+      tipo_valor == "PLOA" && exercicio == "2021" ~ "ploa_atual"
+    )
+  )
 
-
+# computar informacoes necessarias para a vis
 
 
 # exploracao por funcao tipica --------------------------------------------
