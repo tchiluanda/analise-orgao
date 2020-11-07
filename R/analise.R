@@ -121,13 +121,59 @@ base <- dados_combinados %>%
     orgao_decreto = ifelse(is.na(orgao_decreto), orgao, orgao_decreto),
     orgao_decreto_nome = ifelse(is.na(orgao_decreto_nome), nomeorgao, orgao_decreto_nome),
     id_info = case_when(
-      tipo_valor == "PLOA" && exercicio == "2019" ~ "ploa_anterior",
-      tipo_valor == "PLOA" && exercicio == "2021" ~ "ploa_atual"
+      tipo_valor == "PLOA" & exercicio == "2019" ~ "ref",
+      tipo_valor == "PLOA" & exercicio == "2021" ~ "atu"
     )
   )
 
-# computar informacoes necessarias para a vis
+# computar informacoes necessarias para a vis, por orgao e acao
 
+perfil_gnd <- base %>%
+  filter(orgao_decreto == "25000") %>%
+  mutate(grupo = case_when(
+    gnd == "1" ~ "Pessoal",
+    gnd == "3" ~ "Custeio",
+    gnd %in% c("4", "5") ~ "Investimento",
+    TRUE ~ "Dívida")) %>%
+  group_by(id_info, acao) %>%
+  mutate(total_acao = sum(valor)) %>%
+  group_by(id_info, acao, grupo) %>%
+  mutate(total_gnd = sum(valor)) %>%
+  group_by(id_info, acao, grupo) %>%
+  summarise(percent_gnd = first(total_gnd / total_acao)) %>%
+  ungroup() %>%
+  unite("classificador", c(id_info,grupo), remove = TRUE) %>%
+  spread(classificador, percent_gnd)
+  
+perfil_mod <- base %>%
+  filter(orgao_decreto == "25000") %>%
+  mutate(modalidade = case_when(
+    str_sub(mod,1,1) == "9" ~ "Direta",
+    TRUE ~ "Transferencia")) %>%
+  group_by(id_info, acao) %>%
+  mutate(total_acao = sum(valor)) %>%
+  group_by(id_info, acao, modalidade) %>%
+  mutate(total_mod = sum(valor)) %>%
+  group_by(id_info, acao, modalidade) %>%
+  summarise(percent_mod = first(total_mod / total_acao)) %>%
+  ungroup() %>%
+  unite("classificador", c(id_info, modalidade), remove = TRUE) %>%
+  spread(classificador, percent_mod)
+
+base_acao <- base %>%
+  filter(orgao_decreto == "25000") %>%
+  group_by(agregador, funcao_tipica, acao, id_info) %>%
+  summarise(total = sum(valor)) %>%
+  ungroup() %>%
+  mutate(id_info = paste(id_info, "total", sep = "_")) %>%
+  spread(id_info, total) %>%
+  mutate(acao_nova = is.na(ref_total),
+         acao_extinta = is.na(atu_total)) %>%
+  filter(!acao_extinta)
+
+base_export <- base_acao %>%
+  left_join(perfil_gnd) %>%
+  left_join(perfil_mod)
 
 # exploracao por funcao tipica --------------------------------------------
 
