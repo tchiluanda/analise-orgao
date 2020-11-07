@@ -148,3 +148,13 @@ Para cada ação podemos calcular métricas como:
 * Aumento Dotação de [i-1] para [i]
 * Pagto RAP / Pagto Total
 * como conjugar aumento percentual com valor absoluto? (fazer gráfico de dispersão?)
+
+### Estrutura do código
+
+vis
+ |
+ +---
+
+ Controlar o estado com data-attributes?
+
+ O back-and-forth entre a construção da visualização e a preparação dos dados no R.
