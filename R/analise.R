@@ -169,11 +169,25 @@ base_acao <- base %>%
   spread(id_info, total) %>%
   mutate(acao_nova = is.na(ref_total),
          acao_extinta = is.na(atu_total)) %>%
-  filter(!acao_extinta)
+  filter(!acao_extinta) %>%
+  mutate(varia = atu_total - ref_total,
+         varia_pct = (atu_total / ref_total - 1) * 100)
 
 base_export <- base_acao %>%
   left_join(perfil_gnd) %>%
   left_join(perfil_mod)
+
+
+# exploracao --------------------------------------------------------------
+
+base_export$aumento %>% summary()
+ggplot(base_export, aes(varia)) + geom_histogram()
+ggplot(base_export, aes(varia)) + geom_jitter(aes(y = 1)) + xlim(c(-1e9, NA))
+ggplot(base_export, aes(varia)) + geom_jitter(aes(y = 1)) + scale_x_log10()
+
+ggplot(base_export, aes(varia_pct)) + geom_histogram()
+ggplot(base_export, aes(varia_pct)) + geom_jitter(aes(y = 1))
+
 
 # exploracao por funcao tipica --------------------------------------------
 
