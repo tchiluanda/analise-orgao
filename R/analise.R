@@ -173,10 +173,26 @@ base_acao <- base %>%
   mutate(varia = atu_total - ref_total,
          varia_pct = (atu_total / ref_total - 1) * 100)
 
-base_export <- base_acao %>%
+base_pre_stack <- base_acao %>%
   left_join(perfil_gnd) %>%
   left_join(perfil_mod)
 
+variaveis_de_interesse <- c("agregador", "funcao_tipica")
+
+base_stack <- base_pre_stack
+
+for (var in variaveis_de_interesse) {
+  quo_var <- sym(var) # transforma "var", que é string, num símbolo
+  
+  base_stack <- base_stack %>%
+    group_by(!! quo_var) %>%
+    mutate(!! paste0("pos_ini_", var) := cumsum(atu_total) - atu_total) %>%
+    ungroup()
+}
+
+base_export <- base_stack
+
+write.csv2(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
 
 # exploracao --------------------------------------------------------------
 
