@@ -1,0 +1,14 @@
+:root {
+    --main-bk-color: #f7f3eb;
+    --main-txt-color: "fafafa";
+    --main-highlight-color: "firebrick";
+
+    --main-font: "Inter";
+
+}
+
+body {
+    font-family: var(--main-font);
+    background-color: var(--main-bk-color);
+    color: var(--main-txt-color);
+}
