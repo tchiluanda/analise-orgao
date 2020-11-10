@@ -10,22 +10,23 @@ const vis = {
 
     sels: {
 
-        svg: d3.select(vis.refs.svg),
-        cont: d3.select(vis.refs.cont)
+        svg: null,
+        cont: null
 
     },
 
     elems: {
 
-        svg:  document.querySelector(vis.refs.svg),
-        cont: document.querySelector(vis.refs.cont)
+        svg:  null,
+        cont: null
 
     },
 
     dims : {
 
         h: null,
-        w: null
+        w: null,
+        margins: 20
 
     },
 
@@ -36,16 +37,43 @@ const vis = {
 
     init : function() {
 
+        vis.f.generates_refs();
         vis.f.get_size();
+        vis.f.set_size();
 
     },
 
     f : {
 
+        generates_refs: function() {
+
+            vis.sels.svg  = d3.select(vis.refs.svg);
+            vis.sels.cont = d3.select(vis.refs.cont);
+
+            vis.elems.svg  = document.querySelector(vis.refs.svg);
+            vis.elems.cont = document.querySelector(vis.refs.cont);
+
+        },
+
         get_size: function() {
 
+            let win_w = window.innerWidth;
+            let win_h = window.innerHeight;
+
+            let pos_vis_y = vis.elems.svg.getBoundingClientRect().y;
+
+            vis.dims.h = win_h - pos_vis_y - vis.dims.margins;
             vis.dims.w = +vis.sels.svg.style("width").slice(0, -2);
-            vis.dims.h = +vis.sels.svg.style("height").slice(0, -2);
+
+        },
+
+        set_size: function() {
+
+            vis.elems.svg.style.setProperty(
+                "height", vis.dims.h + "px");
+
+            vis.elems.svg.style.setProperty("background-color", "coral");
+
 
         },
 
@@ -61,4 +89,5 @@ const vis = {
 }
 
 vis.init();
+
 console.log(vis);
