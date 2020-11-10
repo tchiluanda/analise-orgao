@@ -3,6 +3,7 @@
     --dark: #383735;
     --main-highlight-color: firebrick;
     --ligther: #787672;
+    --ligther2: #DEDAD3;
     --pink: #F7DFED;
     --cream: #F7EBD2;
     --highlight: #F9DCA2;
@@ -33,24 +34,25 @@ main {
 }
 
 .mission-control button {
-    padding: 0.4em 0.5em;
-    margin-right: 0.5em;
-    background: none;
-    border: none;
-    border-bottom: 5px solid transparent;
+    padding: 0.4em 0.8em;
+    margin-right: 1em;
+    border: 3px solid white;
+    border-radius: 1.5em;
     color: var(--dark);
+    background-color: var(--light);
 }
 
-.mission-control button.selected {
+.mission-control button.selected.selected {
     border: 3px solid var(--dark);
     border-radius: 1.5em;
     color: var(--dark);
-    font-weight: bold;
     background-color: var(--highlight);
+    font-weight: bold;
 }
 
-nav.controle-vis button:hover {
-    border-bottom: 5px solid var(--var);
+.mission-control button:hover {
+    background-color: var(--cream);
+    border-color: var(--ligther);
 }
 
 /* vis */
