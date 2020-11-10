@@ -153,7 +153,13 @@ Para cada ação podemos calcular métricas como:
 
 vis
 |
-+---
+=- params
+=- init
+=- f
+   |
+   =- scales
+      |
+      =- domain
 
  Controlar o estado com data-attributes?
 
