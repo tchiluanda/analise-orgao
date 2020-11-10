@@ -1,14 +1,48 @@
 :root {
     --main-bk-color: #f7f3eb;
-    --main-txt-color: "fafafa";
-    --main-highlight-color: "firebrick";
+    --main-txt-color: fafafa;
+    --main-highlight-color: firebrick;
 
     --main-font: "Inter";
 
+}
+
+* {
+    box-sizing: border-box;
 }
 
 body {
     font-family: var(--main-font);
     background-color: var(--main-bk-color);
     color: var(--main-txt-color);
+}
+
+main {
+    margin-top: 1rem;
+}
+
+/* botoes controle */
+
+.mission-control {
+    display: flex;
+    justify-content: center;
+}
+
+.mission-control button {
+    padding: 0.4em 0.5em;
+    margin-right: 0.5em;
+    background: none;
+    border: none;
+    border-bottom: 5px solid transparent;
+    color: var(--main-txt-color);
+}
+
+.mission-control button.selected {
+    border-bottom: 5px solid var(--main-highlight-color);
+    color: var(--main-highlight-color);
+    font-weight: bold;
+}
+
+nav.controle-vis button:hover {
+    border-bottom: 5px solid var(--main-highlight-color);
 }

@@ -8,6 +8,11 @@
     <link rel="stylesheet" href="./web/style.css">
 </head>
 <body>
+    <header>
+        <h1>
+            Aqui vai ser o título.
+        </h1>
+    </header>
     <nav class="mission-control"
 
      data-overview-criteria = "agregador|funcao_tipica"
@@ -21,15 +26,19 @@
 
     >
 
-    <h1>
-        Aqui vai ser o título e controles.
-    </h1>
+        <button id="agregado" class="selected">Valores Agregados</button>
+        <button id="detalhado">Valores Detalhados</button>
 
     </nav>
 
     <main>
 
         Aqui vai ficar a visualização.
+        <div class="vis-wrapper">
+            <svg class="vis">
+
+            </svg>
+        </div>
 
     </main>
 
