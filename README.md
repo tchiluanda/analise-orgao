@@ -152,9 +152,15 @@ Para cada ação podemos calcular métricas como:
 ### Estrutura do código
 
 vis
- |
- +---
+|
++---
 
  Controlar o estado com data-attributes?
 
  O back-and-forth entre a construção da visualização e a preparação dos dados no R.
+
+
+### Inspirações
+
+Minimap o 
+ https://pudding.cool/process/pivot-continue-down/
