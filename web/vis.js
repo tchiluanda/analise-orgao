@@ -40,10 +40,13 @@ const vis = {
         vis.f.generates_refs();
         vis.f.get_size();
         vis.f.set_size();
+        vis.f.read_data();
 
     },
 
     f : {
+
+        // "administrative tasks"
 
         generates_refs: function() {
 
@@ -74,6 +77,21 @@ const vis = {
 
             vis.elems.svg.style.setProperty("background-color", "coral");
 
+
+        },
+
+        read_data: function(url) {
+
+            d3.csv(vis.refs.data).then(
+                data => vis.f.draw(data)
+            );
+
+        },
+
+        draw: function(data) {
+
+            console.log(data.columns);
+            console.table(data);
 
         },
 
