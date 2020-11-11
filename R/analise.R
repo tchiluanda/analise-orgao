@@ -192,12 +192,13 @@ for (var in variaveis_de_interesse) {
 
 base_export <- base_stack
 
-write.csv2(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
+write.csv(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
 
 # exploracao --------------------------------------------------------------
 
 base_export$aumento %>% summary()
 ggplot(base_export, aes(varia)) + geom_histogram()
+ggplot(base_export, aes(varia)) + geom_boxplot()+ scale_x_log10()
 ggplot(base_export, aes(varia)) + geom_jitter(aes(y = 1)) + xlim(c(-1e9, NA))
 ggplot(base_export, aes(varia)) + geom_jitter(aes(y = 1)) + scale_x_log10()
 
