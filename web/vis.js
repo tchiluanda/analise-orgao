@@ -30,8 +30,11 @@ const vis = {
 
     },
 
+    data : {},
+
     params : {
 
+        variables : ["atu_total", "varia", "varia_pct"]
 
     },
 
@@ -80,24 +83,53 @@ const vis = {
 
         },
 
-        read_data: function(url) {
+        read_data : function(url) {
 
             d3.csv(vis.refs.data).then(
-                data => vis.f.draw(data)
+                data => vis.draw.begin(data)
             );
 
         },
 
-        draw: function(data) {
+        get_domain : function(data, variable) {
+
+            return d3.extent(data, d => +d[variable]);
+
+        }
+    },
+
+    draw: {
+
+        domains : {},
+
+        ranges : {},
+
+        begin : function(data) {
 
             console.log(data.columns);
-            console.table(data);
+            vis.data = data;
+
+            vis.params.variables.forEach(variable => {
+                vis.draw.domains[variable] = vis.f.get_domain(data, variable);
+            });
 
         },
 
-        scales : {
+        agregado : {
 
-            domain : null
+            scales : {
+
+                x: d3.scaleLinear(),
+    
+                y: d3.scaleLinear(),
+
+                w: d3.scaleLinear()
+
+        },
+
+        detalhado : {},
+
+        card : {}
 
         }
 
