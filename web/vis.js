@@ -27,7 +27,7 @@ const vis = {
 
         h: null,
         w: null,
-        margins: 20
+        margins: 50
 
     },
 
@@ -194,7 +194,7 @@ const vis = {
                   .append("g") 
                   .attr(
                       "transform", 
-                      "translate(-" 
+                      "translate(" 
                       + desloc_x 
                       + "," 
                       + desloc_y
@@ -203,9 +203,9 @@ const vis = {
                   .call(vis.draw.axis[dimension]); 
             },
 
-            x :  d3.axisTop(),
+            x :  d3.axisBottom().tickFormat(d => formataBR(d/1e6)),
 
-            y :  d3.axisLeft()
+            y :  d3.axisLeft().tickFormat(d => d3.format(".1%")(d/100))
 
         },
 
@@ -260,12 +260,17 @@ const vis = {
 
             // update and add axis
             vis.draw.axis.update("x");
-            vis.draw.axis.update("x");
+            vis.draw.axis.update("y");
 
             vis.draw.axis.create(
                 desloc_x = 0,
-                desloc_y = vis.dims.margins,
+                desloc_y = vis.draw.scales.y(0),//vis.dims.h - vis.dims.margins,
                 "x");
+
+            vis.draw.axis.create(
+                desloc_x = vis.dims.margins,
+                desloc_y = 0,
+                "y");
 
         },
 

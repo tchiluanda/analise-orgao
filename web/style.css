@@ -61,3 +61,12 @@ svg {
     width: 100%;
     height: 100%;
 }
+
+.axis {
+    font-family: "Inter";
+    color: var(--ligther);
+}
+
+.axis line, .axis path {
+    stroke: var(--ligther);
+}
