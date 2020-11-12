@@ -114,7 +114,7 @@ const vis = {
 
                 // fixando mínimo de domínios relacionados a tamanhos em 0. Talvez criar um marcador?
 
-                vis.draw.domains["atu_total"][0] = 0;
+                //vis.draw.domains["atu_total"][0] = 0;
 
             },
 
@@ -134,7 +134,7 @@ const vis = {
 
                 vis.draw.ranges.x = [ vis.dims.margins, vis.dims.w - vis.dims.margins ];
     
-                vis.draw.ranges.y = [ vis.dims.margins, vis.dims.h - vis.dims.margins ];
+                vis.draw.ranges.y = [ vis.dims.h - vis.dims.margins, vis.dims.margins ];
 
                 vis.draw.ranges.w = [ 0, vis.dims.w - 2*vis.dims.margins ];
     
@@ -143,7 +143,7 @@ const vis = {
             x : null,
             y : null,
             w : null,
-            r : [0,12]
+            r : [1,30]
 
         },
 
@@ -176,6 +176,39 @@ const vis = {
 
         },
 
+        axis : {
+
+            update : function(dimension) {
+
+                vis.draw.axis[dimension].scale(
+                    vis.draw.scales[dimension]
+                )
+
+            },
+
+            create : function(desloc_x, desloc_y, dimension) {
+                
+                let svg = vis.sels.svg;
+
+                svg
+                  .append("g") 
+                  .attr(
+                      "transform", 
+                      "translate(-" 
+                      + desloc_x 
+                      + "," 
+                      + desloc_y
+                      + ")")
+                  .classed("axis", true)
+                  .call(vis.draw.axis[dimension]); 
+            },
+
+            x :  d3.axisTop(),
+
+            y :  d3.axisLeft()
+
+        },
+
         bubbles : {
 
             add : function() {
@@ -184,7 +217,7 @@ const vis = {
 
                 let r = 2;
 
-                svg
+                vis.sels.rects_acoes = svg
                   .selectAll("rect")
                   .data(vis.data)
                   .join("rect")
@@ -194,8 +227,8 @@ const vis = {
                   .attr("y", d => 
                      vis.draw.scales.y(+d.varia_pct) 
                      - vis.draw.scales.r(+d.atu_total))
-                  .attr("height", d => vis.draw.scales.r(+d.atu_total))
-                  .attr("width", d => vis.draw.scales.r(+d.atu_total))
+                  .attr("height", d => 2*vis.draw.scales.r(+d.atu_total))
+                  .attr("width", d => 2*vis.draw.scales.r(+d.atu_total))
                   .attr("fill", "var(--pink)");
 
             }
@@ -222,6 +255,17 @@ const vis = {
             vis.draw.scales.set_domain("y", "varia_pct");
             vis.draw.scales.set_domain("r", "atu_total");
 
+            // add rects/bubbles
+            vis.draw.bubbles.add();
+
+            // update and add axis
+            vis.draw.axis.update("x");
+            vis.draw.axis.update("x");
+
+            vis.draw.axis.create(
+                desloc_x = 0,
+                desloc_y = vis.dims.margins,
+                "x");
 
         },
 
