@@ -43,7 +43,7 @@ const vis = {
 
         modes : ["agregado", "detalhado"],
 
-        variables : ["atu_total", "varia", "varia_pct", "pos_ini_agregador", "pos_ini_funcao_tipica"],
+        variables : ["atu_total", "varia", "varia_pct"],
 
         categorical_vars : ["agregador", "funcao_tipica"],
         // also, those are the variables used for evaluating summaries in the "agregado" mode
@@ -144,7 +144,7 @@ const vis = {
                     vis.draw.domains[variable] = vis.draw.domains.get(vis.data.raw, variable, categorical = true);
                 });
 
-                function initialize_agregado() {
+                function initialize_domain_agregado() {
 
                     const maxs = vis.params.categorical_vars.map(
                         cat => d3.max(vis.data.processed[cat],
@@ -159,9 +159,7 @@ const vis = {
                     // ES6
                 }
 
-                initialize_agregado();
-
-
+                initialize_domain_agregado();
 
             },
 
