@@ -69,7 +69,7 @@ const utils = {
     for (cat of categorias_unicas) {
       const soma = objeto
                       .filter(d => d[coluna_categoria] === cat)
-                      .map(d => d[coluna_valor])
+                      .map(d => +d[coluna_valor])
                       .reduce((valor_acum, valor_atual) => valor_acum + valor_atual);
       resultado.push({"categoria" : cat,
                       "subtotal"  : soma});   
