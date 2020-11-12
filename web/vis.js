@@ -37,7 +37,9 @@ const vis = {
 
         modes : ["agregado", "detalhado"],
 
-        variables : ["atu_total", "varia", "varia_pct"]
+        variables : ["atu_total", "varia", "varia_pct"],
+
+        dimensions : ["x", "y", "w", "r"]
 
     },
 
@@ -110,6 +112,10 @@ const vis = {
                     vis.draw.domains[variable] = vis.draw.domains.get(vis.data, variable);
                 });
 
+                // fixando mínimo de domínios relacionados a tamanhos em 0. Talvez criar um marcador?
+
+                vis.draw.domains["atu_total"][0] = 0;
+
             },
 
             get : function(data, variable) {
@@ -117,6 +123,8 @@ const vis = {
                 return d3.extent(data, d => +d[variable]);
     
             },
+
+            // variables will be properties
 
         },
 
@@ -126,44 +134,45 @@ const vis = {
 
                 vis.draw.ranges.x = [ vis.dims.margins, vis.dims.w - vis.dims.margins ];
     
-                vis.draw.ranges.y = [ vis.dims.margins, vis.dims.h - vis.dims.margins ]
+                vis.draw.ranges.y = [ vis.dims.margins, vis.dims.h - vis.dims.margins ];
+
+                vis.draw.ranges.w = [ 0, vis.dims.w - 2*vis.dims.margins ];
     
             },
 
             x : null,
             y : null,
-            w : null
+            w : null,
+            r : [0,12]
 
         },
 
         scales : {
 
-            initialize : function(mode, dimension) {
-
-                vis.draw.scales[mode][dimension]
-                  .range(vis.draw.ranges[dimension])
+            initialize : function() {
+                
+                vis.params.dimensions.forEach(dimension => {
+                    vis.draw.scales[dimension]
+                    .range(vis.draw.ranges[dimension])
+                    .clamp(true);
+                });
     
             },
 
-            agregado : {
+            set_domain : function(dimension, variable) {
 
-                x: d3.scaleLinear(),
-
-                y: d3.scaleLinear(),
-
-                w: d3.scaleLinear()
-
+                vis.draw.scales[dimension]
+                  .domain(vis.draw.domains[variable]);
+    
             },
 
-            detalhado : {
+            x: d3.scaleLinear(),
 
-                x: d3.scaleLinear(),
-        
-                y: d3.scaleLinear(),
+            y: d3.scaleLinear(),
 
-                r: d3.scaleSqrt()
+            w: d3.scaleLinear(),
 
-            }
+            r: d3.scaleSqrt()
 
         },
 
@@ -173,7 +182,21 @@ const vis = {
 
                 let svg = vis.sels.svg;
 
-                svg.selectAll("rect")
+                let r = 2;
+
+                svg
+                  .selectAll("rect")
+                  .data(vis.data)
+                  .join("rect")
+                  .attr("x", d => 
+                     vis.draw.scales.x(+d.varia) 
+                     - vis.draw.scales.r(+d.atu_total))
+                  .attr("y", d => 
+                     vis.draw.scales.y(+d.varia_pct) 
+                     - vis.draw.scales.r(+d.atu_total))
+                  .attr("height", d => vis.draw.scales.r(+d.atu_total))
+                  .attr("width", d => vis.draw.scales.r(+d.atu_total))
+                  .attr("fill", "var(--pink)");
 
             }
 
@@ -193,7 +216,12 @@ const vis = {
             // updates ranges
             vis.draw.ranges.update();
 
-            
+            // sets scales
+            vis.draw.scales.initialize();
+            vis.draw.scales.set_domain("x", "varia");
+            vis.draw.scales.set_domain("y", "varia_pct");
+            vis.draw.scales.set_domain("r", "atu_total");
+
 
         },
 
