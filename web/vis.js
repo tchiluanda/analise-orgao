@@ -10,9 +10,10 @@ const vis = {
 
     sels: {
 
-        svg: null,
-        cont: null,
-        rects_acoes: null
+        svg : null,
+        cont : null,
+        rects_acoes : null,
+        axis : {}
 
     },
 
@@ -190,7 +191,7 @@ const vis = {
                 
                 let svg = vis.sels.svg;
 
-                svg
+                vis.sels.axis[dimension] = svg
                   .append("g") 
                   .attr(
                       "transform", 
