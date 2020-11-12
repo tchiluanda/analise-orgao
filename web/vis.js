@@ -46,6 +46,7 @@ const vis = {
         variables : ["atu_total", "varia", "varia_pct", "pos_ini_agregador", "pos_ini_funcao_tipica"],
 
         categorical_vars : ["agregador", "funcao_tipica"],
+        // also, those are the variables used for evaluating summaries in the "agregado" mode
 
         dimensions : ["x", "y", "w", "r"]
 
@@ -105,14 +106,21 @@ const vis = {
 
         },
 
-        summarise : function(categorical_variable, numerical_variable) {
+        summarise_categorical : function(numerical_variable) {
 
-            vis.data.processed[categorical_variable] = utils.group_by_sum(
-                objeto = vis.data.raw, 
-                coluna_categoria = categorical_variable, 
-                coluna_valor = numerical_variable, 
-                ordena_decrescente = true
-            )
+            vis.params.categorical_vars.forEach(categorical_variable => {
+
+                vis.data.processed[categorical_variable] =
+                utils.group_by_sum(
+                    objeto = vis.data.raw, 
+                    coluna_categoria = categorical_variable, 
+                    coluna_valor = numerical_variable, 
+                    ordena_decrescente = true
+                )
+                
+            });
+
+
 
         },
 
@@ -136,9 +144,24 @@ const vis = {
                     vis.draw.domains[variable] = vis.draw.domains.get(vis.data.raw, variable, categorical = true);
                 });
 
-                // fixando mínimo de domínios relacionados a tamanhos em 0. Talvez criar um marcador?
+                function initialize_agregado() {
 
-                //vis.draw.domains["atu_total"][0] = 0;
+                    const maxs = vis.params.categorical_vars.map(
+                        cat => d3.max(vis.data.processed[cat],
+                            d => +d.subtotal)
+                    )
+    
+                    vis.draw.domains["agregado"] = [
+                        0, 
+                        d3.max(maxs, d => d)
+                    ];
+                    // Math.max(...maxs)
+                    // ES6
+                }
+
+                initialize_agregado();
+
+
 
             },
 
@@ -192,10 +215,10 @@ const vis = {
     
             },
 
-            set_domain : function(dimension, variable) {
+            set_domain : function(dimension, option) {
 
                 vis.draw.scales[dimension]
-                  .domain(vis.draw.domains[variable]);
+                  .domain(vis.draw.domains[option]);
     
             },
 
@@ -281,6 +304,10 @@ const vis = {
 
             // saves data as a property to make it easier to access it elsewhere
             vis.data.raw = data;
+
+            // summarise data for categorical variables
+            vis.f.summarise_categorical(
+                numerical_variable = "atu_total");
 
             // evaluates domains for selected variables
             vis.draw.domains.initialize();
