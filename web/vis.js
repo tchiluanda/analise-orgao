@@ -107,7 +107,12 @@ const vis = {
 
         summarise : function(categorical_variable, numerical_variable) {
 
-            vis.data[categorical_variable] = group_by_sum_v
+            vis.data.processed[categorical_variable] = utils.group_by_sum(
+                objeto = vis.data.raw, 
+                coluna_categoria = categorical_variable, 
+                coluna_valor = numerical_variable, 
+                ordena_decrescente = true
+            )
 
         },
 
@@ -123,7 +128,12 @@ const vis = {
             initialize : function() {
 
                 vis.params.variables.forEach(variable => {
-                    vis.draw.domains[variable] = vis.draw.domains.get(vis.data.raw, variable);
+                    vis.draw.domains[variable] = vis.draw.domains.get(vis.data.raw, variable,
+                        categorical = false);
+                });
+
+                vis.params.categorical_vars.forEach(variable => {
+                    vis.draw.domains[variable] = vis.draw.domains.get(vis.data.raw, variable, categorical = true);
                 });
 
                 // fixando mínimo de domínios relacionados a tamanhos em 0. Talvez criar um marcador?
@@ -132,9 +142,18 @@ const vis = {
 
             },
 
-            get : function(data, variable) {
+            get : function(data, variable, categorical = false) {
 
-                return d3.extent(data, d => +d[variable]);
+                if (!categorical) {
+                    return d3.extent(data, d => +d[variable])
+                }
+                
+                else {
+                    return  utils.unique(
+                        obj = data, 
+                        col = variable
+                    )
+                }
     
             },
 
@@ -183,6 +202,8 @@ const vis = {
             x: d3.scaleLinear(),
 
             y: d3.scaleLinear(),
+
+            y_cat: d3.scaleBand(),
 
             w: d3.scaleLinear(),
 
