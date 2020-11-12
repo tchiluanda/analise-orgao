@@ -161,7 +161,53 @@ vis
       |
       =- domain
 
- Controlar o estado com data-attributes?
+Controlar o estado com data-attributes?
+
+Para cada seleção, atualizar a escala?
+O range não vai mudar, mas o domain sim
+
+então poderia pegar armazena num data-attribute o estado, tipo
+data-modo = "agregado"
+data-opcao = "funcao_tipica"
+
+E aí teria os domains armazenados dessa forma, tipo
+
+```
+domains
+ |
+ +- agregado
+    \- todos
+ \- detalhado
+    |
+    +- alteracoes
+    +- novos
+    \- outro
+```
+
+Então um método varia o update da escala, tipo
+
+vis.draw.scales[dataModo].x.domain(
+  vis.draw.domains[dataModo][dataOpcao]
+)
+
+ooou, os dominios seriam mais sinteticos, de acordo com as variaveis
+
+```
+domains
+   |
+   +- atu_total
+   +- varia
+   +- varia_pct
+```
+
+e só teria uma escala por ~modo~ dimensão, que seria atualizada no momento da seleção, com o domínio correspondente.
+
+O objeto contém uma lista de variáveis de interesse, com os mesmos nomes das colunas dos dados, e constrói um range para cada uma delas.
+
+
+
+Precisaria  ?
+
 
  O back-and-forth entre a construção da visualização e a preparação dos dados no R.
 
