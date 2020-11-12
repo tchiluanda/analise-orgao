@@ -32,13 +32,20 @@ const vis = {
 
     },
 
-    data : {},
+    data : {
+
+        raw : null,
+        processed : {}
+
+    },
 
     params : {
 
         modes : ["agregado", "detalhado"],
 
-        variables : ["atu_total", "varia", "varia_pct"],
+        variables : ["atu_total", "varia", "varia_pct", "pos_ini_agregador", "pos_ini_funcao_tipica"],
+
+        categorical_vars : ["agregador", "funcao_tipica"],
 
         dimensions : ["x", "y", "w", "r"]
 
@@ -98,6 +105,12 @@ const vis = {
 
         },
 
+        summarise : function(categorical_variable, numerical_variable) {
+
+            vis.data[categorical_variable] = group_by_sum_v
+
+        },
+
         update_positions : {
             // para quando for disparado um resize
         }
@@ -110,7 +123,7 @@ const vis = {
             initialize : function() {
 
                 vis.params.variables.forEach(variable => {
-                    vis.draw.domains[variable] = vis.draw.domains.get(vis.data, variable);
+                    vis.draw.domains[variable] = vis.draw.domains.get(vis.data.raw, variable);
                 });
 
                 // fixando mínimo de domínios relacionados a tamanhos em 0. Talvez criar um marcador?
@@ -204,9 +217,13 @@ const vis = {
                   .call(vis.draw.axis[dimension]); 
             },
 
-            x :  d3.axisBottom().tickFormat(d => formataBR(d/1e6)),
+            x :  d3.axisBottom().tickFormat(d => utils.formataBR(d/1e6)),
 
             y :  d3.axisLeft().tickFormat(d => d3.format(".1%")(d/100))
+
+        },
+
+        agregado : {
 
         },
 
@@ -220,7 +237,7 @@ const vis = {
 
                 vis.sels.rects_acoes = svg
                   .selectAll("rect")
-                  .data(vis.data)
+                  .data(vis.data.raw)
                   .join("rect")
                   .attr("x", d => 
                      vis.draw.scales.x(+d.varia) 
@@ -242,7 +259,7 @@ const vis = {
             console.log(data.columns);
 
             // saves data as a property to make it easier to access it elsewhere
-            vis.data = data;
+            vis.data.raw = data;
 
             // evaluates domains for selected variables
             vis.draw.domains.initialize();
