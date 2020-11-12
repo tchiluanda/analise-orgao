@@ -1,4 +1,4 @@
-const utils = {
+const utils_consts = {
 
   localeBrasil : {
     "decimal": ",",
@@ -19,8 +19,15 @@ const utils = {
     "shortMonths": ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"]
   },
 
-  formataBR   : d3.formatDefaultLocale(utils.localeBrasil).format(",.0f"),
-  formataBR_1 : d3.formatDefaultLocale(utils.localeBrasil).format(",.1f"),
+}
+
+const utils = {
+
+  localeBrasil : utils_consts.localeBrasil,
+  localeDataBrasil : utils_consts.localeDataBrasil,
+
+  formataBR   : d3.formatDefaultLocale(utils_consts.localeBrasil).format(",.0f"),
+  formataBR_1 : d3.formatDefaultLocale(utils_consts.localeBrasil).format(",.1f"),
   formataPct  : d3.format(".0%"),
 
   valor_formatado : function(x) { 
@@ -187,7 +194,7 @@ const utils = {
 
   init : function() {
 
-    d3.timeFormatDefaultLocale(utils.localeDataBrasil);
+    d3.timeFormatDefaultLocale(utils_consts.localeDataBrasil);
 
   }
 
