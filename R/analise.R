@@ -202,7 +202,18 @@ ggplot(base_export, aes(varia)) + geom_boxplot()+ scale_x_log10()
 ggplot(base_export, aes(varia)) + geom_jitter(aes(y = 1)) + xlim(c(-1e9, NA))
 ggplot(base_export, aes(varia)) + geom_jitter(aes(y = 1)) + scale_x_log10()
 
-ggplot(base_export, aes(varia_pct)) + geom_histogram()
+ggplot(base_export, aes(x = varia, y = varia_pct, size = atu_total)) + geom_point()
+
+sumario_agregador <- base_export %>%
+  group_by(agregador) %>%
+  summarise(total = sum(atu_total)) %>%
+  arrange(desc(total))
+
+
+
+ggplot(sumario_agregador, aes(y = reorder(agregador, total), x = total)) + geom_col()
+
+edddrfdddqwtxxcdrtyuipxvzxcvbxggplot(base_export, aes(varia_pct)) + geom_histogram()
 ggplot(base_export, aes(varia_pct)) + geom_jitter(aes(y = 1))
 
 
