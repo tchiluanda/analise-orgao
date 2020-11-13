@@ -93,7 +93,7 @@ const vis = {
             vis.elems.svg.style.setProperty(
                 "height", vis.dims.h + "px");
 
-            vis.elems.svg.style.setProperty("background-color", "coral");
+            //vis.elems.svg.style.setProperty("background-color", "coral");
 
 
         },
@@ -289,6 +289,8 @@ const vis = {
                      - vis.draw.scales.r(+d.atu_total))
                   .attr("height", d => 2*vis.draw.scales.r(+d.atu_total))
                   .attr("width", d => 2*vis.draw.scales.r(+d.atu_total))
+                  .attr("rx", d => 2*vis.draw.scales.r(+d.atu_total))
+                  .attr("stroke", "coral")
                   .attr("fill", "var(--pink)");
 
             }
