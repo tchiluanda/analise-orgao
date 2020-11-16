@@ -52,6 +52,79 @@ const vis = {
 
     },
 
+    states : {
+
+        modes: {
+
+            "agregado" : {
+
+                options : {
+
+                    "agregador" : {
+
+                        set_scales : {
+
+                        },
+
+                        draw : function() {
+
+                        }
+
+                    },
+
+                    "funcao_tipica" : {
+
+                        set_scales : {
+
+                        },
+
+                        draw : function() {
+                            
+                        }
+
+                    }
+
+                }
+
+            },
+
+            "detalhado" : {
+
+                options : {
+
+                    "variacao" : {
+
+                        set_scales : [
+
+                            { dimension: "x" , 
+                              variable : "varia" },
+
+                            { dimension : "y" ,  
+                              variable  : "varia_pct"},
+
+                            { dimension : "r" , 
+                              variable  : "atu_total"}
+
+                        ],
+    
+                        draw : function() {
+    
+    
+    
+                        }
+
+
+                    }
+
+                }
+
+            }
+
+        }
+
+
+    },
+
     init : function() {
 
         vis.f.generates_refs();
@@ -101,7 +174,7 @@ const vis = {
         read_data : function(url) {
 
             d3.csv(vis.refs.data).then(
-                data => vis.draw.begin(data)
+                data => vis.control.begin(data)
             );
 
         },
@@ -251,6 +324,21 @@ const vis = {
     
             },
 
+            set : function(mode, option) {
+
+                vis.states
+                  .modes[mode]
+                  .options[option]
+                  .set_scales.forEach(pair => {
+                    vis.draw.scales.set_domain(
+                        pair.dimension, 
+                        pair.variable)
+                    });
+
+                    // ISSUE : testar em algum momento se o domínio permanece igual? vale a pena em termos de performance? poderia ter um "current" em vis.states
+
+            },
+
             x: d3.scaleLinear(),
 
             y: d3.scaleLinear(),
@@ -298,6 +386,8 @@ const vis = {
 
         agregado : {
 
+
+
         },
 
         bubbles : {
@@ -329,6 +419,17 @@ const vis = {
 
         },
 
+        card : {
+
+            // outro script, talvez?
+
+        }
+
+
+    },
+
+    control : {
+
         begin : function(data) {
 
             console.log(data.columns);
@@ -348,9 +449,17 @@ const vis = {
 
             // sets scales
             vis.draw.scales.initialize();
-            vis.draw.scales.set_domain("x", "varia");
-            vis.draw.scales.set_domain("y", "varia_pct");
-            vis.draw.scales.set_domain("r", "atu_total");
+
+            // esses já dependem da seleção
+
+            vis.draw.scales.set(
+                mode = "detalhado", 
+                option = "variacao"
+            );
+
+            // vis.draw.scales.set_domain("x", "varia");
+            // vis.draw.scales.set_domain("y", "varia_pct");
+            // vis.draw.scales.set_domain("r", "atu_total");
 
             // add rects/bubbles
             vis.draw.bubbles.add();
@@ -371,12 +480,16 @@ const vis = {
 
         },
 
-        card : {
+        draw_state : function(mode, option) {
 
-            // outro script, talvez?
+
+        },
+
+        monitor_mode_button : function() {
+
+
 
         }
-
 
     }
 
