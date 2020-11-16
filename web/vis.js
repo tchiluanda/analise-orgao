@@ -4,6 +4,7 @@ const vis = {
 
         svg: "svg.vis",
         cont: "div.vis-container",
+        mode_button: "nav.mission-control",
         data: "./dados/dados.csv"
 
     },
@@ -20,7 +21,8 @@ const vis = {
     elems: {
 
         svg:  null,
-        cont: null
+        cont: null,
+        mode_button: null
 
     },
 
@@ -477,6 +479,8 @@ const vis = {
                 desloc_y = 0,
                 "y");
 
+            this.monitor_mode_button();
+
         },
 
         draw_state : function(mode, option) {
@@ -490,6 +494,21 @@ const vis = {
         },
 
         monitor_mode_button : function() {
+
+            let buttons = document.querySelector(vis.refs.mode_button);
+
+            vis.elems.mode_button = buttons;
+
+            buttons.addEventListener("click", function(e) {
+
+                let mode = e.target.id;
+
+                console.log(mode);
+
+
+            });
+
+
 
 
 
