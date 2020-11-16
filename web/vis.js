@@ -451,11 +451,10 @@ const vis = {
             vis.draw.scales.initialize();
 
             // esses já dependem da seleção
-
-            vis.draw.scales.set(
+            vis.control.draw_state(
                 mode = "detalhado", 
                 option = "variacao"
-            );
+                );
 
             // vis.draw.scales.set_domain("x", "varia");
             // vis.draw.scales.set_domain("y", "varia_pct");
@@ -481,6 +480,11 @@ const vis = {
         },
 
         draw_state : function(mode, option) {
+
+            vis.draw.scales.set(
+                mode = mode, 
+                option = option
+            );
 
 
         },
