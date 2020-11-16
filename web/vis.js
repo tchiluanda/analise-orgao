@@ -135,13 +135,28 @@ const vis = {
 
             initialize : function() {
 
+                function generate(data, variable, categorical = false) {
+
+                    if (!categorical) {
+                        return d3.extent(data, d => +d[variable])
+                    }
+                    
+                    else {
+                        return  utils.unique(
+                            obj = data, 
+                            col = variable
+                        )
+                    }
+        
+                }
+
                 vis.params.variables.forEach(variable => {
-                    vis.draw.domains[variable] = vis.draw.domains.get(vis.data.raw, variable,
+                    vis.draw.domains[variable] = generate(vis.data.raw, variable,
                         categorical = false);
                 });
 
                 vis.params.categorical_vars.forEach(variable => {
-                    vis.draw.domains[variable] = vis.draw.domains.get(vis.data.raw, variable, categorical = true);
+                    vis.draw.domains[variable] = generate(vis.data.raw, variable, categorical = true);
                 });
 
                 function initialize_domain_agregado() {
@@ -161,22 +176,38 @@ const vis = {
 
                 initialize_domain_agregado();
 
-            },
+                function normalize_domain_categoricals() {
 
-            get : function(data, variable, categorical = false) {
+                    let lengths = vis.params.categorical_vars.map(variable => vis.draw.domains[variable].length);
 
-                if (!categorical) {
-                    return d3.extent(data, d => +d[variable])
+                    let max_length = Math.max(...lengths)
+
+                    vis.params.categorical_vars.forEach(variable => {
+
+                        const length_difference = max_length - vis.draw.domains[variable].length;
+
+                        if (length_difference > 0) {
+
+                            const current_domain = vis.draw.domains[variable];
+
+                            const dummy_domain = Array(length_difference);
+
+                            vis.draw.domains[variable] = [
+                                ...current_domain,
+                                ...dummy_domain
+                            ];
+
+                        }
+
+                    });
+
                 }
-                
-                else {
-                    return  utils.unique(
-                        obj = data, 
-                        col = variable
-                    )
-                }
-    
-            },
+
+                normalize_domain_categoricals();
+
+
+
+            }
 
             // variables will be properties
 
