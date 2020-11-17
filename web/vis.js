@@ -628,7 +628,8 @@ const vis = {
 
                 //console.log(this.children, e.target, this.children[0] == e.target);
 
-                // to avoid de-selecting all buttons when user does not click on a button
+                // to avoid de-selecting all buttons and running everything when user clicks outside the buttons
+
                 if (e.target.tagName == "BUTTON") {
 
                     vis.control.activates_button(
@@ -636,28 +637,28 @@ const vis = {
                         clicked = e.target
                     );
 
-                }
+                    let mode = e.target.id;
 
-                let mode = e.target.id;
+                    if (mode == "detalhado") {
 
-                if (mode == "detalhado") {
+                        vis.control.draw_state(
+                            mode = "detalhado", 
+                            option = "variacao"
+                            );
+                    }
 
-                    vis.control.draw_state(
-                        mode = "detalhado", 
-                        option = "variacao"
-                        );
-                }
+                    if (mode == "agregado") {
 
-                if (mode == "agregado") {
+                        vis.control.draw_state(
+                            mode = "agregado", 
+                            option = "agregador"
+                            );
 
-                    vis.control.draw_state(
-                        mode = "agregado", 
-                        option = "agregador"
-                        );
+                    }
 
-                }
+                    console.log(mode);
 
-                console.log(mode);
+                } else {console.log("Clique num botão, meu filho.")}
 
             });
 
