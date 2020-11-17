@@ -639,24 +639,30 @@ const vis = {
 
                     let mode = e.target.id;
 
-                    if (mode == "detalhado") {
+                    if (this.dataset.mode != mode) {
 
-                        vis.control.draw_state(
-                            mode = "detalhado", 
-                            option = "variacao"
-                            );
-                    }
+                        this.dataset.mode = mode;
 
-                    if (mode == "agregado") {
+                        if (mode == "detalhado") {
 
-                        vis.control.draw_state(
-                            mode = "agregado", 
-                            option = "agregador"
-                            );
+                            vis.control.draw_state(
+                                mode = "detalhado", 
+                                option = "variacao"
+                                );
+                        }
+    
+                        if (mode == "agregado") {
+    
+                            vis.control.draw_state(
+                                mode = "agregado", 
+                                option = "agregador"
+                                );
+    
+                        }
+    
+                        console.log(mode);
 
-                    }
-
-                    console.log(mode);
+                    } else {console.log("ô, camarada, vc já está nesse modo :)")}
 
                 } else {console.log("Clique num botão, meu filho.")}
 
