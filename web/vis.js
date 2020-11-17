@@ -30,7 +30,14 @@ const vis = {
 
         h: null,
         w: null,
-        margins: 50
+        margins: {
+
+            top: 10,
+            left: 200,
+            right: 10,
+            bottom: 20
+
+        }
 
     },
 
@@ -99,7 +106,7 @@ const vis = {
 
             let pos_vis_y = vis.elems.svg.getBoundingClientRect().y;
 
-            vis.dims.h = win_h - pos_vis_y - vis.dims.margins;
+            vis.dims.h = win_h - pos_vis_y - vis.dims.margins.top - vis.dims.margins.bottom;
             // subtraio a margem para usar como margem
             vis.dims.w = +vis.sels.svg.style("width").slice(0, -2);
 
@@ -234,11 +241,11 @@ const vis = {
 
             update : function() {
 
-                vis.draw.ranges.x = [ vis.dims.margins, vis.dims.w - vis.dims.margins ];
+                vis.draw.ranges.x = [ vis.dims.margins.left, vis.dims.w - vis.dims.margins.right ];
     
-                vis.draw.ranges.y = [ vis.dims.h - vis.dims.margins, vis.dims.margins ];
+                vis.draw.ranges.y = [ vis.dims.h - vis.dims.margins.bottom, vis.dims.margins.top ];
 
-                vis.draw.ranges.w = [ 0, vis.dims.w - 2*vis.dims.margins ];
+                vis.draw.ranges.w = [ 0, vis.dims.w - vis.dims.margins.left - vis.dims.margins.right];
     
             },
 
@@ -368,7 +375,7 @@ const vis = {
                     "x");
     
                 vis.draw.axis.create(
-                    desloc_x = vis.dims.margins,
+                    desloc_x = vis.dims.margins.left,
                     desloc_y = 0,
                     "y");
                 
