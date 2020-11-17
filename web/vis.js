@@ -101,13 +101,16 @@ const vis = {
                         set_scales : [
 
                             { dimension: "x" , 
-                              variable : "varia" },
+                              variable : "varia",
+                              axis     : true },
 
                             { dimension : "y" ,  
-                              variable  : "varia_pct"},
+                              variable  : "varia_pct",
+                              axis      : true },
 
                             { dimension : "r" , 
-                              variable  : "atu_total"}
+                              variable  : "atu_total",
+                              axis      : false }
 
                         ],
     
@@ -333,10 +336,16 @@ const vis = {
                 vis.states
                   .modes[mode]
                   .options[option]
-                  .set_scales.forEach(pair => {
+                  .set_scales.forEach(scale => {
                     vis.draw.scales.set_domain(
-                        pair.dimension, 
-                        pair.variable)
+                        scale.dimension, 
+                        scale.variable)
+
+                    if (scale.axis == true) {
+
+                        vis.draw.axis.update_axis_scale(scale.dimension)
+
+                    }
                     });
 
                     // ISSUE : testar em algum momento se o domínio permanece igual? vale a pena em termos de performance? poderia ter um "current" em vis.states
@@ -393,6 +402,25 @@ const vis = {
                 ;
 
             },
+
+            initialize : function() {
+
+                vis.draw.axis.update_axis_scale("x");
+                vis.draw.axis.update_axis_scale("y");
+    
+                vis.draw.axis.create(
+                    desloc_x = 0,
+                    desloc_y = vis.draw.scales.y(0),//vis.dims.h - vis.dims.margins,
+                    "x");
+    
+                vis.draw.axis.create(
+                    desloc_x = vis.dims.margins,
+                    desloc_y = 0,
+                    "y");
+                
+            },
+
+            // dar um jeito nos ticks
 
             x :  d3.axisBottom().tickFormat(d => utils.formataBR(d/1e6)),
 
@@ -479,21 +507,10 @@ const vis = {
             // add rects/bubbles
             vis.draw.bubbles.add();
 
-            // update and add axis
-            vis.draw.axis.update_axis_scale("x");
-            vis.draw.axis.update_axis_scale("y");
+            // add x, y axis
+            vis.draw.axis.initialize();
 
-            vis.draw.axis.create(
-                desloc_x = 0,
-                desloc_y = vis.draw.scales.y(0),//vis.dims.h - vis.dims.margins,
-                "x");
-
-            vis.draw.axis.create(
-                desloc_x = vis.dims.margins,
-                desloc_y = 0,
-                "y");
-
-            this.monitor_mode_button();
+            vis.control.monitor_mode_button();
 
         },
 
