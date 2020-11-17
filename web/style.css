@@ -34,6 +34,7 @@ main {
 }
 
 .mission-control button {
+    font-size: .9em;
     padding: 0.4em 0.8em;
     margin-right: 1em;
     border: 3px solid white;
@@ -53,6 +54,11 @@ main {
 .mission-control button:hover {
     background-color: var(--cream);
     border-color: var(--ligther);
+}
+
+.option-control {
+    margin-top: .5rem;
+    font-size: .8rem;
 }
 
 /* vis */

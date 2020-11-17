@@ -4,7 +4,8 @@ const vis = {
 
         svg: "svg.vis",
         cont: "div.vis-container",
-        mode_button: "nav.mission-control",
+        mode_button: "nav.mode-control",
+        option_button: "nav.option-control",
         data: "./dados/dados.csv"
 
     },
@@ -643,6 +644,8 @@ const vis = {
 
                         this.dataset.mode = mode;
 
+                        vis.control.show_option_buttons(mode);
+
                         if (mode == "detalhado") {
 
                             vis.control.draw_state(
@@ -682,6 +685,21 @@ const vis = {
 
             clicked.classList.add("selected");
             
+        },
+
+        show_option_buttons : function(mode) {
+
+            let nav_options = document.querySelectorAll(vis.refs.option_button);
+
+            nav_options.forEach(nav => nav.classList.add("hidden"));
+
+            let active_nav = document.querySelector(
+                '[data-visible-on-mode="' +
+                mode +
+                '"]' );
+
+            active_nav.classList.remove("hidden");
+
         }
 
     }

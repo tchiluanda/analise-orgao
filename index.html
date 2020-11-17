@@ -13,7 +13,7 @@
             Aqui vai ser o título.
         </h1>
     </header>
-    <nav class="mission-control"
+    <nav class="mission-control mode-control"
 
      data-mode = "agregado|detalhado"
      data-overview-focus = "true|false"
@@ -26,6 +26,16 @@
         <button id="agregado">Valores Agregados</button>
         <button id="detalhado">Valores Detalhados</button>
 
+    </nav>
+
+    <nav class="mission-control option-control hidden" data-visible-on-mode="agregado" >
+        <button id="agregador">Por agregador</button>
+        <button id="funcao_tipica">Por função típica</button>
+    </nav>
+
+    <nav class="mission-control option-control hidden" data-visible-on-mode="detalhado" >
+        <button id="agregador">Variação</button>
+        <button id="funcao_tipica">Ações novas</button>
     </nav>
 
     <main>
