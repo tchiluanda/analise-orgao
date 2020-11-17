@@ -56,82 +56,6 @@ const vis = {
 
     },
 
-    states : {
-
-        modes: {
-
-            "agregado" : {
-
-                options : {
-
-                    "agregador" : {
-
-                        set_scales : {
-
-                        },
-
-                        render : function() {
-
-                        }
-
-                    },
-
-                    "funcao_tipica" : {
-
-                        set_scales : {
-
-                        },
-
-                        render : function() {
-                            
-                        }
-
-                    }
-
-                }
-
-            },
-
-            "detalhado" : {
-
-                options : {
-
-                    "variacao" : {
-
-                        set_scales : [
-
-                            { dimension: "x" , 
-                              variable : "varia",
-                              axis     : true },
-
-                            { dimension : "y" ,  
-                              variable  : "varia_pct",
-                              axis      : true },
-
-                            { dimension : "r" , 
-                              variable  : "atu_total",
-                              axis      : false }
-
-                        ],
-    
-                        draw : function() {
-    
-    
-    
-                        }
-
-
-                    }
-
-                }
-
-            }
-
-        }
-
-
-    },
-
     init : function() {
 
         vis.f.generates_refs();
@@ -333,7 +257,7 @@ const vis = {
 
             set : function(mode, option) {
 
-                vis.states
+                vis.control.states
                   .modes[mode]
                   .options[option]
                   .set_scales.forEach(scale => {
@@ -350,7 +274,7 @@ const vis = {
                     }
                     });
 
-                    // ISSUE : testar em algum momento se o domínio permanece igual? vale a pena em termos de performance? poderia ter um "current" em vis.states
+                    // ISSUE : testar em algum momento se o domínio permanece igual? vale a pena em termos de performance? poderia ter um "current" em vis.control.states
 
             },
 
@@ -448,15 +372,11 @@ const vis = {
                   .selectAll("rect")
                   .data(vis.data.raw)
                   .join("rect")
-                  .attr("x", d => 
-                     vis.draw.scales.x(+d.varia) 
-                     - vis.draw.scales.r(+d.atu_total))
-                  .attr("y", d => 
-                     vis.draw.scales.y(+d.varia_pct) 
-                     - vis.draw.scales.r(+d.atu_total))
-                  .attr("height", d => 2*vis.draw.scales.r(+d.atu_total))
-                  .attr("width", d => 2*vis.draw.scales.r(+d.atu_total))
-                  .attr("rx", d => 2*vis.draw.scales.r(+d.atu_total))
+                  .attr("x", vis.dims.h/2)
+                  .attr("y", vis.dims.w/2)
+                  .attr("height", 1)
+                  .attr("width", 1)
+                  .attr("rx", 0)
                   .attr("stroke", "coral")
                   .attr("fill", "var(--pink)");
 
@@ -475,6 +395,91 @@ const vis = {
     },
 
     control : {
+
+        states : {
+
+            modes: {
+    
+                "agregado" : {
+    
+                    options : {
+    
+                        "agregador" : {
+    
+                            set_scales : {
+    
+                            },
+    
+                            render : function() {
+    
+                            }
+    
+                        },
+    
+                        "funcao_tipica" : {
+    
+                            set_scales : {
+    
+                            },
+    
+                            render : function() {
+                                
+                            }
+    
+                        }
+    
+                    }
+    
+                },
+    
+                "detalhado" : {
+    
+                    options : {
+    
+                        "variacao" : {
+    
+                            set_scales : [
+    
+                                { dimension: "x" , 
+                                  variable : "varia",
+                                  axis     : true },
+    
+                                { dimension : "y" ,  
+                                  variable  : "varia_pct",
+                                  axis      : true },
+    
+                                { dimension : "r" , 
+                                  variable  : "atu_total",
+                                  axis      : false }
+    
+                            ],
+        
+                            render : function() {
+    
+                                vis.sels.rects_acoes
+                                  .transition()
+                                  .duration(vis.params.transitions_duration)
+                                  .attr("x", d => vis.draw.scales.x(+d.varia) 
+                                                - vis.draw.scales.r(+d.atu_total))
+                                  .attr("y", d => vis.draw.scales.y(+d.varia_pct) 
+                                                - vis.draw.scales.r(+d.atu_total))
+                                  .attr("height", d => 2*vis.draw.scales.r(+d.atu_total))
+                                  .attr("width", d => 2*vis.draw.scales.r(+d.atu_total))
+                                  .attr("rx", d => 2*vis.draw.scales.r(+d.atu_total))
+                                ;
+                            }
+    
+    
+                        }
+    
+                    }
+    
+                }
+    
+            }
+    
+    
+        },
 
         begin : function(data) {
 
@@ -499,6 +504,10 @@ const vis = {
             // add x, y axis
             vis.draw.axis.initialize();
 
+            // add rects/bubbles
+            vis.draw.bubbles.add();
+
+            // starts monitoring button clicks
             vis.control.monitor_mode_button();
 
         },
@@ -510,6 +519,11 @@ const vis = {
                 option = option
             );
 
+            vis.control.states
+              .modes[mode]
+              .options[option]
+              .render()
+            ;
 
         },
 
@@ -528,9 +542,6 @@ const vis = {
                     mode = "detalhado", 
                     option = "variacao"
                     );
-
-                // add rects/bubbles
-                vis.draw.bubbles.add();
 
                 console.log(mode);
 
