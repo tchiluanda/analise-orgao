@@ -219,6 +219,12 @@ https://www.tesourotransparente.gov.br/publicacoes/cronograma-de-pagamento-dos-o
 mapa de estados, indicando cada possível combinação e que escalas ajustar, que comandos usar para desenhar.
 
 
+para cada nova combinação modo / opcao, basta definir o mapeamento de escalas (dimensao x variavel) e a funcao de renderização.
+
+### dúvidas
+
+como dar um "clean" no tickFormat do eixo? por ora estou dando um reset e recriando o objeto eixo. 
+
 ### Inspirações
 
 Minimap o 
