@@ -67,6 +67,7 @@ const vis = {
             varia             : "numerical",
             varia_pct         : "percent",
             pos_ini_agregador : "numerical",
+            agregado          : "numerical",
             agregador         : "categorical",
             funcao_tipica     : "categorical"
 
@@ -490,7 +491,7 @@ const vis = {
                             set_scales : [
 
                               { dimension: "x" , 
-                                variable : "pos_ini_agregador",
+                                variable : "agregado", //"pos_ini_agregador",
                                 axis     : true },
   
                               { dimension : "y_cat" ,  
@@ -498,7 +499,7 @@ const vis = {
                                 axis      : true },
 
                               { dimension : "w" ,
-                                variable  : "atu_total",
+                                variable  : "agregado", //"atu_total",
                                 axis      : false }
     
                             ],
