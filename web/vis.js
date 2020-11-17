@@ -343,7 +343,9 @@ const vis = {
 
                     if (scale.axis == true) {
 
-                        vis.draw.axis.update_axis_scale(scale.dimension)
+                        vis.draw.axis.update(scale.dimension);
+
+                        vis.draw.axis.update_axis_scale(scale.dimension);
 
                     }
                     });
@@ -494,19 +496,6 @@ const vis = {
             // sets scales
             vis.draw.scales.initialize();
 
-            // esses já dependem da seleção
-            vis.control.draw_state(
-                mode = "detalhado", 
-                option = "variacao"
-                );
-
-            // vis.draw.scales.set_domain("x", "varia");
-            // vis.draw.scales.set_domain("y", "varia_pct");
-            // vis.draw.scales.set_domain("r", "atu_total");
-
-            // add rects/bubbles
-            vis.draw.bubbles.add();
-
             // add x, y axis
             vis.draw.axis.initialize();
 
@@ -533,6 +522,15 @@ const vis = {
             buttons.addEventListener("click", function(e) {
 
                 let mode = e.target.id;
+
+                // esses já dependem da seleção
+                vis.control.draw_state(
+                    mode = "detalhado", 
+                    option = "variacao"
+                    );
+
+                // add rects/bubbles
+                vis.draw.bubbles.add();
 
                 console.log(mode);
 
