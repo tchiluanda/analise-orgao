@@ -212,6 +212,13 @@ Precisaria  ?
  O back-and-forth entre a construção da visualização e a preparação dos dados no R.
 
 
+
+https://www.tesourotransparente.gov.br/publicacoes/cronograma-de-pagamento-dos-orgaos-do-poder-executivo-da-uniao/2020/26
+
+
+mapa de estados, indicando cada possível combinação e que escalas ajustar, que comandos usar para desenhar.
+
+
 ### Inspirações
 
 Minimap o 
