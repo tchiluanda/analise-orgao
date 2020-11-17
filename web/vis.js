@@ -43,6 +43,8 @@ const vis = {
 
     params : {
 
+        transitions_duration: 1000,
+
         modes : ["agregado", "detalhado"],
 
         variables : ["atu_total", "varia", "varia_pct"],
@@ -68,7 +70,7 @@ const vis = {
 
                         },
 
-                        draw : function() {
+                        render : function() {
 
                         }
 
@@ -80,7 +82,7 @@ const vis = {
 
                         },
 
-                        draw : function() {
+                        render : function() {
                             
                         }
 
@@ -355,7 +357,7 @@ const vis = {
 
         axis : {
 
-            update : function(dimension) {
+            update_axis_scale : function(dimension) {
 
                 vis.draw.axis[dimension].scale(
                     vis.draw.scales[dimension]
@@ -377,7 +379,19 @@ const vis = {
                       + desloc_y
                       + ")")
                   .classed("axis", true)
-                  .call(vis.draw.axis[dimension]); 
+                  .classed("axis-" + dimension, true)
+                  .call(vis.draw.axis[dimension])
+                ; 
+            },
+
+            update : function(dimension) {
+
+                vis.sels.axis[dimension]
+                  .transition()
+                  .duration(vis.params.transitions_duration)
+                  .call(vis.draw.axis[dimension])
+                ;
+
             },
 
             x :  d3.axisBottom().tickFormat(d => utils.formataBR(d/1e6)),
@@ -466,8 +480,8 @@ const vis = {
             vis.draw.bubbles.add();
 
             // update and add axis
-            vis.draw.axis.update("x");
-            vis.draw.axis.update("y");
+            vis.draw.axis.update_axis_scale("x");
+            vis.draw.axis.update_axis_scale("y");
 
             vis.draw.axis.create(
                 desloc_x = 0,
