@@ -47,12 +47,25 @@ const vis = {
 
         modes : ["agregado", "detalhado"],
 
-        variables : ["atu_total", "varia", "varia_pct"],
+        variables : ["atu_total", "varia", "varia_pct", "pos_ini_agregador"],
 
         categorical_vars : ["agregador", "funcao_tipica"],
-        // also, those are the variables used for evaluating summaries in the "agregado" mode
+        // also, those are the variables used for evaluating summaries in the "agregado" mode.
 
-        dimensions : ["x", "y", "w", "r"]
+        // this will serve to determine axis
+
+        variables_type : {
+
+            atu_total         : "numerical",
+            varia             : "numerical",
+            varia_pct         : "percent",
+            pos_ini_agregador : "numerical",
+            agregador         : "categorical",
+            funcao_tipica     : "categorical"
+
+        },
+
+        dimensions : ["x", "y", "y_cat", "w", "r"]
 
     },
 
@@ -241,9 +254,11 @@ const vis = {
             initialize : function() {
                 
                 vis.params.dimensions.forEach(dimension => {
+
+                    let dimension_range = dimension == "y_cat" ? "y" : dimension;
+
                     vis.draw.scales[dimension]
-                    .range(vis.draw.ranges[dimension])
-                    .clamp(true);
+                    .range(vis.draw.ranges[dimension_range]);
                 });
     
             },
@@ -267,9 +282,7 @@ const vis = {
 
                     if (scale.axis == true) {
 
-                        vis.draw.axis.update(scale.dimension);
-
-                        vis.draw.axis.update_axis_scale(scale.dimension);
+                        vis.draw.axis.update(scale.dimension, scale.variable);
 
                     }
                     });
@@ -278,13 +291,13 @@ const vis = {
 
             },
 
-            x: d3.scaleLinear(),
+            x: d3.scaleLinear().clamp(true),
 
-            y: d3.scaleLinear(),
+            y: d3.scaleLinear().clamp(true),
 
             y_cat: d3.scaleBand(),
 
-            w: d3.scaleLinear(),
+            w: d3.scaleLinear().clamp(true),
 
             r: d3.scaleSqrt()
 
@@ -292,9 +305,15 @@ const vis = {
 
         axis : {
 
+            // para garantir as transições de eixo, quando passa de uma variável numérica para uma categórica, só vamos usar eixos x e y. Por isso vão aparecer argumentos "dimension" e "dimension_axis": o dimension para acessar a escala correta ("y_cat", por exemplo), e o dimension_axis para acessar o eixo correto ("y", nesse caso do exemplo, e não um "y_cat" que seria uma novo eixo y, o que não é desejável)
+
             update_axis_scale : function(dimension) {
 
-                vis.draw.axis[dimension].scale(
+                let dimension_axis = dimension == "y_cat" ? "y" : dimension;
+
+                console.log("Updating o axis_scale da dimensao", dimension, dimension_axis)
+
+                vis.draw.axis[dimension_axis].scale(
                     vis.draw.scales[dimension]
                 )
 
@@ -319,12 +338,20 @@ const vis = {
                 ; 
             },
 
-            update : function(dimension) {
+            update : function(dimension, variable) {
 
-                vis.sels.axis[dimension]
+                let dimension_axis = dimension == "y_cat" ? "y" : dimension;
+
+                console.log("Vamos dar um update no eixo", dimension_axis, variable);
+
+                vis.draw.axis.tick_format(dimension_axis, variable);
+
+                vis.draw.axis.update_axis_scale(dimension);
+
+                vis.sels.axis[dimension_axis]
                   .transition()
                   .duration(vis.params.transitions_duration)
-                  .call(vis.draw.axis[dimension])
+                  .call(vis.draw.axis[dimension_axis])
                 ;
 
             },
@@ -333,6 +360,7 @@ const vis = {
 
                 vis.draw.axis.update_axis_scale("x");
                 vis.draw.axis.update_axis_scale("y");
+                vis.draw.axis.update_axis_scale("y_cat");
     
                 vis.draw.axis.create(
                     desloc_x = 0,
@@ -346,11 +374,43 @@ const vis = {
                 
             },
 
+            reset : function(dimension) {
+
+                if (dimension == "x") {
+                    this.x = d3.axisBottom();
+                } else {
+                    this.y = d3.axisLeft();
+                }
+
+            },
+
             // dar um jeito nos ticks
+            tick_format : function(dimension, variable) {
 
-            x :  d3.axisBottom().tickFormat(d => utils.formataBR(d/1e6)),
+                let type = vis.params.variables_type[variable];
 
-            y :  d3.axisLeft().tickFormat(d => d3.format(".1%")(d/100))
+                console.log("Tô agora no update do tick_format", dimension, variable, type)
+
+                switch (type) {
+
+                    case 'numerical' :  
+                        this[dimension].tickFormat(d => utils.formataBR(d/1e6));
+                        break;
+
+                    case 'percent' :
+                        this[dimension].tickFormat(d => d3.format(".1%")(d/100));
+                        break;
+
+                    case 'categorical' :
+                        this.reset(dimension);
+                        break;
+                }
+
+            },
+
+            x :  d3.axisBottom(),
+
+            y :  d3.axisLeft()
 
         },
 
@@ -404,18 +464,6 @@ const vis = {
     
                     options : {
     
-                        "agregador" : {
-    
-                            set_scales : {
-    
-                            },
-    
-                            render : function() {
-    
-                            }
-    
-                        },
-    
                         "funcao_tipica" : {
     
                             set_scales : {
@@ -423,6 +471,42 @@ const vis = {
                             },
     
                             render : function() {
+
+
+    
+                            }
+    
+                        },
+    
+                        "agregador" : {
+    
+                            set_scales : [
+
+                              { dimension: "x" , 
+                                variable : "pos_ini_agregador",
+                                axis     : true },
+  
+                              { dimension : "y_cat" ,  
+                                variable  : "agregador",
+                                axis      : true },
+
+                              { dimension : "w" ,
+                                variable  : "atu_total",
+                                axis      : false }
+    
+                            ],
+    
+                            render : function() {
+
+                                vis.sels.rects_acoes
+                                  .transition()
+                                  .duration(vis.params.transitions_duration)
+                                  .attr("x", d => vis.draw.scales.x(+d.pos_ini_agregador) )
+                                  .attr("y", d => vis.draw.scales.y_cat(d.agregador) )
+                                  .attr("height", 10 )
+                                  .attr("width", d => vis.draw.scales.w(+d.atu_total))
+                                  .attr("rx", 0)
+                                ;
                                 
                             }
     
@@ -467,6 +551,7 @@ const vis = {
                                   .attr("width", d => 2*vis.draw.scales.r(+d.atu_total))
                                   .attr("rx", d => 2*vis.draw.scales.r(+d.atu_total))
                                 ;
+
                             }
     
     
@@ -537,11 +622,23 @@ const vis = {
 
                 let mode = e.target.id;
 
-                // esses já dependem da seleção
-                vis.control.draw_state(
-                    mode = "detalhado", 
-                    option = "variacao"
-                    );
+                if (mode == "detalhado") {
+
+                    vis.control.draw_state(
+                        mode = "detalhado", 
+                        option = "variacao"
+                        );
+                }
+
+                if (mode == "agregado") {
+
+                    vis.control.draw_state(
+                        mode = "agregado", 
+                        option = "agregador"
+                        );
+
+                }
+ 
 
                 console.log(mode);
 
