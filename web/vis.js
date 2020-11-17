@@ -145,8 +145,6 @@ const vis = {
                 
             });
 
-
-
         },
 
         update_positions : {
@@ -628,6 +626,18 @@ const vis = {
 
             buttons.addEventListener("click", function(e) {
 
+                //console.log(this.children, e.target, this.children[0] == e.target);
+
+                // to avoid de-selecting all buttons when user does not click on a button
+                if (e.target.tagName == "BUTTON") {
+
+                    vis.control.activates_button(
+                        all_buttons = this.children,
+                        clicked = e.target
+                    );
+
+                }
+
                 let mode = e.target.id;
 
                 if (mode == "detalhado") {
@@ -646,17 +656,25 @@ const vis = {
                         );
 
                 }
- 
 
                 console.log(mode);
-
 
             });
 
 
+        },
 
+        activates_button : function(all_buttons, clicked) {
 
+            let all_buttons_arr = Array.from(all_buttons);
+            // pq o que vem é um HTML Collection
 
+            all_buttons_arr.forEach(button => {
+                button.classList.remove("selected");
+            })
+
+            clicked.classList.add("selected");
+            
         }
 
     }
