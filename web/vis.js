@@ -35,7 +35,7 @@ const vis = {
 
             top: 10,
             left: 200,
-            right: 10,
+            right: 20,
             bottom: 20
 
         }
@@ -632,6 +632,7 @@ const vis = {
                 // to avoid de-selecting all buttons and running everything when user clicks outside the buttons
 
                 if (e.target.tagName == "BUTTON") {
+                    //ou (e.target.matches("button"))
 
                     vis.control.activates_button(
                         all_buttons = this.children,
