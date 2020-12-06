@@ -31,6 +31,7 @@ const vis = {
 
         h: null,
         w: null,
+        height: 10,
         margins: {
 
             top: 10,
@@ -74,7 +75,7 @@ const vis = {
 
         },
 
-        dimensions : ["x", "y", "y_cat", "w", "r"]
+        dimensions : ["x", "y", "y_cat", "y_cat2", "w", "r"]
 
     },
 
@@ -204,9 +205,9 @@ const vis = {
 
                 initialize_domain_agregado();
 
-                /*
+                
 
-                function normalize_domain_categoricals() {
+                function calculate_special_range() {
 
                     let lengths = vis.params.categorical_vars.map(variable => vis.draw.domains[variable].length);
 
@@ -234,8 +235,6 @@ const vis = {
                 }
 
                 normalize_domain_categoricals();
-
-                */
 
 
 
@@ -509,7 +508,7 @@ const vis = {
                                     .duration(vis.params.transitions_duration)
                                     .attr("x", d => vis.draw.scales.x(+d.pos_ini_funcao_tipica) )
                                     .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica) )
-                                    .attr("height", 10 )
+                                    .attr("height", vis.dims.height )
                                     .attr("width", d => vis.draw.scales.w(+d.atu_total))
                                     .attr("rx", 0)
                                 ;
