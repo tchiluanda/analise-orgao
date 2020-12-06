@@ -477,51 +477,81 @@ const vis = {
     
                         "funcao_tipica" : {
     
-                            set_scales : {
-    
-                            },
-    
-                            render : function() {
-
-
-    
-                            }
-    
-                        },
-    
-                        "agregador" : {
-    
                             set_scales : [
 
-                              { dimension: "x" , 
-                                variable : "agregado", //"pos_ini_agregador",
-                                axis     : true },
-  
-                              { dimension : "y_cat" ,  
-                                variable  : "agregador",
-                                axis      : true },
-
-                              { dimension : "w" ,
-                                variable  : "agregado", //"atu_total",
-                                axis      : false }
+                                { dimension: "x" , 
+                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
+                                    axis     : true 
+                                },
     
+                                { dimension : "y_cat" ,  
+                                    variable  : "agregador",
+                                    axis      : true 
+                                },
+    
+                                { dimension : "w" ,
+                                    variable  : "agregado", //"atu_total",
+                                    axis      : false 
+                                }
+
                             ],
     
                             render : function() {
 
+                                console.log(this);
+
                                 vis.sels.rects_acoes
-                                  .transition()
-                                  .duration(vis.params.transitions_duration)
-                                  .attr("x", d => vis.draw.scales.x(+d.pos_ini_agregador) )
-                                  .attr("y", d => vis.draw.scales.y_cat(d.agregador) )
-                                  .attr("height", 10 )
-                                  .attr("width", d => vis.draw.scales.w(+d.atu_total))
-                                  .attr("rx", 0)
+                                    .transition()
+                                    .duration(vis.params.transitions_duration)
+                                    .attr("x", d => vis.draw.scales.x(+d.pos_ini_funcao_tipica) )
+                                    .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica) )
+                                    .attr("height", 10 )
+                                    .attr("width", d => vis.draw.scales.w(+d.atu_total))
+                                    .attr("rx", 0)
+                                ;
+
+                            }
+
+                        },
+
+                        "agregador" : {
+
+                            set_scales : [
+
+                                { dimension: "x" , 
+                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
+                                    axis     : true },
+    
+                                { dimension : "y_cat" ,  
+                                    variable  : "agregador",
+                                    axis      : true },
+    
+                                { dimension : "w" ,
+                                    variable  : "agregado", //"atu_total",
+                                    axis      : false }
+        
+                                ],
+        
+                            render : function() {
+
+                                console.log(this);
+
+                                vis.sels.rects_acoes
+                                    .transition()
+                                    .duration(vis.params.transitions_duration)
+                                    .attr("x", d => vis.draw.scales.x(+d.pos_ini_agregador) )
+                                    .attr("y", d => vis.draw.scales.y_cat(d.agregador) )
+                                    .attr("height", 10 )
+                                    .attr("width", d => vis.draw.scales.w(+d.atu_total))
+                                    .attr("rx", 0)
                                 ;
                                 
                             }
-    
+
+
+
                         }
+    
     
                     }
     
@@ -605,6 +635,7 @@ const vis = {
 
             // starts monitoring button clicks
             vis.control.monitor_mode_button();
+            vis.control.monitor_option_button();
 
         },
 
@@ -651,6 +682,8 @@ const vis = {
 
                         vis.control.show_option_buttons(mode);
 
+                        /*
+
                         if (mode == "detalhado") {
 
                             vis.control.draw_state(
@@ -667,6 +700,8 @@ const vis = {
                                 );
     
                         }
+                        
+                        */
     
                         console.log(mode);
 
@@ -676,6 +711,48 @@ const vis = {
 
             });
 
+
+        },
+
+        monitor_option_button : function() {
+
+            // otimizar : dá para deixar um monitor só
+
+            let buttons = document.querySelector(vis.refs.option_button);
+
+            vis.elems.option_button = buttons;
+
+            buttons.addEventListener("click", function(e) {
+
+                //console.log(this.children, e.target, this.children[0] == e.target);
+
+                // to avoid de-selecting all buttons and running everything when user clicks outside the buttons
+
+                if (e.target.tagName == "BUTTON") {
+                    //ou (e.target.matches("button"))
+
+                    vis.control.activates_button(
+                        all_buttons = this.children,
+                        clicked = e.target
+                    );
+
+                    let option = e.target.id;
+
+                    if (this.dataset.option != option) {
+
+                        this.dataset.option = option;
+
+                        let mode = this.dataset.mode;
+
+                        console.log("hi", mode, option);
+
+                        vis.control.draw_state(mode, option);
+
+                    } else {console.log("ô, camarada, vc já está nesse modo :)")}
+
+                } else {console.log("Clique num botão, meu filho.")}
+
+            });
 
         },
 
