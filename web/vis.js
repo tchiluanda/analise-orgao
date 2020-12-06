@@ -204,6 +204,8 @@ const vis = {
 
                 initialize_domain_agregado();
 
+                /*
+
                 function normalize_domain_categoricals() {
 
                     let lengths = vis.params.categorical_vars.map(variable => vis.draw.domains[variable].length);
@@ -218,11 +220,11 @@ const vis = {
 
                             const current_domain = vis.draw.domains[variable];
 
-                            const dummy_domain = Array(length_difference);
+                            const dummy_domain = Array(length_difference).map((d,i) => " ".repeat(i));
 
                             vis.draw.domains[variable] = [
-                                ...current_domain,
-                                ...dummy_domain
+                                ...dummy_domain,
+                                ...current_domain
                             ];
 
                         }
@@ -232,6 +234,8 @@ const vis = {
                 }
 
                 normalize_domain_categoricals();
+
+                */
 
 
 
@@ -485,7 +489,7 @@ const vis = {
                                 },
     
                                 { dimension : "y_cat" ,  
-                                    variable  : "agregador",
+                                    variable  : "funcao_tipica",
                                     axis      : true 
                                 },
     
