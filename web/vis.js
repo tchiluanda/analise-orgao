@@ -108,7 +108,7 @@ const vis = {
 
             let pos_vis_y = vis.elems.svg.getBoundingClientRect().y;
 
-            vis.dims.h = win_h - pos_vis_y - vis.dims.margins.top - vis.dims.margins.bottom;
+            vis.dims.h = win_h - pos_vis_y; // - vis.dims.margins.top - vis.dims.margins.bottom;
             // subtraio a margem para usar como margem
             vis.dims.w = +vis.sels.svg.style("width").slice(0, -2);
 
@@ -118,6 +118,10 @@ const vis = {
 
             vis.elems.svg.style.setProperty(
                 "height", vis.dims.h + "px");
+
+                /*
+            vis.elems.svg.style.setProperty(
+                "width", vis.dims.w + "px");*/
 
             //vis.elems.svg.style.setProperty("background-color", "coral");
 
@@ -439,13 +443,13 @@ const vis = {
                   .selectAll("rect")
                   .data(vis.data.raw)
                   .join("rect")
+                  .classed("acoes", true)
                   .attr("x", vis.dims.h/2)
                   .attr("y", vis.dims.w/2)
                   .attr("height", 1)
                   .attr("width", 1)
                   .attr("rx", 0)
-                  .attr("stroke", "coral")
-                  .attr("fill", "var(--pink)");
+                ;
 
             }
 

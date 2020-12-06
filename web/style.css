@@ -26,6 +26,12 @@ main {
     margin-top: 1rem;
 }
 
+/* titulo */
+
+h1 {
+    font-size: 1rem;
+}
+
 /* botoes controle */
 
 .mission-control {
@@ -75,6 +81,13 @@ svg {
 
 .axis line, .axis path {
     stroke: var(--ligther);
+}
+
+/* rects */
+
+rect.acoes {
+    stroke : coral;
+    fill : var(--pink);
 }
 
 /* card */
