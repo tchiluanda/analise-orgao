@@ -31,7 +31,7 @@ const vis = {
 
         h: null,
         w: null,
-        height: 10,
+        bar_height: 10,
         margins: {
 
             top: 10,
@@ -75,7 +75,7 @@ const vis = {
 
         },
 
-        dimensions : ["x", "y", "y_cat", "y_cat2", "w", "r"]
+        dimensions : ["x", "y", "y_cat", "y_anexos", "w", "r"]
 
     },
 
@@ -205,41 +205,7 @@ const vis = {
 
                 initialize_domain_agregado();
 
-                
-
-                function calculate_special_range() {
-
-                    let lengths = vis.params.categorical_vars.map(variable => vis.draw.domains[variable].length);
-
-                    let max_length = Math.max(...lengths)
-
-                    vis.params.categorical_vars.forEach(variable => {
-
-                        const length_difference = max_length - vis.draw.domains[variable].length;
-
-                        if (length_difference > 0) {
-
-                            const current_domain = vis.draw.domains[variable];
-
-                            const dummy_domain = Array(length_difference).map((d,i) => " ".repeat(i));
-
-                            vis.draw.domains[variable] = [
-                                ...dummy_domain,
-                                ...current_domain
-                            ];
-
-                        }
-
-                    });
-
-                }
-
-                normalize_domain_categoricals();
-
-
-
             }
-
             // variables will be properties
 
         },
@@ -256,8 +222,20 @@ const vis = {
     
             },
 
+            calcula_range_var_categorica : function(categorical_var) {
+
+                let qde_categorias = vis.draw.domains[categorical_var].length;
+
+                let comprimento_necessario = vis.dims.bar_height * qde_categorias;
+
+                return([vis.dims.margins.top, vis.dims.margins.top + comprimento_necessario]);
+
+            },
+
             x : null,
             y : null,
+            y_anexos : null,
+            y_agregadores : null,
             w : null,
             r : [1,30]
 
@@ -508,7 +486,7 @@ const vis = {
                                     .duration(vis.params.transitions_duration)
                                     .attr("x", d => vis.draw.scales.x(+d.pos_ini_funcao_tipica) )
                                     .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica) )
-                                    .attr("height", vis.dims.height )
+                                    .attr("height", vis.dims.bar_height )
                                     .attr("width", d => vis.draw.scales.w(+d.atu_total))
                                     .attr("rx", 0)
                                 ;
