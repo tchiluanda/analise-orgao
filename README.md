@@ -221,6 +221,8 @@ mapa de estados, indicando cada possível combinação e que escalas ajustar, qu
 
 para cada nova combinação modo / opcao, basta definir o mapeamento de escalas (dimensao x variavel) e a funcao de renderização.
 
+Fazer um dashboard pode ser me
+
 ### dúvidas
 
 como dar um "clean" no tickFormat do eixo? por ora estou dando um reset e recriando o objeto eixo. 
