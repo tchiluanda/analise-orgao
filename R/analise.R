@@ -86,15 +86,18 @@ ploa <- ploa_raw %>%
   ungroup()
 
 dados_adicionais <- dados_adicionais_raw %>%
-  mutate(tipo_valor = "PLOA") %>%
+  mutate(tipo_valor = "PLOA",
+         fonte = str_sub(fonte, 3, 4)) %>%
   group_by(exercicio,
            tipo_valor,
            uo,
            orgao,
            nomeorgao,
+           funcao,
            acao,
            tituloacao,
            subfuncao,
+           fonte,
            gnd,
            mod,
            resultadoprimario,
@@ -125,6 +128,32 @@ base <- dados_combinados %>%
       tipo_valor == "PLOA" & exercicio == "2021" ~ "atu"
     )
   )
+
+
+# Incorpora informação dos anexos -----------------------------------------
+
+acoes_PUC <- c("0090", "009V", "00HH", "00HT", "00HZ", "0019", "001T", "00J0", "00J8", "00JA", "00M9", "00MA", "00MG", "00MH", "00MI", "00MJ", "00MK", "00ML", "00MU", "00PA", "09JC", "09JD", "0A45", "0A45", "0A87", "0A88", "0A90", "0E45", "0E50", "0EB6", "0EC3", "0EC4")
+
+
+acoes_defesa <- c("123B", "123G", "123H", "123I", "14LW", "14T0", "14T4", "14T5", "14T7", "14XJ", "2919")
+
+uos_ressalvadas <- c("20225", "36201", "74910", "93381", "22202", "47204", "93181", "93436", "24901", "47205", "93201", "25300", "61201", "93202", "25301")
+
+fontes_excetuadas <- c("16", "21", "70", "82", "50", "63", "80", "81", "93", "96")
+
+base_anexos <- base %>%
+  mutate(
+    ressalvadas = case_when(
+      orgao_decreto == "24000" &
+        !(uo %in% c(" 24901", "74910", "93436")) &
+        
+      
+      
+      
+      
+    )
+  )
+
 
 # computar informacoes necessarias para a vis, por orgao e acao
 
@@ -176,6 +205,10 @@ base_acao <- base %>%
 base_pre_stack <- base_acao %>%
   left_join(perfil_gnd) %>%
   left_join(perfil_mod)
+
+
+
+
 
 variaveis_de_interesse <- c("agregador", "funcao_tipica")
 
