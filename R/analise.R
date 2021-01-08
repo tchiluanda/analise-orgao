@@ -3,9 +3,9 @@
 
 library(tidyverse)
 library(readxl)
-library(networkD3)
-library(igraph)
-library(collapsibleTree)
+#library(networkD3)
+#library(igraph)
+#library(collapsibleTree)
 
 
 
