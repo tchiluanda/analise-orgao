@@ -68,36 +68,30 @@ ploa <- ploa_raw %>%
   rename(valor = `PLOA 2020 Mensagem Modificativa`) %>%
   mutate(tipo_valor = "PLOA",
          gnd = str_sub(naturezadespesa,2,2),
-         mod = str_sub(naturezadespesa,3,4)) %>%
-  group_by(exercicio,
-         tipo_valor,
-         uo,
-         orgao,
-         nomeorgao,
-         acao,
-         tituloacao,
-         subfuncao,
-         gnd,
-         mod,
-         resultadoprimario,
-         credito,
-         ied) %>%
-  summarise(valor = sum(valor)) %>%
-  ungroup()
+         mod = str_sub(naturezadespesa,3,4))
 
 dados_adicionais <- dados_adicionais_raw %>%
   mutate(tipo_valor = "PLOA",
-         fonte = str_sub(fonte, 3, 4)) %>%
+         fonte = str_sub(fonte, 3, 4))
+
+dados_combinados_raw <-
+  bind_rows(
+    ploa,
+    dados_adicionais
+  )
+
+# reúne informações na tabela ---------------------------------------------
+
+dados_combinados <-
+  dados_combinados_raw %>%
   group_by(exercicio,
            tipo_valor,
            uo,
            orgao,
            nomeorgao,
-           funcao,
            acao,
            tituloacao,
            subfuncao,
-           fonte,
            gnd,
            mod,
            resultadoprimario,
@@ -105,14 +99,7 @@ dados_adicionais <- dados_adicionais_raw %>%
            ied) %>%
   summarise(valor = sum(valor)) %>%
   ungroup()
-
-# reúne informações na tabela ---------------------------------------------
-
-dados_combinados <-
-  bind_rows(
-    ploa,
-    dados_adicionais
-  )
+    
 
 exercicio_ref <- 2021
 
