@@ -89,8 +89,11 @@ dados_combinados <-
            uo,
            orgao,
            nomeorgao,
+           fonte,
+           programa,
            acao,
            tituloacao,
+           funcao,
            subfuncao,
            gnd,
            mod,
@@ -119,28 +122,72 @@ base <- dados_combinados %>%
 
 # Incorpora informação dos anexos -----------------------------------------
 
-acoes_PUC <- c("0090", "009V", "00HH", "00HT", "00HZ", "0019", "001T", "00J0", "00J8", "00JA", "00M9", "00MA", "00MG", "00MH", "00MI", "00MJ", "00MK", "00ML", "00MU", "00PA", "09JC", "09JD", "0A45", "0A45", "0A87", "0A88", "0A90", "0E45", "0E50", "0EB6", "0EC3", "0EC4")
-
+acoes_PUC <- c("0090", "009V", "00HH", "00HT", "00HZ", "00I9", "00IT", "00J0", "00J8", "00JA", "00M9", "00MA", "00MG", "00MH", "00MI", "00MJ", "00MK", "00ML", "00MU", "00PA", "09JC", "09JD", "0A45", "0A87", "0A88", "0A90", "0E45", "0E50", "0EB6", "0EC3", "0EC4")
 
 acoes_defesa <- c("123B", "123G", "123H", "123I", "14LW", "14T0", "14T4", "14T5", "14T7", "14XJ", "2919")
 
 uos_ressalvadas <- c("20225", "36201", "74910", "93381", "22202", "47204", "93181", "93436", "24901", "47205", "93201", "25300", "61201", "93202", "25301")
 
-fontes_excetuadas <- c("16", "21", "70", "82", "50", "63", "80", "81", "93", "96")
+fontes_proprias <- c("16", "70", "82", "50", "63", "80", "81", "93", "96")
 
-base_anexos <- base %>%
+fonte_21 <- c("21")
+
+fontes_excetuadas <- c(fontes_proprias, fonte_21)
+
+custeio_investimento <- c("3", "4", "5")
+
+eof_discricionaria <- c("2", "3")
+
+cred_extraordinario <- c("G", "Z")
+
+base_marcadores <- base %>%
   mutate(
-    ressalvadas = case_when(
-      orgao_decreto == "24000" &
-        !(uo %in% c(" 24901", "74910", "93436")) &
-        
-      
-      
-      
-      
-    )
+    acoes_PUC = acao %in% acoes_PUC,
+    acoes_defesa = acao %in% acoes_defesa,
+    uos_ressalvadas = uo %in% uos_ressalvadas,
+    fontes_proprias = fonte %in% fontes_proprias,
+    fonte_21 = fonte %in% fonte_21,
+    fontes_excetuadas = fonte %in% fontes_excetuadas,
+    custeio_investimento = gnd %in% custeio_investimento,
+    eof_discricionaria = resultadoprimario %in% eof_discricionaria,
+    credito_extraordinario = credito %in% cred_extraordinario,
+    
+    ressalvadas_1 = 
+      orgao_decreto == "24000" &&
+      !(uo %in% c(" 24901", "74910", "93436")) &&
+      funcao == "19" &&
+      custeio_investimento &&
+      eof_discricionaria &&
+      !cred_extraordinario,
+
+    ressalvadas_2 =
+      acoes_defesa &&
+      custeio_investimento &&
+      eof_discricionaria &&
+      !cred_extraordinario,
+
+    ressalvadas_3 =
+      fonte == "83" &&
+      custeio_investimento &&
+      eof_discricionaria &&
+      !cred_extraordinario,
+
+    ressalvadas_4 =
+      !(uo %in% c("22202", "93183")) &&
+      programa == "2203" &&
+      custeio_investimento &&
+      eof_discricionaria &&
+      !cred_extraordinario,
+
+    ressalvadas_5 =
+      uos_ressalvadas &&
+      programa == "2203" &&
+      custeio_investimento &&
+      eof_discricionaria &&
+      !cred_extraordinario
   )
 
+base_anexos <- base_marcadores
 
 # computar informacoes necessarias para a vis, por orgao e acao
 
