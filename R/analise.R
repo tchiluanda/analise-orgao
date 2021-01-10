@@ -153,38 +153,38 @@ base_marcadores <- base %>%
     credito_extraordinario = credito %in% cred_extraordinario,
     
     ressalvadas_1 = 
-      orgao_decreto == "24000" &&
-      !(uo %in% c(" 24901", "74910", "93436")) &&
-      funcao == "19" &&
-      custeio_investimento &&
-      eof_discricionaria &&
-      !cred_extraordinario,
+      orgao_decreto == "24000" &
+      !(uo %in% c(" 24901", "74910", "93436")) &
+      funcao == "19" &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario),
 
     ressalvadas_2 =
-      acoes_defesa &&
-      custeio_investimento &&
-      eof_discricionaria &&
-      !cred_extraordinario,
+      acoes_defesa &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario),
 
     ressalvadas_3 =
-      fonte == "83" &&
-      custeio_investimento &&
-      eof_discricionaria &&
-      !cred_extraordinario,
+      fonte == "83" &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario),
 
     ressalvadas_4 =
-      !(uo %in% c("22202", "93183")) &&
-      programa == "2203" &&
-      custeio_investimento &&
-      eof_discricionaria &&
-      !cred_extraordinario,
+      !(uo %in% c("22202", "93183")) &
+      programa == "2203" &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario),
 
     ressalvadas_5 =
-      uos_ressalvadas &&
-      programa == "2203" &&
-      custeio_investimento &&
-      eof_discricionaria &&
-      !cred_extraordinario
+      uos_ressalvadas &
+      programa == "2203" &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario)
   )
 
 base_anexos <- base_marcadores
