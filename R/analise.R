@@ -129,11 +129,11 @@ acoes_defesa <- c("123B", "123G", "123H", "123I", "14LW", "14T0", "14T4", "14T5"
 
 uos_ressalvadas <- c("20225", "36201", "74910", "93381", "22202", "47204", "93181", "93436", "24901", "47205", "93201", "25300", "61201", "93202", "25301")
 
-fontes_proprias <- c("16", "70", "82", "50", "63", "80", "81", "93", "96")
+fontes_proprias <- c("70", "82", "50", "63", "80", "81", "93", "96")
 
 fonte_21 <- c("21")
 
-fontes_excetuadas <- c(fontes_proprias, fonte_21)
+fontes_excetuadas <- c(fontes_proprias, fonte_21, "16")
 
 custeio_investimento <- c("3", "4", "5")
 
@@ -142,6 +142,8 @@ eof_discricionaria <- c("2", "3")
 eof_emendas_impositivas <- c("6", "7")
 
 eof_emendas_comissao <- c("8")
+
+eof_emendas_relator <- c("9")
 
 cred_extraordinario <- c("G", "Z")
 
@@ -159,6 +161,7 @@ base_marcadores <- base %>%
     eof_discricionaria = resultadoprimario %in% eof_discricionaria,
     eof_emendas_impositivas = resultadoprimario %in% eof_emendas_impositivas,
     eof_emendas_comissao = resultadoprimario %in% eof_emendas_comissao,
+    eof_emendas_relator = resultadoprimario %in% eof_emendas_relator,
     credito_extraordinario = credito %in% cred_extraordinario,
     cred_nao_extraordinario = credito %in% cred_nao_extraordinario,
     
@@ -255,7 +258,50 @@ base_anexos <- base_marcadores %>%
     
     # emendas discricionárias
     
+    anexo_VII = 
+      custeio_investimento &
+      eof_emendas_impositivas &
+      (!credito_extraordinario),
     
+    anexo_VIII =
+      custeio_investimento &
+      eof_emendas_comissao &
+      (!credito_extraordinario) &
+      (!ressalvadas_qq),
+    
+    anexo_IX =
+      custeio_investimento &
+      eof_emendas_comissao &
+      (!credito_extraordinario) &
+      ressalvadas_qq,
+    
+    anexo_X = 
+      custeio_investimento &
+      eof_emendas_relator &
+      (!fontes_excetuadas) &
+      (!credito_extraordinario) &
+      (!ressalvadas_qq),
+    
+    anexo_XI =
+      custeio_investimento &
+      eof_emendas_relator &
+      (!fontes_excetuadas) &
+      (!credito_extraordinario) &
+      ressalvadas_qq,
+    
+    anexo_XII =
+      custeio_investimento &
+      eof_emendas_relator &
+      fontes_proprias &
+      (!credito_extraordinario) &
+      (!ressalvadas_qq),
+    
+    anexo_XIIa =
+      custeio_investimento &
+      eof_emendas_relator &
+      fontes_proprias &
+      (!credito_extraordinario) &
+      ressalvadas_qq
     
   )
 
