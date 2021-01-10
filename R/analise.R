@@ -201,7 +201,7 @@ base_marcadores <- base %>%
 base_anexos <- base_marcadores %>%
   mutate(
     
-    anexo_ii = 
+    anexo_II = 
       (!acoes_PUC) &
       (!fontes_excetuadas) &
       custeio_investimento &
@@ -209,7 +209,7 @@ base_anexos <- base_marcadores %>%
       (!credito_extraordinario) &
       (!ressalvadas_qq),
     
-    anexo_iii =
+    anexo_III =
       (!acoes_PUC) &
       (!fontes_excetuadas) &
       custeio_investimento &
@@ -217,13 +217,33 @@ base_anexos <- base_marcadores %>%
       (!credito_extraordinario) &
       ressalvadas_qq,
     
-    anexo_iv = 
+    anexo_IV = 
       (!acoes_PUC) &
       fontes_proprias &
       custeio_investimento &
       eof_discricionaria &
       (!credito_extraordinario) &
       (!ressalvadas_qq),
+    
+    anexo_V =
+      (!acoes_PUC) &
+      fontes_proprias &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario) &
+      ressalvadas_qq,
+    
+    anexo_VI = 
+      acoes_PUC &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario),
+    
+    anexo_VIa =
+      fonte_21 &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario)
     
   )
 
