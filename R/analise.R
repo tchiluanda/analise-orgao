@@ -65,6 +65,7 @@ agrupadores <- readxl::read_excel("./dados/dados_originais/Novos Agregadores Min
 # prepara tabelas com informacoes principais ------------------------------
 
 ploa <- ploa_raw %>%
+  filter(!is.na(exercicio)) %>%
   rename(valor = `PLOA 2020 Mensagem Modificativa`) %>%
   mutate(tipo_valor = "PLOA",
          gnd = str_sub(naturezadespesa,2,2),
@@ -140,6 +141,8 @@ eof_discricionaria <- c("2", "3")
 
 cred_extraordinario <- c("G", "Z")
 
+cred_nao_extraordinario <- c("A", "C", "X", "Y")
+
 base_marcadores <- base %>%
   mutate(
     acoes_PUC = acao %in% acoes_PUC,
@@ -151,6 +154,7 @@ base_marcadores <- base %>%
     custeio_investimento = gnd %in% custeio_investimento,
     eof_discricionaria = resultadoprimario %in% eof_discricionaria,
     credito_extraordinario = credito %in% cred_extraordinario,
+    cred_nao_extraordinario = credito %in% cred_nao_extraordinario,
     
     ressalvadas_1 = 
       orgao_decreto == "24000" &
@@ -184,10 +188,44 @@ base_marcadores <- base %>%
       programa == "2203" &
       custeio_investimento &
       eof_discricionaria &
-      (!credito_extraordinario)
+      (!credito_extraordinario),
+    
+    ressalvadas_qq =
+      ressalvadas_1 |
+      ressalvadas_2 |
+      ressalvadas_3 |
+      ressalvadas_4 |
+      ressalvadas_5
   )
 
-base_anexos <- base_marcadores
+base_anexos <- base_marcadores %>%
+  mutate(
+    
+    anexo_ii = 
+      (!acoes_PUC) &
+      (!fontes_excetuadas) &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario) &
+      (!ressalvadas_qq),
+    
+    anexo_iii =
+      (!acoes_PUC) &
+      (!fontes_excetuadas) &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario) &
+      ressalvadas_qq,
+    
+    anexo_iv = 
+      (!acoes_PUC) &
+      fontes_proprias &
+      custeio_investimento &
+      eof_discricionaria &
+      (!credito_extraordinario) &
+      (!ressalvadas_qq),
+    
+  )
 
 # computar informacoes necessarias para a vis, por orgao e acao
 
