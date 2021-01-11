@@ -123,11 +123,17 @@ base <- dados_combinados %>%
 
 # Incorpora informação dos anexos -----------------------------------------
 
+## marcadores ##
+
 acoes_PUC <- c("0090", "009V", "00HH", "00HT", "00HZ", "00I9", "00IT", "00J0", "00J8", "00JA", "00M9", "00MA", "00MG", "00MH", "00MI", "00MJ", "00MK", "00ML", "00MU", "00PA", "09JC", "09JD", "0A45", "0A87", "0A88", "0A90", "0E45", "0E50", "0EB6", "0EC3", "0EC4")
 
 acoes_defesa <- c("123B", "123G", "123H", "123I", "14LW", "14T0", "14T4", "14T5", "14T7", "14XJ", "2919")
 
+acoes_controle_fluxo <- c("0095", "00M1", "00P1", "00RC", "0359", "0515", "0969", "2004", "2010", "2011", "2012", "20AB", "20AD", "20AE", "20A1", "20AL", "20XV", "20YE", "212B", "212O", "214O", "219A", "21BZ", "2865", "2887", "2913", "2E79", "4368", "4370", "4705", "8442", "8446", "8573", "8577", "8585", "8744")
+
 uos_ressalvadas <- c("20225", "36201", "74910", "93381", "22202", "47204", "93181", "93436", "24901", "47205", "93201", "25300", "61201", "93202", "25301")
+
+uos_funpen <- c("30907", "30911", "82901", "82902")
 
 fontes_proprias <- c("70", "82", "50", "63", "80", "81", "93", "96")
 
@@ -145,15 +151,22 @@ eof_emendas_comissao <- c("8")
 
 eof_emendas_relator <- c("9")
 
+eof_obrigatorias <- c("1")
+
 cred_extraordinario <- c("G", "Z")
 
 cred_nao_extraordinario <- c("A", "C", "X", "Y")
 
+## cria base com marcadores ##
+
 base_marcadores <- base %>%
   mutate(
+    LeJu = str_sub(orgao_decreto, 1, 2) %in% c("01", "02", "03", "29", "34", "59"),
     acoes_PUC = acao %in% acoes_PUC,
     acoes_defesa = acao %in% acoes_defesa,
+    acoes_controle_fluxo = acao %in% acoes_controle_fluxo,
     uos_ressalvadas = uo %in% uos_ressalvadas,
+    uos_funpen = uo %in% uos_funpen,
     fontes_proprias = fonte %in% fontes_proprias,
     fonte_21 = fonte %in% fonte_21,
     fontes_excetuadas = fonte %in% fontes_excetuadas,
@@ -162,6 +175,7 @@ base_marcadores <- base %>%
     eof_emendas_impositivas = resultadoprimario %in% eof_emendas_impositivas,
     eof_emendas_comissao = resultadoprimario %in% eof_emendas_comissao,
     eof_emendas_relator = resultadoprimario %in% eof_emendas_relator,
+    eof_obrigatorias = resultadoprimario %in% eof_obrigatorias,
     credito_extraordinario = credito %in% cred_extraordinario,
     cred_nao_extraordinario = credito %in% cred_nao_extraordinario,
     
@@ -206,6 +220,8 @@ base_marcadores <- base %>%
       ressalvadas_4 |
       ressalvadas_5
   )
+
+## cria base com marcadores dos anexos
 
 base_anexos <- base_marcadores %>%
   mutate(
@@ -301,8 +317,39 @@ base_anexos <- base_marcadores %>%
       eof_emendas_relator &
       fontes_proprias &
       (!credito_extraordinario) &
-      ressalvadas_qq
+      ressalvadas_qq,
     
+    # obrigatorias com controle de fluxo
+    
+    anexo_XIII = 
+      (
+        (!LeJu) &
+        acoes_controle_fluxo &
+        (!fontes_excetuadas) &
+        (!credito_extraordinario) &
+        eof_obrigatorias
+      ) | (
+        uos_funpen &
+        (!fontes_excetuadas) &
+        custeio_investimento &
+        (!credito_extraordinario) &
+        eof_obrigatorias
+      ),
+    
+    anexo_XIV =
+      (
+        (!LeJu) &
+        acoes_controle_fluxo &
+        fontes_excetuadas &
+        (!credito_extraordinario) &
+        eof_obrigatorias
+      ) | (
+        uos_funpen &
+        fontes_excetuadas &
+        custeio_investimento &
+        (!credito_extraordinario) &
+        eof_obrigatorias
+      )
   )
 
 # computar informacoes necessarias para a vis, por orgao e acao
