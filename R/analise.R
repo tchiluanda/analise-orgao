@@ -388,8 +388,9 @@ base_anexos_filtrada %>%
 
 # computar informacoes necessarias para a vis, por orgao e acao
 
-perfil_gnd <- base %>%
-  filter(orgao_decreto == "25000") %>%
+tipo_valor_principal <- "PLOA" # eventualmente pode se algo mais sofisticado aqui, tipo um id que podemos criar para identificar um tipo de valor de um determinado exercício
+
+perfil_gnd <- base_anexos_filtrada %>%
   mutate(grupo = case_when(
     gnd == "1" ~ "Pessoal",
     gnd == "3" ~ "Custeio",
