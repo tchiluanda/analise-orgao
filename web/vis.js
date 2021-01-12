@@ -54,11 +54,11 @@ const vis = {
 
         transitions_duration: 1000,
 
-        modes : ["agregado", "detalhado"],
+        modes : ["anexo", "agregador", "acao"],
 
         variables : ["atu_total", "varia", "varia_pct", "pos_ini_agregador"],
 
-        categorical_vars : ["agregador", "funcao_tipica"],
+        categorical_vars : ["anexo", "agregador"],
         // also, those are the variables used for evaluating summaries in the "agregado" mode.
 
         // this will serve to determine axis
