@@ -69,7 +69,8 @@ ploa <- ploa_raw %>%
   rename(valor = `PLOA 2020 Mensagem Modificativa`) %>%
   mutate(tipo_valor = "PLOA",
          gnd = str_sub(naturezadespesa,2,2),
-         mod = str_sub(naturezadespesa,3,4))
+         mod = str_sub(naturezadespesa,3,4),
+         fonte = str_sub(fonte, 2, 3))
 
 dados_adicionais <- dados_adicionais_raw %>%
   mutate(fonte = str_sub(fonte, 3, 4))
@@ -369,6 +370,21 @@ base_anexos_filtrada <- base_anexos_verifica %>%
   select(-pertence) %>%
   left_join(tab_anexos) %>%
   select(-Anexo)
+
+# testes vis
+
+ggplot(base_anexos_filtrada %>% filter(tipo_valor == "PLOA")) +
+  geom_col(aes(y = valor, x = reorder(agregador, valor))) +
+  coord_flip()
+
+ggplot(base_anexos_filtrada %>% filter(tipo_valor == "PLOA")) +
+  geom_col(aes(y = valor, x = anexo)) +
+  coord_flip()
+
+base_anexos_filtrada %>% 
+  filter(tipo_valor == "DESPESAS EMPENHADAS") %>%
+  group_by(anexo) %>%
+  summarise(sum(valor))
 
 # computar informacoes necessarias para a vis, por orgao e acao
 
