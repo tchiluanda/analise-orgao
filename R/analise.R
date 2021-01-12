@@ -365,37 +365,76 @@ base_anexos_verifica %>%
   arrange(desc(n)) %>%
   filter(n>1)
 
-base_anexos_filtrada <- base_anexos_verifica %>%
+# verifica se cada acao está vinculada apenas em um único anexo
+base_anexos_verifica %>% 
   filter(pertence) %>%
-  select(-pertence) %>%
+  select(acao, anexo) %>%
+  distinct() %>%
+  group_by(acao) %>%
+  count(anexo) %>%
+  arrange(desc(n)) %>%
+  filter(n>1)
+
+
+
+# sumariza a base ---------------------------------------------------------
+
+tipos_de_valor <- data.frame(
+  tipo_valor = base_anexos_verifica %>% select(tipo_valor) %>% unique() %>% unlist(),
+  variavel = c("desp_emp", "desp_liq", "desp_paga", "dot_atu", "RAP_inscritos", "RAP_pagos", "PLOA")
+)
+
+base_anexos_sumarizada <- base_anexos_verifica %>%
+  filter(pertence) %>%
   left_join(tab_anexos) %>%
-  select(-Anexo)
+  group_by(
+    orgao_decreto, orgao_decreto_nome, 
+    anexo, 
+    agregador, 
+    acao, tituloacao, 
+    fonte, 
+    gnd, 
+    mod, 
+    funcao_tipica,
+    tipo_valor) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  left_join(tipos_de_valor) %>%
+  select(-tipo_valor) %>%
+  mutate(gnd = case_when(
+    gnd == "1" ~ "Pessoal",
+    gnd == "3" ~ "Custeio",
+    gnd %in% c("4", "5") ~ "Investimento",
+    TRUE ~ "Dívida")) %>%
+  mutate(mod = case_when(
+    str_sub(mod,1,1) == "9" ~ "Direta",
+    TRUE ~ "Transferencia"))
+    
+  
 
 # testes vis
 
-ggplot(base_anexos_filtrada %>% filter(tipo_valor == "PLOA")) +
+ggplot(base_anexos_sumarizada %>% filter(variavel == "PLOA")) +
   geom_col(aes(y = valor, x = reorder(agregador, valor))) +
   coord_flip()
 
-ggplot(base_anexos_filtrada %>% filter(tipo_valor == "PLOA")) +
+ggplot(base_anexos_sumarizada %>% filter(variavel == "PLOA")) +
   geom_col(aes(y = valor, x = anexo)) +
   coord_flip()
 
-base_anexos_filtrada %>% 
-  filter(tipo_valor == "DESPESAS EMPENHADAS") %>%
+base_anexos_sumarizada %>% 
+  filter(variavel == "desp_emp") %>%
   group_by(anexo) %>%
   summarise(sum(valor))
+
+# Para ter ideia do máximo de fontes por ação
+base_anexos_sumarizada %>% select(acao, fonte) %>% distinct() %>% count(acao) %>% arrange(desc(n))
 
 # computar informacoes necessarias para a vis, por orgao e acao
 
 tipo_valor_principal <- "PLOA" # eventualmente pode se algo mais sofisticado aqui, tipo um id que podemos criar para identificar um tipo de valor de um determinado exercício
 
 perfil_gnd <- base_anexos_filtrada %>%
-  mutate(grupo = case_when(
-    gnd == "1" ~ "Pessoal",
-    gnd == "3" ~ "Custeio",
-    gnd %in% c("4", "5") ~ "Investimento",
-    TRUE ~ "Dívida")) %>%
   group_by(id_info, acao) %>%
   mutate(total_acao = sum(valor)) %>%
   group_by(id_info, acao, grupo) %>%
@@ -408,9 +447,6 @@ perfil_gnd <- base_anexos_filtrada %>%
   
 perfil_mod <- base %>%
   filter(orgao_decreto == "25000") %>%
-  mutate(modalidade = case_when(
-    str_sub(mod,1,1) == "9" ~ "Direta",
-    TRUE ~ "Transferencia")) %>%
   group_by(id_info, acao) %>%
   mutate(total_acao = sum(valor)) %>%
   group_by(id_info, acao, modalidade) %>%
