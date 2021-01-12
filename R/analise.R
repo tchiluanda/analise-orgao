@@ -352,6 +352,23 @@ base_anexos <- base_marcadores %>%
       )
   )
 
+
+base_anexos_verifica <- base_anexos %>%
+  mutate(celula = row_number()) %>%
+  gather(starts_with("anexo_"), key = "anexo", value = "pertence")
+
+# verifica se cada celula de despesa só está marcada em um único anexo
+base_anexos_verifica %>% 
+  filter(pertence) %>%
+  group_by(celula) %>% 
+  count(pertence) %>% 
+  arrange(desc(n)) %>%
+  filter(n>1)
+
+base_anexos_filtrada <- base_anexos_verifica %>%
+  filter(pertence) %>%
+  select(-pertence)
+
 # computar informacoes necessarias para a vis, por orgao e acao
 
 perfil_gnd <- base %>%
