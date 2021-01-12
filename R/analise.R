@@ -13,7 +13,7 @@ library(readxl)
 
 ploa_raw <- readxl::read_excel("./dados/dados_originais/SOF_PLOA_2021_STN_ajustada_gepla.xlsx", sheet = "ajustada")
 
-dados_adicionais_raw <- readxl::read_excel("./dados/dados_originais/d2019_ploa.xlsx", skip = 8)
+dados_adicionais_raw <- readxl::read_excel("./dados/dados_originais/d2019_ME.xlsx", skip = 8)
 
 colnames(dados_adicionais_raw) <- c(
   "exercicio", 
@@ -28,7 +28,7 @@ colnames(dados_adicionais_raw) <- c(
   "iduso", "descricaoiduso", 
   "gnd", "gnd_descricao",
   "mod", "mod_descricao",
-  "elemento", "elemento_descricao",
+  #"elemento", "elemento_descricao",
   "fonte", 
   "resultadoprimario", "descricaoresultadoprimario", 
   "resultadoprimariolei", "descricaoresultadoprimariolei", 
@@ -72,8 +72,7 @@ ploa <- ploa_raw %>%
          mod = str_sub(naturezadespesa,3,4))
 
 dados_adicionais <- dados_adicionais_raw %>%
-  mutate(tipo_valor = "PLOA",
-         fonte = str_sub(fonte, 3, 4))
+  mutate(fonte = str_sub(fonte, 3, 4))
 
 dados_combinados_raw <-
   bind_rows(
@@ -104,8 +103,7 @@ dados_combinados <-
   summarise(valor = sum(valor)) %>%
   ungroup()
     
-
-exercicio_ref <- 2021
+#exercicio_ref <- 2021
 
 base <- dados_combinados %>%
   left_join(orgaos) %>%
@@ -113,12 +111,9 @@ base <- dados_combinados %>%
   left_join(tab_funcao) %>%
   mutate(
     orgao_decreto = ifelse(is.na(orgao_decreto), orgao, orgao_decreto),
-    orgao_decreto_nome = ifelse(is.na(orgao_decreto_nome), nomeorgao, orgao_decreto_nome),
-    id_info = case_when(
-      tipo_valor == "PLOA" & exercicio == "2019" ~ "ref",
-      tipo_valor == "PLOA" & exercicio == "2021" ~ "atu"
-    )
-  )
+    orgao_decreto_nome = ifelse(is.na(orgao_decreto_nome), nomeorgao, orgao_decreto_nome)
+  ) %>%
+  filter(orgao_decreto == "25000")
 
 
 # Incorpora informação dos anexos -----------------------------------------
@@ -352,10 +347,14 @@ base_anexos <- base_marcadores %>%
       )
   )
 
+tab_anexos <- data.frame(
+  Anexo = base_anexos %>% select(starts_with("anexo_")) %>% colnames(),
+  anexo = c("Anexo II", "Anexo III", "Anexo IV", "Anexo V", "Anexo VI", "Anexo VI-A", "Anexo VII", "Anexo VIII", "Anexo IX", "Anexo X", "Anexo XI", "Anexo XII", "Anexo XII-A", "Anexo XIII", "Anexo XIV")
+  )
 
 base_anexos_verifica <- base_anexos %>%
   mutate(celula = row_number()) %>%
-  gather(starts_with("anexo_"), key = "anexo", value = "pertence")
+  gather(starts_with("anexo_"), key = "Anexo", value = "pertence")
 
 # verifica se cada celula de despesa só está marcada em um único anexo
 base_anexos_verifica %>% 
@@ -367,7 +366,9 @@ base_anexos_verifica %>%
 
 base_anexos_filtrada <- base_anexos_verifica %>%
   filter(pertence) %>%
-  select(-pertence)
+  select(-pertence) %>%
+  left_join(tab_anexos) %>%
+  select(-Anexo)
 
 # computar informacoes necessarias para a vis, por orgao e acao
 
