@@ -36,7 +36,7 @@ h1 {
 
 .mission-control {
     display: flex;
-    justify-content: center;
+    justify-content: left;
 }
 
 .mission-control button {
