@@ -436,8 +436,8 @@ base_anexos_sumarizada %>%
 base_anexos_sumarizada %>% select(acao, fonte) %>% distinct() %>% count(acao) %>% arrange(desc(n))
 
 # para ter ideia da quantidade acoes por anexo e por agrupador
-base_anexos_sumarizada %>% select(anexo, acao) %>% distinct() %>% count(anexo) %>% arrange(desc(n))
-base_anexos_sumarizada %>% select(agregador, acao) %>% distinct() %>% count(agregador) %>% arrange(desc(n))
+base_anexos_sumarizada %>% select(acao, anexo) %>% distinct() %>% count(acao) %>% arrange(desc(n))
+base_anexos_sumarizada %>% select(agregador, acao) %>% distinct() %>% count(acao) %>% arrange(desc(n))
 
 # computa dados para os cards das ações -----------------------------------
 
@@ -481,28 +481,47 @@ principais_orgaos <- base_anexos_sumarizada %>%
   unite("uo_valor", c(uo, valor), sep = "_", remove = TRUE) %>%
   spread(ranking, uo_valor)
     
-  
+titulo_acao <- ploa %>%
+  select(acao, tituloacao) %>%
+  distinct()
 
-base_acao <- base %>%
-  filter(orgao_decreto == "25000") %>%
-  group_by(agregador, funcao_tipica, acao, id_info) %>%
-  summarise(total = sum(valor)) %>%
+# calcula posições iniciais -----------------------------------------------
+
+base_variacoes <- base_anexos_sumarizada %>%
+  group_by(orgao_decreto, orgao_decreto_nome, agregador, 
+           #anexo, ### sem anexo, por enquanto, pq senão teremos ações fragmentadas 
+           acao, funcao_tipica, variavel) %>%
+  summarise(valor = sum(valor)) %>%
   ungroup() %>%
-  mutate(id_info = paste(id_info, "total", sep = "_")) %>%
-  spread(id_info, total) %>%
-  mutate(acao_nova = is.na(ref_total),
-         acao_extinta = is.na(atu_total)) %>%
-  filter(!acao_extinta) %>%
-  mutate(varia = atu_total - ref_total,
-         varia_pct = (atu_total / ref_total - 1) * 100)
+  spread(variavel, valor) %>%
+  filter(!is.na(PLOA)) %>% # (1)
+  mutate(
+    var_abs = PLOA - dot_atu,
+    var_pct = (PLOA / dot_atu - 1)*100,
+    acao_nova = dot_atu == 0 | is.na(dot_atu)
+  )
+ 
+ # (1) tira ações que não estão no PLOA
 
-base_pre_stack <- base_acao %>%
+
+
+# base_variacoes <- base_anexos_sumarizada %>%
+#   group_by(agregador, anexo, acao, tipo_valor) %>%
+#   summarise(total = sum(valor)) %>%
+#   ungroup() %>%
+#   mutate(id_info = paste(id_info, "total", sep = "_")) %>%
+#   spread(id_info, total) %>%
+#   mutate(acao_nova = is.na(ref_total),
+#          acao_extinta = is.na(atu_total)) %>%
+#   filter(!acao_extinta) %>%
+#   mutate(varia = atu_total - ref_total,
+#          varia_pct = (atu_total / ref_total - 1) * 100)
+
+base_pre_stack <- base_variacoes %>%
   left_join(perfil_gnd) %>%
-  left_join(perfil_mod)
-
-
-
-
+  left_join(perfil_mod) %>%
+  left_join(principais_orgaos) %>%
+  left_join(titulo_acao)
 
 variaveis_de_interesse <- c("agregador", "funcao_tipica")
 
