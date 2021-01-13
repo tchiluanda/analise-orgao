@@ -345,17 +345,24 @@ base_anexos <- base_marcadores %>%
         custeio_investimento &
         (!credito_extraordinario) &
         eof_obrigatorias
-      )
+      ),
+    
+    anexo_nenhum = !(
+      anexo_II | anexo_III | anexo_IV | anexo_V | anexo_VI | anexo_VIa | anexo_VII | anexo_VIII | anexo_IX | anexo_X | anexo_XI | anexo_XII | anexo_XIIa | anexo_XIII | anexo_XIV
+    )
+    
   )
 
 tab_anexos <- data.frame(
   Anexo = base_anexos %>% select(starts_with("anexo_")) %>% colnames(),
-  anexo = c("Anexo II", "Anexo III", "Anexo IV", "Anexo V", "Anexo VI", "Anexo VI-A", "Anexo VII", "Anexo VIII", "Anexo IX", "Anexo X", "Anexo XI", "Anexo XII", "Anexo XII-A", "Anexo XIII", "Anexo XIV")
+  anexo = c("Anexo II", "Anexo III", "Anexo IV", "Anexo V", "Anexo VI", "Anexo VI-A", "Anexo VII", "Anexo VIII", "Anexo IX", "Anexo X", "Anexo XI", "Anexo XII", "Anexo XII-A", "Anexo XIII", "Anexo XIV", "Obrigatórias")
   )
 
 base_anexos_verifica <- base_anexos %>%
   mutate(celula = row_number()) %>%
-  gather(starts_with("anexo_"), key = "Anexo", value = "pertence")
+  gather(starts_with("anexo_"), key = "Anexo", value = "pertence") %>%
+  filter(pertence) %>%
+  left_join(tab_anexos)
 
 # verifica se cada celula de despesa só está marcada em um único anexo
 base_anexos_verifica %>% 
@@ -385,8 +392,6 @@ tipos_de_valor <- data.frame(
 )
 
 base_anexos_sumarizada <- base_anexos_verifica %>%
-  filter(pertence) %>%
-  left_join(tab_anexos) %>%
   group_by(
     orgao_decreto, orgao_decreto_nome, 
     anexo, 
@@ -409,8 +414,6 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
   mutate(mod = case_when(
     str_sub(mod,1,1) == "9" ~ "Direta",
     TRUE ~ "Transferencia"))
-    
-  
 
 # testes vis
 
@@ -430,32 +433,40 @@ base_anexos_sumarizada %>%
 # Para ter ideia do máximo de fontes por ação
 base_anexos_sumarizada %>% select(acao, fonte) %>% distinct() %>% count(acao) %>% arrange(desc(n))
 
-# computar informacoes necessarias para a vis, por orgao e acao
+# para ter ideia da quantidade acoes por anexo e por agrupador
+base_anexos_sumarizada %>% select(anexo, acao) %>% distinct() %>% count(anexo) %>% arrange(desc(n))
+base_anexos_sumarizada %>% select(agregador, acao) %>% distinct() %>% count(agregador) %>% arrange(desc(n))
 
-tipo_valor_principal <- "PLOA" # eventualmente pode se algo mais sofisticado aqui, tipo um id que podemos criar para identificar um tipo de valor de um determinado exercício
+# computa dados para os cards das ações -----------------------------------
 
-perfil_gnd <- base_anexos_filtrada %>%
-  group_by(id_info, acao) %>%
+variavel_principal <- "PLOA" # eventualmente pode se algo mais sofisticado aqui, tipo um id que podemos criar para identificar um tipo de valor de um determinado exercício
+
+perfil_gnd <- base_anexos_sumarizada %>%
+  filter(variavel == variavel_principal) %>%
+  group_by(acao) %>%
   mutate(total_acao = sum(valor)) %>%
-  group_by(id_info, acao, grupo) %>%
+  group_by(acao, gnd) %>%
   mutate(total_gnd = sum(valor)) %>%
-  group_by(id_info, acao, grupo) %>%
+  group_by(acao, gnd) %>%
   summarise(percent_gnd = first(total_gnd / total_acao)) %>%
   ungroup() %>%
-  unite("classificador", c(id_info,grupo), remove = TRUE) %>%
-  spread(classificador, percent_gnd)
+  #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
+  spread(gnd, percent_gnd)
   
-perfil_mod <- base %>%
-  filter(orgao_decreto == "25000") %>%
-  group_by(id_info, acao) %>%
+perfil_mod <- base_anexos_sumarizada %>%
+  filter(variavel == variavel_principal) %>%
+  group_by(acao) %>%
   mutate(total_acao = sum(valor)) %>%
-  group_by(id_info, acao, modalidade) %>%
+  group_by(acao, mod) %>%
   mutate(total_mod = sum(valor)) %>%
-  group_by(id_info, acao, modalidade) %>%
+  group_by(acao, mod) %>%
   summarise(percent_mod = first(total_mod / total_acao)) %>%
   ungroup() %>%
-  unite("classificador", c(id_info, modalidade), remove = TRUE) %>%
-  spread(classificador, percent_mod)
+  #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
+  spread(mod, percent_mod)
+
+principais_fontes <- base_anexos_sumarizada %>%
+  
 
 base_acao <- base %>%
   filter(orgao_decreto == "25000") %>%
