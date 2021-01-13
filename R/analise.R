@@ -13,7 +13,7 @@ library(readxl)
 
 ploa_raw <- readxl::read_excel("./dados/dados_originais/SOF_PLOA_2021_STN_ajustada_gepla.xlsx", sheet = "ajustada")
 
-dados_adicionais_raw <- readxl::read_excel("./dados/dados_originais/d2019_ME.xlsx", skip = 8)
+dados_adicionais_raw <- readxl::read_excel("./dados/dados_originais/d2020_ME.xlsx", skip = 8)
 
 colnames(dados_adicionais_raw) <- c(
   "exercicio", 
@@ -88,6 +88,7 @@ dados_combinados <-
   group_by(exercicio,
            tipo_valor,
            uo,
+           nomeuo,
            orgao,
            nomeorgao,
            fonte,
@@ -396,6 +397,7 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
     orgao_decreto, orgao_decreto_nome, 
     anexo, 
     agregador, 
+    uo, nomeuo,
     acao, tituloacao, 
     fonte, 
     gnd, 
@@ -465,7 +467,20 @@ perfil_mod <- base_anexos_sumarizada %>%
   #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
   spread(mod, percent_mod)
 
-principais_fontes <- base_anexos_sumarizada %>%
+principais_orgaos <- base_anexos_sumarizada %>%
+  group_by(acao, uo, nomeuo) %>%
+  summarise(valor = sum(valor)) %>%
+  arrange(desc(valor)) %>%
+  group_by(acao) %>%
+  mutate(ranking = paste0("uo_valor_", ifelse(row_number()>5, 6, row_number())),
+         uo = ifelse(row_number()>5, "Demais", paste(uo,"-",nomeuo))) %>%
+  group_by(acao, uo, ranking) %>%
+  summarize(valor = sum(valor)) %>%
+  ungroup() %>%
+  arrange(ranking) %>%
+  unite("uo_valor", c(uo, valor), sep = "_", remove = TRUE) %>%
+  spread(ranking, uo_valor)
+    
   
 
 base_acao <- base %>%
