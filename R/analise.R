@@ -523,7 +523,7 @@ base_pre_stack <- base_variacoes %>%
   left_join(principais_orgaos) %>%
   left_join(titulo_acao)
 
-variaveis_de_interesse <- c("agregador", "funcao_tipica")
+variaveis_de_interesse <- c("agregador")
 
 base_stack <- base_pre_stack
 
@@ -532,7 +532,7 @@ for (var in variaveis_de_interesse) {
   
   base_stack <- base_stack %>%
     group_by(!! quo_var) %>%
-    mutate(!! paste0("pos_ini_", var) := cumsum(atu_total) - atu_total) %>%
+    mutate(!! paste0("pos_ini_", var) := cumsum(PLOA) - PLOA) %>%
     ungroup()
 }
 
