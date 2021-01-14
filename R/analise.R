@@ -13,7 +13,19 @@ library(readxl)
 
 ploa_raw <- readxl::read_excel("./dados/dados_originais/SOF_PLOA_2021_STN_ajustada_gepla.xlsx", sheet = "ajustada")
 
-dados_adicionais_raw <- readxl::read_excel("./dados/dados_originais/d2020_ME.xlsx", skip = 8)
+arquivos <- c(
+  "./dados/dados_originais/dot_2020_ate26000.xlsx",
+  "./dados/dados_originais/dot_2020_so26000.xlsx",
+  "./dados/dados_originais/dot_2020_maior26000.xlsx",
+  "./dados/dados_originais/pago_2020_menor_igual26000.xlsx",
+  "./dados/dados_originais/pago_2020_26001_36000.xlsx",
+  "./dados/dados_originais/pago_2020_36001_53000.xlsx",
+  "./dados/dados_originais/pago_2020_maior53000.xlsx"
+)
+
+dados_adicionais_raw <- 
+  purrr::map(.x = arquivos, .f = readxl::read_excel, skip = 8) %>%
+  bind_rows()
 
 colnames(dados_adicionais_raw) <- c(
   "exercicio", 
