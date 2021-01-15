@@ -46,7 +46,20 @@ const vis = {
     data : {
 
         raw : null,
-        processed : {}
+
+        processed : null
+        
+        //{
+
+            // geral : {
+
+            //     por_orgao : {}
+
+            // },
+
+            // detalhado : {}
+
+        //}
 
     },
 
@@ -56,9 +69,11 @@ const vis = {
 
         modes : ["anexo", "agregador", "acao"],
 
-        variables : ["atu_total", "varia", "varia_pct", "pos_ini_agregador"],
+        variables : ["PLOA", "dot_atu", "desp_paga"],
 
-        categorical_vars : ["anexo", "agregador"],
+        main_variable : "PLOA",
+
+        categorical_vars : ["orgao_decreto", "anexo"],
         // also, those are the variables used for evaluating summaries in the "agregado" mode.
 
         // this will serve to determine axis
@@ -75,7 +90,9 @@ const vis = {
 
         },
 
-        dimensions : ["x", "y", "y_cat", "y_anexos", "w", "r"]
+        dimensions : ["x", "y", "w", "r"],
+
+        //dimensions : ["x", "y", "y_cat", "y_anexos", "w", "r"]
 
     },
 
@@ -153,6 +170,23 @@ const vis = {
 
         },
 
+        summarise_combinacao : function(modo, var_filtro, valor_filtro, var_detalhamento) {
+
+            vis.data.processed = utils.group_by_sum_cols(
+
+                objeto = vis.data.raw
+                           .filter(d => d[var_filtro] == valor_filtro),
+                           // por exemplo, var_filtro = "orgao_decreto",
+                           //valor_filtro = "todos"
+                colunas_valor = vis.params.variables,
+                ordena_decrescente = true,
+                coluna_ordem = vis.params.main_variable
+
+            );
+
+
+        },
+
         update_positions : {
             // para quando for disparado um resize
         }
@@ -162,7 +196,7 @@ const vis = {
 
         domains : {
 
-            initialize : function() {
+            initialize_categorical : function() {
 
                 function generate(data, variable, categorical = false) {
 
@@ -179,34 +213,53 @@ const vis = {
         
                 }
 
-                vis.params.variables.forEach(variable => {
-                    vis.draw.domains[variable] = generate(vis.data.raw, variable,
-                        categorical = false);
-                });
+                // vis.params.variables.forEach(variable => {
+                //     vis.draw.domains[variable] = generate(vis.data.raw, variable,
+                //         categorical = false);
+                // });
 
                 vis.params.categorical_vars.forEach(variable => {
                     vis.draw.domains[variable] = generate(vis.data.raw, variable, categorical = true);
                 });
 
-                function initialize_domain_agregado() {
+                // function initialize_domain_agregado() {
 
-                    const maxs = vis.params.categorical_vars.map(
-                        cat => d3.max(vis.data.processed[cat],
-                            d => +d.subtotal)
-                    )
+                //     const maxs = vis.params.categorical_vars.map(
+                //         cat => d3.max(vis.data.processed[cat],
+                //             d => +d.subtotal)
+                //     )
     
-                    vis.draw.domains["agregado"] = [
-                        0, 
-                        d3.max(maxs, d => d)
-                    ];
-                    // Math.max(...maxs)
-                    // ES6
-                }
+                //     vis.draw.domains["agregado"] = [
+                //         0, 
+                //         d3.max(maxs, d => d)
+                //     ];
+                //     // Math.max(...maxs)
+                //     // ES6
+                // }
 
-                initialize_domain_agregado();
+                // initialize_domain_agregado();
+
+            },
+
+            current_domain_modo_geral : null,
+
+            get_current_domain_modo_geral : function(){
+
+                // maximos dos dados selecionados atuais
+
+                const maxs = vis.params.variables.map(
+                    variable => d3.max(vis.data.processed,d => d[variable])
+                );
+
+                vis.draw.domains.current_domain_modo_geral = [
+                    0,
+                    Math.max(...maxs)
+                ];
 
             }
-            // variables will be properties
+
+
+            // categorical variables will be properties
 
         },
 
@@ -234,8 +287,8 @@ const vis = {
 
             x : null,
             y : null,
-            y_anexos : null,
-            y_agregadores : null,
+            //y_anexos : null,
+            //y_agregadores : null,
             w : null,
             r : [1,30]
 
@@ -447,6 +500,10 @@ const vis = {
     },
 
     control : {
+
+        current_state : {
+            mode : null
+        },
 
         states : {
 
