@@ -90,7 +90,7 @@ const vis = {
 
         },
 
-        dimensions : ["x", "y", "w", "r"],
+        dimensions : ["x", "y", "y_cat", "w", "r"],
 
         //dimensions : ["x", "y", "y_cat", "y_anexos", "w", "r"]
 
@@ -172,12 +172,15 @@ const vis = {
 
         summarise_combinacao : function(modo, var_filtro, valor_filtro, var_detalhamento) {
 
+            console.log(vis.params.variables);
+
             vis.data.processed = utils.group_by_sum_cols(
 
                 objeto = vis.data.raw
-                           .filter(d => d[var_filtro] == valor_filtro),
+                           .filter(d => d[var_filtro] != valor_filtro), //temp
                            // por exemplo, var_filtro = "orgao_decreto",
                            //valor_filtro = "todos"
+                coluna_categoria = var_detalhamento,
                 colunas_valor = vis.params.variables,
                 ordena_decrescente = true,
                 coluna_ordem = vis.params.main_variable
@@ -241,9 +244,7 @@ const vis = {
 
             },
 
-            current_domain_modo_geral : null,
-
-            get_current_domain_modo_geral : function(){
+            get_current_domain_agregado : function(){
 
                 // maximos dos dados selecionados atuais
 
@@ -251,13 +252,14 @@ const vis = {
                     variable => d3.max(vis.data.processed,d => d[variable])
                 );
 
-                vis.draw.domains.current_domain_modo_geral = [
+                vis.draw.domains.agregado = [
                     0,
                     Math.max(...maxs)
                 ];
 
-            }
+            },
 
+            agregado : null,
 
             // categorical variables will be properties
 
@@ -287,6 +289,7 @@ const vis = {
 
             x : null,
             y : null,
+            y_cat : null,
             //y_anexos : null,
             //y_agregadores : null,
             w : null,
@@ -308,10 +311,10 @@ const vis = {
     
             },
 
-            set_domain : function(dimension, option) {
+            set_domain : function(dimension, variable) {
 
                 vis.draw.scales[dimension]
-                  .domain(vis.draw.domains[option]);
+                  .domain(vis.draw.domains[variable]);
     
             },
 
@@ -513,7 +516,7 @@ const vis = {
     
                     options : {
     
-                        "funcao_tipica" : {
+                        "orgao_decreto" : {
     
                             set_scales : [
 
@@ -523,7 +526,7 @@ const vis = {
                                 },
     
                                 { dimension : "y_cat" ,  
-                                    variable  : "funcao_tipica",
+                                    variable  : "orgao_decreto",
                                     axis      : true 
                                 },
     
@@ -538,14 +541,14 @@ const vis = {
 
                                 console.log(this);
 
-                                vis.sels.rects_acoes
-                                    .transition()
-                                    .duration(vis.params.transitions_duration)
-                                    .attr("x", d => vis.draw.scales.x(+d.pos_ini_funcao_tipica) )
-                                    .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica) )
-                                    .attr("height", vis.dims.bar_height )
-                                    .attr("width", d => vis.draw.scales.w(+d.atu_total))
-                                    .attr("rx", 0)
+                                // vis.sels.rects_acoes
+                                //     .transition()
+                                //     .duration(vis.params.transitions_duration)
+                                //     .attr("x", d => vis.draw.scales.x(+d.pos_ini_funcao_tipica) )
+                                //     .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica) )
+                                //     .attr("height", vis.dims.bar_height )
+                                //     .attr("width", d => vis.draw.scales.w(+d.atu_total))
+                                //     .attr("rx", 0)
                                 ;
 
                             }
@@ -652,9 +655,20 @@ const vis = {
             // saves data as a property to make it easier to access it elsewhere
             vis.data.raw = data;
 
-            // summarise data for categorical variables
-            vis.f.summarise_categorical(
-                numerical_variable = "atu_total");
+            // // summarise data for categorical variables
+            // vis.f.summarise_categorical(
+            //     numerical_variable = "atu_total");
+
+
+
+            vis.f.summarise_combinacao(
+                modo = null,
+                var_filtro = "orgao_decreto",
+                valor_filtro = "Todos",
+                var_detalhamento = "orgao_decreto"
+            );
+
+/*
 
             // evaluates domains for selected variables
             vis.draw.domains.initialize();
@@ -674,6 +688,8 @@ const vis = {
             // starts monitoring button clicks
             vis.control.monitor_mode_button();
             vis.control.monitor_option_button();
+
+            */
 
         },
 
