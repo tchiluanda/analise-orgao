@@ -126,8 +126,8 @@ base <- dados_combinados %>%
   mutate(
     orgao_decreto = ifelse(is.na(orgao_decreto), orgao, orgao_decreto),
     orgao_decreto_nome = ifelse(is.na(orgao_decreto_nome), nomeorgao, orgao_decreto_nome)
-  ) %>%
-  filter(orgao_decreto == "25000")
+  ) #%>%
+  #filter(orgao_decreto == "25000")
 
 
 # Incorpora informação dos anexos -----------------------------------------
@@ -390,10 +390,13 @@ base_anexos_verifica %>%
   filter(pertence) %>%
   select(acao, anexo) %>%
   distinct() %>%
-  group_by(acao) %>%
-  count(anexo) %>%
+  count(acao) %>%
   arrange(desc(n)) %>%
   filter(n>1)
+  # group_by(acao) %>%
+  # count(anexo) %>%
+  # arrange(desc(n)) %>%
+  # filter(n>1)
 
 
 
@@ -401,7 +404,7 @@ base_anexos_verifica %>%
 
 tipos_de_valor <- data.frame(
   tipo_valor = base_anexos_verifica %>% select(tipo_valor) %>% unique() %>% unlist(),
-  variavel = c("desp_emp", "desp_liq", "desp_paga", "dot_atu", "RAP_inscritos", "RAP_pagos", "PLOA")
+  variavel = c("desp_paga", "dot_atu", "PLOA") #c("desp_emp", "desp_liq", "desp_paga", "dot_atu", "RAP_inscritos", "RAP_pagos", "PLOA")
 )
 
 base_anexos_sumarizada <- base_anexos_verifica %>%
@@ -429,6 +432,16 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
     str_sub(mod,1,1) == "9" ~ "Direta",
     TRUE ~ "Transferencia"))
 
+base_anexos_todos_orgaos <- base_anexos_sumarizada %>%
+  group_by_at(vars(-orgao_decreto, -orgao_decreto_nome)) %>%
+  summarise(valor = sum(valor)) %>%
+  mutate(orgao_decreto = "Todos", orgao_decreto_nome = "Todos")
+
+base_completa <- bind_rows(
+  base_anexos_sumarizada,
+  base_anexos_todos_orgaos
+)
+
 # testes vis
 
 ggplot(base_anexos_sumarizada %>% filter(variavel == "PLOA")) +
@@ -440,7 +453,7 @@ ggplot(base_anexos_sumarizada %>% filter(variavel == "PLOA")) +
   coord_flip()
 
 base_anexos_sumarizada %>% 
-  filter(variavel == "desp_emp") %>%
+  filter(variavel == "desp_paga") %>%
   group_by(anexo) %>%
   summarise(sum(valor))
 
@@ -451,17 +464,20 @@ base_anexos_sumarizada %>% select(acao, fonte) %>% distinct() %>% count(acao) %>
 base_anexos_sumarizada %>% select(acao, anexo) %>% distinct() %>% count(acao) %>% arrange(desc(n))
 base_anexos_sumarizada %>% select(agregador, acao) %>% distinct() %>% count(acao) %>% arrange(desc(n))
 
+# subtotais por orgao
+ggplot(base_anexos_sumarizada %>% filter(variavel == "dot_atu")) + geom_col(aes(x = orgao_decreto, y = valor)) + coord_flip()
+
 # computa dados para os cards das ações -----------------------------------
 
 variavel_principal <- "PLOA" # eventualmente pode se algo mais sofisticado aqui, tipo um id que podemos criar para identificar um tipo de valor de um determinado exercício
 
-perfil_gnd <- base_anexos_sumarizada %>%
+perfil_gnd <- base_completa %>%
   filter(variavel == variavel_principal) %>%
-  group_by(acao) %>%
+  group_by(orgao_decreto, acao) %>%
   mutate(total_acao = sum(valor)) %>%
-  group_by(acao, gnd) %>%
+  group_by(orgao_decreto, acao, gnd) %>%
   mutate(total_gnd = sum(valor)) %>%
-  group_by(acao, gnd) %>%
+  group_by(orgao_decreto, acao, gnd) %>%
   summarise(percent_gnd = first(total_gnd / total_acao)) %>%
   ungroup() %>%
   #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
@@ -469,24 +485,24 @@ perfil_gnd <- base_anexos_sumarizada %>%
   
 perfil_mod <- base_anexos_sumarizada %>%
   filter(variavel == variavel_principal) %>%
-  group_by(acao) %>%
+  group_by(orgao_decreto, acao) %>%
   mutate(total_acao = sum(valor)) %>%
-  group_by(acao, mod) %>%
+  group_by(orgao_decreto, acao, mod) %>%
   mutate(total_mod = sum(valor)) %>%
-  group_by(acao, mod) %>%
+  group_by(orgao_decreto, acao, mod) %>%
   summarise(percent_mod = first(total_mod / total_acao)) %>%
   ungroup() %>%
   #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
   spread(mod, percent_mod)
 
 principais_orgaos <- base_anexos_sumarizada %>%
-  group_by(acao, uo, nomeuo) %>%
+  group_by(orgao_decreto, acao, uo, nomeuo) %>%
   summarise(valor = sum(valor)) %>%
   arrange(desc(valor)) %>%
-  group_by(acao) %>%
+  group_by(orgao_decreto, acao) %>%
   mutate(ranking = paste0("uo_valor_", ifelse(row_number()>5, 6, row_number())),
          uo = ifelse(row_number()>5, "Demais", paste(uo,"-",nomeuo))) %>%
-  group_by(acao, uo, ranking) %>%
+  group_by(orgao_decreto, acao, uo, ranking) %>%
   summarize(valor = sum(valor)) %>%
   ungroup() %>%
   arrange(ranking) %>%
@@ -499,7 +515,7 @@ titulo_acao <- ploa %>%
 
 # calcula posições iniciais -----------------------------------------------
 
-base_variacoes <- base_anexos_sumarizada %>%
+base_variacoes <- base_completa %>%
   group_by(orgao_decreto, orgao_decreto_nome, agregador, 
            #anexo, ### sem anexo, por enquanto, pq senão teremos ações fragmentadas 
            acao, funcao_tipica, variavel) %>%
@@ -535,20 +551,20 @@ base_pre_stack <- base_variacoes %>%
   left_join(principais_orgaos) %>%
   left_join(titulo_acao)
 
-variaveis_de_interesse <- c("agregador")
+# variaveis_de_interesse <- c("agregador")
+# 
+# base_stack <- base_pre_stack
+# 
+# for (var in variaveis_de_interesse) {
+#   quo_var <- sym(var) # transforma "var", que é string, num símbolo
+#   
+#   base_stack <- base_stack %>%
+#     group_by(!! quo_var) %>%
+#     mutate(!! paste0("pos_ini_", var) := cumsum(PLOA) - PLOA) %>%
+#     ungroup()
+# }
 
-base_stack <- base_pre_stack
-
-for (var in variaveis_de_interesse) {
-  quo_var <- sym(var) # transforma "var", que é string, num símbolo
-  
-  base_stack <- base_stack %>%
-    group_by(!! quo_var) %>%
-    mutate(!! paste0("pos_ini_", var) := cumsum(PLOA) - PLOA) %>%
-    ungroup()
-}
-
-base_export <- base_stack
+base_export <- base_pre_stack
 
 write.csv(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
 
