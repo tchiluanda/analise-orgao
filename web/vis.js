@@ -170,7 +170,7 @@ const vis = {
 
         },
 
-        summarise_combinacao : function(modo, var_filtro, valor_filtro, var_detalhamento) {
+        evaluate_dataset : function(modo, var_filtro, valor_filtro, var_detalhamento) {
 
             console.log(vis.params.variables);
 
@@ -244,7 +244,7 @@ const vis = {
 
             },
 
-            get_current_domain_agregado : function(){
+            evaluate_domain_agregado : function(){
 
                 // maximos dos dados selecionados atuais
 
@@ -259,13 +259,21 @@ const vis = {
 
             },
 
-            agregado : null,
+            agregado : null, // trocar esse nome
 
             // categorical variables will be properties
 
         },
 
         ranges : {
+
+            x : null,
+            y : null,
+            y_cat : null,
+            //y_anexos : null,
+            //y_agregadores : null,
+            w : null,
+            r : [1,30],
 
             update : function() {
 
@@ -285,19 +293,17 @@ const vis = {
 
                 return([vis.dims.margins.top, vis.dims.margins.top + comprimento_necessario]);
 
-            },
-
-            x : null,
-            y : null,
-            y_cat : null,
-            //y_anexos : null,
-            //y_agregadores : null,
-            w : null,
-            r : [1,30]
+            }
 
         },
 
         scales : {
+
+            x: d3.scaleLinear().clamp(true),
+            y: d3.scaleLinear().clamp(true),
+            y_cat: d3.scaleBand(),
+            w: d3.scaleLinear().clamp(true),
+            r: d3.scaleSqrt(),
 
             initialize : function() {
                 
@@ -337,17 +343,7 @@ const vis = {
 
                     // ISSUE : testar em algum momento se o domínio permanece igual? vale a pena em termos de performance? poderia ter um "current" em vis.control.states
 
-            },
-
-            x: d3.scaleLinear().clamp(true),
-
-            y: d3.scaleLinear().clamp(true),
-
-            y_cat: d3.scaleBand(),
-
-            w: d3.scaleLinear().clamp(true),
-
-            r: d3.scaleSqrt()
+            }
 
         },
 
@@ -520,17 +516,20 @@ const vis = {
     
                             set_scales : [
 
-                                { dimension: "x" , 
-                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
-                                    axis     : true 
+                                { 
+                                    dimension : "x" , 
+                                    variable  : "agregado",
+                                    axis      : true 
                                 },
     
-                                { dimension : "y_cat" ,  
+                                { 
+                                    dimension : "y_cat" ,  
                                     variable  : "orgao_decreto",
                                     axis      : true 
                                 },
     
-                                { dimension : "w" ,
+                                { 
+                                    dimension : "w" ,
                                     variable  : "agregado", //"atu_total",
                                     axis      : false 
                                 }
@@ -540,6 +539,20 @@ const vis = {
                             render : function() {
 
                                 console.log(this);
+
+                                vis.sels.svg
+                                  .selectAll("rect.barras")
+                                  .data(vis.data.processed)
+                                  .join("rect")
+                                  .classed("barras", true)
+                                  .attr("x", vis.dims.margins.left)
+                                  .attr("width", 0)
+                                  .attr("height", vis.dims.bar_height)
+                                  .attr("y", d => vis.draw.scales.y_cat(d.orgao_decreto))
+                                  .transition()
+                                  .duration(vis.params.transitions_duration)
+                                  .attr("width", d => vis.draw.scales.w(d.PLOA));
+
 
                                 // vis.sels.rects_acoes
                                 //     .transition()
@@ -661,17 +674,18 @@ const vis = {
 
 
 
-            vis.f.summarise_combinacao(
+            vis.f.evaluate_dataset(
                 modo = null,
                 var_filtro = "orgao_decreto",
                 valor_filtro = "Todos",
                 var_detalhamento = "orgao_decreto"
             );
 
-/*
+
 
             // evaluates domains for selected variables
-            vis.draw.domains.initialize();
+            vis.draw.domains.initialize_categorical();
+            vis.draw.domains.evaluate_domain_agregado();
 
             // updates ranges
             vis.draw.ranges.update();
@@ -683,17 +697,19 @@ const vis = {
             vis.draw.axis.initialize();
 
             // add rects/bubbles
-            vis.draw.bubbles.add();
+            //vis.draw.bubbles.add();
 
             // starts monitoring button clicks
             vis.control.monitor_mode_button();
             vis.control.monitor_option_button();
 
-            */
+            vis.control.draw_state("agregado", "orgao_decreto");
 
         },
 
         draw_state : function(mode, option) {
+
+
 
             vis.draw.scales.set(
                 mode = mode, 

@@ -90,7 +90,7 @@ const utils = {
 
       //console.log(colunas_valor, colunas_valor.length);
 
-      console.log(objeto);
+      //console.log(objeto);
 
     const resultado = []; 
     const categorias_unicas = objeto
