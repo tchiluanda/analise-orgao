@@ -94,6 +94,15 @@ const vis = {
 
         //dimensions : ["x", "y", "y_cat", "y_anexos", "w", "r"]
 
+        nomes_demais : { // aqui preciso de um registro para cada variável que pode ser usada como critério de detalhamento
+
+            anexo: "Demais anexos",
+            agregador: "Demais agregadores",
+            funcao_tipica: "Demais funções",
+            orgao_decreto: "Demais órgãos"
+
+        }
+
     },
 
     init : function() {
@@ -186,6 +195,33 @@ const vis = {
                 coluna_ordem = vis.params.main_variable
 
             );
+
+            if (vis.data.processed.length > 16) {
+
+                let bottom_dataset = vis.data.processed.slice(15);
+
+                // var_detalhamento vai ser a variável usada no detalhamento, então vai ser o nome da coluna/variável no dataset sumarizado que foi armazenado em vis.data.processed.
+
+                //bottom_dataset.forEach(el => el[var_detalhamento] = vis.params.nomes_demais[var_detalhamento]);
+
+                const elemento_demais = {
+                    [var_detalhamento] : vis.params.nomes_demais[var_detalhamento]
+                };
+
+                vis.params.variables.forEach(
+                    variable => elemento_demais[variable] = 
+                    bottom_dataset
+                      .map(d => +d[variable])
+                      .reduce((acu , atu) => acu + atu)
+                );
+
+                vis.data.processed = vis.data.processed
+                  .slice(0,15);
+
+                vis.data.processed.push(elemento_demais);
+                // não dá para encadear aqui
+
+            }
 
 
         },
