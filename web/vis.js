@@ -573,9 +573,24 @@ const vis = {
                 // a main_variable é o PLOA
                 // a variable vai ser o critério de detalhamento: orgao, função etc.
 
+            },
+
+            desenha_linhas_referencia : function(cat_variable, num_variable) {
+
+                vis.sels.svg
+                .selectAll("line.ref")
+                .data(vis.data.processed, d => d[cat_variable])
+                .join("line")
+                .classed("ref", true)
+                .attr("y1", d => vis.draw.scales.y_cat(d[cat_variable]) + vis.dims.margins.top - vis.dims.bar_height/2)
+                .attr("y2", d => vis.draw.scales.y_cat(d[cat_variable]) + vis.dims.margins.top + vis.dims.bar_height*1.5)
+                .transition()
+                .duration(vis.params.transitions_duration)
+                .attr("x1", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
+                .attr("x2", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
+                .attr("stroke", "red");
+
             }
-
-
 
         },
 
