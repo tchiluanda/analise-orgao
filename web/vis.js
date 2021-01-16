@@ -26,7 +26,8 @@ const vis = {
 
         svg:  null,
         cont: null,
-        mode_button: null
+        mode_button: null,
+        seletor_comparacao: null
 
     },
 
@@ -591,12 +592,13 @@ const vis = {
                 .attr("x2", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
                 .attr("stroke", "red");
 
-                vis.sels.linhas_referencia = d3.selectAll("line.ref");
+                vis.sels.linhas_referencia = d3.selectAll("line.ref")
 
-                
-                
+            },
 
+            remove_linhas_referencia : function() {
 
+                vis.sels.linhas_referencia.remove();
 
             }
 
@@ -795,9 +797,6 @@ const vis = {
             // populates comparison selector
             vis.f.populates_comparison_selector();
 
-
-
-
             // evaluates domains for selected variables
             vis.draw.domains.initialize_categorical();
 
@@ -816,6 +815,7 @@ const vis = {
             // starts monitoring button clicks
             vis.control.monitor_mode_button();
             vis.control.monitor_option_button();
+            vis.control.monitora_seletor_comparacao();
 
             //vis.control.draw_state("agregado", "orgao_decreto");
 
@@ -953,6 +953,31 @@ const vis = {
                 } else {console.log("Clique num botão, meu filho.")}
 
             });
+
+        },
+
+        monitora_seletor_comparacao : function() {
+
+            const selector = document.querySelector(vis.refs.comparison_selector);
+
+            vis.elems.seletor_comparacao = selector;
+
+            selector.addEventListener("change", function(e) {
+
+                const opcao_selecionada = e.target.value;
+
+                if (opcao_selecionada == "nada") {
+                    vis.draw.agregado.remove_linhas_referencia();
+                } else {
+                    vis.draw.agregado.desenha_linhas_referencia(
+                        cat_variable = vis.control.current_state.variavel_detalhamento,
+
+                    num_variable = opcao_selecionada
+                    );
+                }
+
+            })
+
 
         },
 
