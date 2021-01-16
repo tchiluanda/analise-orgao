@@ -67,6 +67,13 @@ h1 {
     font-size: .8rem;
 }
 
+[name='seletor-comparacao'] {
+    background-color: transparent;
+    border: 2px solid currentColor;
+    /* border-radius: 10px; */
+    font-family: var(--main-font);
+}
+
 /* vis */
 
 svg {
