@@ -564,7 +564,9 @@ base_pre_stack <- base_variacoes %>%
 #     ungroup()
 # }
 
-base_export <- base_pre_stack
+base_export <- base_pre_stack %>%
+  mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
+         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga))
 
 write.csv(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
 
