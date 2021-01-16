@@ -73,7 +73,7 @@ const vis = {
 
         main_variable : "PLOA",
 
-        categorical_vars : ["orgao_decreto", "anexo"],
+        categorical_vars : ["orgao_decreto", "anexo", "funcao_tipica"],
         // also, those are the variables used for evaluating summaries in the "agregado" mode.
 
         // this will serve to determine axis
@@ -244,12 +244,32 @@ const vis = {
 
             },
 
+            evaluate_domain_categorical : function() {
+
+                let current_variable = vis.control.current_state.variavel_detalhamento;
+
+                let subtotais = utils.group_by_sum(
+                    objeto = vis.data.processed,
+                    coluna_categoria = current_variable,
+                    coluna_valor = vis.params.main_variable,
+                    ordena_decrescente = true
+                );
+
+                console.log(subtotais);
+
+                vis.draw.domains[current_variable] = utils.unique(
+                    obj = subtotais,
+                    col = "categoria"
+                ).reverse();
+
+            },
+
             evaluate_domain_agregado : function(){
 
                 // maximos dos dados selecionados atuais
 
                 const maxs = vis.params.variables.map(
-                    variable => d3.max(vis.data.processed,d => d[variable])
+                    variable => d3.max(vis.data.processed, d => d[variable])
                 );
 
                 vis.draw.domains.agregado = [
@@ -501,7 +521,8 @@ const vis = {
     control : {
 
         current_state : {
-            mode : null
+            mode : null,
+            variavel_detalhamento : null
         },
 
         states : {
@@ -568,7 +589,7 @@ const vis = {
 
                         },
 
-                        "agregador" : {
+                        "funcao_tipica" : {
 
                             set_scales : [
 
@@ -577,7 +598,7 @@ const vis = {
                                     axis     : true },
     
                                 { dimension : "y_cat" ,  
-                                    variable  : "agregador",
+                                    variable  : "funcao_tipica",
                                     axis      : true },
     
                                 { dimension : "w" ,
@@ -590,14 +611,18 @@ const vis = {
 
                                 console.log(this);
 
-                                vis.sels.rects_acoes
-                                    .transition()
-                                    .duration(vis.params.transitions_duration)
-                                    .attr("x", d => vis.draw.scales.x(+d.pos_ini_agregador) )
-                                    .attr("y", d => vis.draw.scales.y_cat(d.agregador) )
-                                    .attr("height", 10 )
-                                    .attr("width", d => vis.draw.scales.w(+d.atu_total))
-                                    .attr("rx", 0)
+                                vis.sels.svg
+                                  .selectAll("rect.barras")
+                                  .data(vis.data.processed)
+                                  .join("rect")
+                                  .classed("barras", true)
+                                  .attr("x", vis.dims.margins.left)
+                                  .attr("width", 0)
+                                  .attr("height", vis.dims.bar_height)
+                                  .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica))
+                                  .transition()
+                                  .duration(vis.params.transitions_duration)
+                                  .attr("width", d => vis.draw.scales.w(d.PLOA));
                                 ;
                                 
                             }
@@ -674,18 +699,9 @@ const vis = {
 
 
 
-            vis.f.evaluate_dataset(
-                modo = null,
-                var_filtro = "orgao_decreto",
-                valor_filtro = "Todos",
-                var_detalhamento = "orgao_decreto"
-            );
-
-
 
             // evaluates domains for selected variables
             vis.draw.domains.initialize_categorical();
-            vis.draw.domains.evaluate_domain_agregado();
 
             // updates ranges
             vis.draw.ranges.update();
@@ -703,13 +719,21 @@ const vis = {
             vis.control.monitor_mode_button();
             vis.control.monitor_option_button();
 
-            vis.control.draw_state("agregado", "orgao_decreto");
+            //vis.control.draw_state("agregado", "orgao_decreto");
 
         },
 
         draw_state : function(mode, option) {
 
+            vis.f.evaluate_dataset(
+                modo = null,
+                var_filtro = "orgao_decreto",
+                valor_filtro = "Todos",
+                var_detalhamento = option
+            );
 
+            vis.draw.domains.evaluate_domain_agregado();
+            vis.draw.domains.evaluate_domain_categorical();
 
             vis.draw.scales.set(
                 mode = mode, 
@@ -815,6 +839,10 @@ const vis = {
                         let mode = this.dataset.mode;
 
                         console.log("hi", mode, option);
+
+                        // fazer esse controle nos data-attributes?
+                        vis.control.current_state.mode = mode;
+                        vis.control.current_state.variavel_detalhamento = option;
 
                         vis.control.draw_state(mode, option);
 
