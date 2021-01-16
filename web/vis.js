@@ -7,6 +7,7 @@ const vis = {
         mode_button: "nav.mode-control",
         option_button: "nav.option-control",
         mode_dependent_controls: "[data-visible-on-mode]",
+        comparison_selector: "[name='seletor-comparacao']",
         data: "./dados/dados.csv"
 
     },
@@ -70,7 +71,15 @@ const vis = {
 
         modes : ["anexo", "agregador", "acao"],
 
-        variables : ["PLOA", "dot_atu", "desp_paga"],
+        variables : ["PLOA", "dot_atu", "desp_paga"], // mudar esse nome aqui depois
+
+        variables_names : {
+
+            PLOA : "PLOA",
+            dot_atu : "Dotação atualizada do ano anterior",
+            desp_paga : "Despesa paga no ano anterior"
+
+        },
 
         main_variable : "PLOA",
 
@@ -224,6 +233,35 @@ const vis = {
 
             }
 
+        },
+
+        populates_comparison_selector : function() {
+
+            const selector = document.querySelector(vis.refs.comparison_selector);
+
+            const comparison_variables = [...vis.params.variables];
+
+            
+            // vou tirar a main_variable, PLOA, dessa lista.
+
+            // hmm essa combinação de indexOf e splice poderia virar uma função.
+
+            const pos_main_variable = comparison_variables.indexOf(vis.params.main_variable);
+
+            comparison_variables.splice(pos_main_variable, 1);
+
+            console.log(comparison_variables, "depois");
+
+
+            comparison_variables.forEach(variable => {
+
+                let new_option = document.createElement("option");
+
+                new_option.setAttribute("value", variable);
+                new_option.innerText = vis.params.variables_names[variable];
+
+                selector.append(new_option);
+            });
 
         },
 
@@ -730,6 +768,9 @@ const vis = {
             // // summarise data for categorical variables
             // vis.f.summarise_categorical(
             //     numerical_variable = "atu_total");
+
+            // populates comparison selector
+            vis.f.populates_comparison_selector();
 
 
 
