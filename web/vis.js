@@ -17,7 +17,8 @@ const vis = {
         svg : null,
         cont : null,
         rects_acoes : null,
-        axis : {}
+        axis : {},
+        linhas_referencia : null
 
     },
 
@@ -589,6 +590,13 @@ const vis = {
                 .attr("x1", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
                 .attr("x2", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
                 .attr("stroke", "red");
+
+                vis.sels.linhas_referencia = d3.selectAll("line.ref");
+
+                
+                
+
+
 
             }
 
