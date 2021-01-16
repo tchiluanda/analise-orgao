@@ -6,6 +6,7 @@ const vis = {
         cont: "div.vis-container",
         mode_button: "nav.mode-control",
         option_button: "nav.option-control",
+        mode_dependent_controls: "[data-visible-on-mode]",
         data: "./dados/dados.csv"
 
     },
@@ -810,7 +811,7 @@ const vis = {
 
                         this.dataset.mode = mode;
 
-                        vis.control.show_option_buttons(mode);
+                        vis.control.show_mode_dependent_controls(mode);
 
                         /*
 
@@ -851,6 +852,7 @@ const vis = {
             let buttons = document.querySelector(vis.refs.option_button);
 
             vis.elems.option_button = buttons;
+
 
             buttons.addEventListener("click", function(e) {
 
@@ -903,20 +905,22 @@ const vis = {
             
         },
 
-        show_option_buttons : function(mode) {
+        show_mode_dependent_controls : function(mode) {
 
-            let nav_options = document.querySelectorAll(vis.refs.option_button);
+            let mode_controls = document.querySelectorAll(vis.refs.mode_dependent_controls);
 
-            nav_options.forEach(nav => nav.classList.add("hidden"));
+            mode_controls.forEach(control => control.classList.add("hidden"));
 
-            let active_nav = document.querySelector(
+            let active_controls = document.querySelectorAll(
                 '[data-visible-on-mode="' +
                 mode +
                 '"]' );
+            
+            // mudei para querySelectorAll para selecionar o seletor de comparação também
 
-            active_nav.classList.remove("hidden");
+            active_controls.forEach(control => control.classList.remove("hidden"));
 
-        }
+        },
 
     }
 

@@ -26,11 +26,11 @@
      data-detail-color-criteria = "pct|abs|funcao_tipica">
 
         <button id="agregado">Agregado</button>
-        <button id="agregador">Detalhado</button>
+        <button id="detalhado">Detalhado</button>
 
     </nav>
 
-    <nav class="mission-control option-control hidden" 
+    <nav class="mission-control option-control show-on-mode hidden" 
      data-visible-on-mode="agregado" 
      data-mode = "agregado"
      data-option = "agregador|funcao_tipica">
@@ -39,7 +39,7 @@
         <button id="funcao_tipica">Por Função Típica</button>
     </nav>
 
-    <nav class="mission-control option-control hidden" 
+    <nav class="mission-control option-control show-on-mode hidden" 
      data-visible-on-mode="detalhado" 
      data-mode = "detalhado"
      data-option = "variacao|acao_nova">
@@ -49,7 +49,14 @@
 
     <main>
 
-        Aqui vai ficar a visualização.
+        <div class="show-on-mode hidden"
+          data-visible-on-mode="agregado"
+          >
+          Valores do PLOA. Comparar com 
+          <select name="variaveis-" id="">
+              <option value="nada">nada</option>
+          </select>
+        </div>
         <div class="vis-container">
             <svg class="vis">
 
