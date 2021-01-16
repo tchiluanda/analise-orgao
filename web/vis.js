@@ -267,6 +267,12 @@ const vis = {
 
         },
 
+        reinicia_seletor_comparacao : function() {
+
+            vis.elems.seletor_comparacao.value = "nada";
+            vis.draw.agregado.remove_linhas_referencia();
+        },
+
         update_positions : {
             // para quando for disparado um resize
         }
@@ -598,7 +604,9 @@ const vis = {
 
             remove_linhas_referencia : function() {
 
-                vis.sels.linhas_referencia.remove();
+                if (vis.sels.linhas_referencia) {
+                    vis.sels.linhas_referencia.remove();
+                }
 
             }
 
@@ -945,6 +953,8 @@ const vis = {
                         // fazer esse controle nos data-attributes?
                         vis.control.current_state.mode = mode;
                         vis.control.current_state.variavel_detalhamento = option;
+
+                        vis.f.reinicia_seletor_comparacao();
 
                         vis.control.draw_state(mode, option);
 
