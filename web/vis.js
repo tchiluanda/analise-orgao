@@ -516,6 +516,26 @@ const vis = {
 
         agregado : {
 
+            desenha_barras : function(variable) {
+
+                vis.sels.svg
+                .selectAll("rect.barras")
+                .data(vis.data.processed, d => d[variable])
+                .join("rect")
+                .classed("barras", true)
+                .attr("x", vis.dims.margins.left)
+                .attr("width", 0)
+                .attr("height", vis.dims.bar_height)
+                .attr("y", d => vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top)
+                .transition()
+                .duration(vis.params.transitions_duration)
+                .attr("width", d => vis.draw.scales.w(d[vis.params.main_variable]));
+
+                // a main_variable é o PLOA
+                // a variable vai ser o critério de detalhamento: orgao, função etc.
+
+            }
+
 
 
         },
@@ -593,22 +613,11 @@ const vis = {
 
                             ],
     
-                            render : function() {
+                            render : function(option) {
 
                                 console.log(this);
 
-                                vis.sels.svg
-                                  .selectAll("rect.barras")
-                                  .data(vis.data.processed)
-                                  .join("rect")
-                                  .classed("barras", true)
-                                  .attr("x", vis.dims.margins.left)
-                                  .attr("width", 0)
-                                  .attr("height", vis.dims.bar_height)
-                                  .attr("y", d => vis.draw.scales.y_cat(d.orgao_decreto))
-                                  .transition()
-                                  .duration(vis.params.transitions_duration)
-                                  .attr("width", d => vis.draw.scales.w(d.PLOA));
+                                vis.draw.agregado.desenha_barras(option);
 
 
                                 // vis.sels.rects_acoes
@@ -643,23 +652,11 @@ const vis = {
         
                                 ],
         
-                            render : function() {
+                            render : function(option) {
 
                                 console.log(this);
 
-                                vis.sels.svg
-                                  .selectAll("rect.barras")
-                                  .data(vis.data.processed)
-                                  .join("rect")
-                                  .classed("barras", true)
-                                  .attr("x", vis.dims.margins.left)
-                                  .attr("width", 0)
-                                  .attr("height", vis.dims.bar_height)
-                                  .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica))
-                                  .transition()
-                                  .duration(vis.params.transitions_duration)
-                                  .attr("width", d => vis.draw.scales.w(d.PLOA));
-                                ;
+                                vis.draw.agregado.desenha_barras(option);
                                 
                             }
 
@@ -761,6 +758,9 @@ const vis = {
 
         draw_state : function(mode, option) {
 
+            // mode é se é agregado ou detalhado
+            // option é a variável de detalhamento (no caso do agregado)
+
             vis.f.evaluate_dataset(
                 modo = null,
                 var_filtro = "orgao_decreto",
@@ -779,7 +779,7 @@ const vis = {
             vis.control.states
               .modes[mode]
               .options[option]
-              .render()
+              .render(option)
             ;
 
         },
