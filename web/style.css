@@ -48,7 +48,6 @@ h1 {
 /* botoes filtro */
 
 fieldset {
-    margin-bottom: 1rem;
     flex: 1;
 }
 
@@ -107,6 +106,12 @@ select {
 .option-control {
     margin-top: .5rem;
     font-size: .8rem;
+}
+
+div.controle-comparacao {
+    max-width: 90vw;
+    margin: 0 auto;
+    text-align: center;
 }
 
 /*
