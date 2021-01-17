@@ -653,7 +653,8 @@ const vis = {
 
         current_state : {
             mode : null,
-            variavel_detalhamento : null
+            variavel_detalhamento : null,
+            variavel_comparacao : null
         },
 
         states : {
@@ -978,6 +979,8 @@ const vis = {
             selector.addEventListener("change", function(e) {
 
                 const opcao_selecionada = e.target.value;
+
+                vis.control.current_state.variavel_comparacao = opcao_selecionada;
 
                 if (opcao_selecionada == "nada") {
                     vis.draw.agregado.remove_linhas_referencia();
