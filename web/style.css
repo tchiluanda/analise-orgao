@@ -90,11 +90,16 @@ svg {
     stroke: var(--ligther);
 }
 
-/* rects */
+/* barras */
 
 rect.acoes {
     stroke : coral;
     fill : var(--pink);
+}
+
+/* linhas de referência */
+line.ref {
+    stroke-width: 2px;
 }
 
 /* card */
