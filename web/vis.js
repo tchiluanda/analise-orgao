@@ -8,7 +8,15 @@ const vis = {
         option_button: "nav.option-control",
         mode_dependent_controls: "[data-visible-on-mode]",
         comparison_selector: "[name='seletor-comparacao']",
-        data: "./dados/dados.csv"
+        barras: "rect.barras",
+        linhas_referencia: "line.ref",
+        data: "./dados/dados.csv",
+
+        colors : {
+            destaque_barra : "--cor-barra-destaque",
+
+            barra_normal : "--cor-barra-normal"
+        }
 
     },
 
@@ -18,6 +26,7 @@ const vis = {
         cont : null,
         rects_acoes : null,
         axis : {},
+        barras : null,
         linhas_referencia : null
 
     },
@@ -68,6 +77,8 @@ const vis = {
     },
 
     params : {
+
+        colors : {},
 
         transitions_duration: 1000,
 
@@ -275,6 +286,16 @@ const vis = {
 
         update_positions : {
             // para quando for disparado um resize
+        },
+
+        update_colors : function() {
+
+            const colors = Object.keys(vis.refs.colors);
+
+            colors.forEach(color => {
+                vis.params.colors[color] = getComputedStyle(document.documentElement).getPropertyValue(vis.refs.colors[color]).slice(1);
+            });
+
         }
     },
 
@@ -576,10 +597,13 @@ const vis = {
                 .attr("y", d => vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top)
                 .transition()
                 .duration(vis.params.transitions_duration)
-                .attr("width", d => vis.draw.scales.w(d[vis.params.main_variable]));
+                .attr("width", d => vis.draw.scales.w(d[vis.params.main_variable]))
+                .attr("fill", vis.params.colors.barra_normal);
 
                 // a main_variable é o PLOA
                 // a variable vai ser o critério de detalhamento: orgao, função etc.
+
+                vis.sels.barras = d3.selectAll(vis.refs.barras);
 
             },
 
@@ -601,7 +625,9 @@ const vis = {
                 .attr("x2", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
                 .attr("stroke", "red");
 
-                vis.sels.linhas_referencia = d3.selectAll("line.ref")
+                vis.sels.linhas_referencia = d3.selectAll(vis.refs.linhas_referencia);
+
+                vis.draw.agregado.colore_barras(num_variable);
 
             },
 
@@ -610,6 +636,26 @@ const vis = {
                 if (vis.sels.linhas_referencia) {
                     vis.sels.linhas_referencia.remove();
                 }
+
+                if (vis.sels.barras) vis.sels.barras.attr("fill", vis.params.colors.barra_normal);
+
+            },
+
+            colore_barras : function(variavel_comparacao) {
+
+                vis.sels.barras.each(function(d,i) {
+                    console.log(d, this);
+                    // d vai trazer o dado amarrado ao elemento; this, o próprio elemento.
+
+                    // // em vez de vis.control.current_state.variavel_comparacao, poderia fazer a própria função de desenhar as linhas de referência chamar esta função aqui, passando a variável numérica usada
+                    // if (d[vis.control.current_state.variavel_comparacao] > d[vis.params.main_variable]) {
+
+
+                    d3.select(this)
+                        .transition()
+                        .duration(vis.params.transitions_duration)
+                        .attr("fill", (d[variavel_comparacao] < d[vis.params.main_variable]) ? vis.params.colors.destaque_barra : vis.params.colors.barra_normal);
+                });
 
             }
 
@@ -805,6 +851,9 @@ const vis = {
             // // summarise data for categorical variables
             // vis.f.summarise_categorical(
             //     numerical_variable = "atu_total");
+
+            //updates colors
+            vis.f.update_colors();
 
             // populates comparison selector
             vis.f.populates_comparison_selector();
