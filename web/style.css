@@ -36,10 +36,20 @@ h1 {
     font-size: 1rem;
 }
 
+/* filtros e visualização */
+
+.fieldsets-wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+
+
 /* botoes filtro */
 
 fieldset {
     margin-bottom: 1rem;
+    flex: 1;
 }
 
 select {
