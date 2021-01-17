@@ -36,6 +36,34 @@ h1 {
     font-size: 1rem;
 }
 
+/* botoes filtro */
+
+fieldset {
+    margin-bottom: 1rem;
+}
+
+select {
+    background-color: transparent;
+    border: 2px solid currentColor;
+    font-family: var(--main-font);
+}
+
+.filter-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.selecoes-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-right: 1rem;
+}
+
+.selecoes-wrapper select + select {
+    margin-top: 1rem;
+}
+
 /* botoes controle */
 
 .mission-control {
@@ -71,12 +99,14 @@ h1 {
     font-size: .8rem;
 }
 
+/*
 [name='seletor-comparacao'] {
     background-color: transparent;
     border: 2px solid currentColor;
-    /* border-radius: 10px; */
+    /* border-radius: 10px; 
     font-family: var(--main-font);
-}
+} 
+*/
 
 /* vis */
 

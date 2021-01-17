@@ -13,6 +13,35 @@
             Análise do PLOA &mdash; Visão do Decreto
         </h1>
     </header>
+    <fieldset>
+        <legend>Filtros</legend>
+        <div class="filter-wrapper">
+            <div class="selecoes-wrapper">
+                <select name="selecao-orgao" id="selecao-orgao">
+                    <option value="todos">Todos os órgãos</option>
+                </select>
+                <select name="selecao-tipo" id="selecao-tipo">
+                    <option value="todos">Todos as despesas</option>
+                </select>
+            </div>
+            <div class="exclusoes-wrapper">
+                <div>
+                    <input type="checkbox" id="exclui-divida" name="exclui-divida" checked>
+                    <label for="exclui-divida">Exclui Dívida Mobiliária</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="exclui-rgps" name="exclui-divida" checked>
+                    <label for="exclui-rgps">Exclui RGPS</label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset>
+        <legend>Visualização</legend>
+
+
+
     <nav class="mission-control mode-control"
 
      data-mode = "agregado | detalhado"
@@ -46,6 +75,8 @@
         <button id="variacao">Variação</button>
         <button id="acao_nova">Ações novas</button>
     </nav>
+
+    </fieldset>
 
     <main>
 
