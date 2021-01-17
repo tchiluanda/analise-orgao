@@ -588,7 +588,10 @@ const vis = {
                 vis.sels.svg
                 .selectAll("line.ref")
                 .data(vis.data.processed, d => d[cat_variable])
-                .join("line")
+                .join(
+                    enter => enter.append("line")
+                      .attr("x1", vis.dims.margins.left)
+                      .attr("x2", vis.dims.margins.left))
                 .classed("ref", true)
                 .attr("y1", d => vis.draw.scales.y_cat(d[cat_variable]) + vis.dims.margins.top - vis.dims.bar_height/2)
                 .attr("y2", d => vis.draw.scales.y_cat(d[cat_variable]) + vis.dims.margins.top + vis.dims.bar_height*1.5)
