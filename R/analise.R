@@ -55,7 +55,7 @@ tab_funcao <- readxl::read_excel("./dados/dados_originais/tabela_funcao.xlsx") %
 
 orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin.xlsx", skip = 5) %>%
   select(uo = `uo Código`,
-         orgao = `orgao Código`,
+         #orgao = `orgao Código`,
          orgao_decreto = `Órgãos Poder Executivo 2020`) %>%
   mutate(
     orgao_decreto_nome = stringr::str_sub(orgao_decreto, 9),
@@ -433,7 +433,7 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
     TRUE ~ "Transferencia"))
 
 base_anexos_todos_orgaos <- base_anexos_sumarizada %>%
-  group_by_at(vars(-orgao_decreto, -orgao_decreto_nome)) %>%
+  group_by_at(vars(-orgao_decreto, -orgao_decreto_nome, -valor)) %>%
   summarise(valor = sum(valor)) %>%
   mutate(orgao_decreto = "Todos", orgao_decreto_nome = "Todos")
 
