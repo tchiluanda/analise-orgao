@@ -74,6 +74,10 @@ select {
     margin-top: .5rem;
 }
 
+.selecoes-wrapper select {
+    width: 20vw;
+}
+
 /* botoes controle */
 
 .mission-control {
@@ -89,6 +93,7 @@ select {
     border-radius: 1.5em;
     color: var(--dark);
     background-color: var(--light);
+    cursor: pointer;
 }
 
 .mission-control button.selected.selected {
@@ -113,6 +118,11 @@ div.controle-comparacao {
     max-width: 90vw;
     margin: 0 auto;
     text-align: center;
+}
+
+.mission-control button.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
 }
 
 /*

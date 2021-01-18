@@ -8,6 +8,8 @@ const vis = {
         option_button: "nav.option-control",
         mode_dependent_controls: "[data-visible-on-mode]",
         comparison_selector: "[name='seletor-comparacao']",
+        filter_selector_orgao_decreto : "#selecao-orgao",
+        filter_selector_anexo : "#selecao-tipo",
         barras: "rect.barras",
         linhas_referencia: "line.ref",
         data: "./dados/dados.csv",
@@ -245,6 +247,24 @@ const vis = {
                 // não dá para encadear aqui
 
             }
+
+        },
+
+        populates_filter_selector : function(seletor) { // orgao_decreto ou anexo
+
+            const selector = document.querySelector(vis.refs["filter_selector_" + seletor]);
+
+            const valores_unicos = utils.unique(vis.data.raw, seletor);
+
+            valores_unicos.forEach(variable => {
+
+                let new_option = document.createElement("option");
+
+                new_option.setAttribute("value", variable);
+                new_option.innerText = variable;
+
+                selector.append(new_option);
+            });
 
         },
 
@@ -913,6 +933,10 @@ const vis = {
 
             // populates comparison selector
             vis.f.populates_comparison_selector();
+            // populates filters
+            vis.f.populates_filter_selector("orgao_decreto");
+            vis.f.populates_filter_selector("anexo");
+
 
             // evaluates domains for selected variables
             vis.draw.domains.initialize_categorical();
