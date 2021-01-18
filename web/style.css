@@ -43,6 +43,13 @@ h1 {
     flex-direction: row;
 }
 
+fieldset.opcoes-filtros {
+    order : 2;
+}
+
+fieldset.opcoes-vis {
+    order : 1;
+}
 
 
 /* botoes filtro */

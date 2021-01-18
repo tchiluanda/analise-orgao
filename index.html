@@ -13,8 +13,10 @@
             Análise do PLOA &mdash; Visão do Decreto
         </h1>
     </header>
+
     <div class="fieldsets-wrapper">
-    <fieldset>
+
+    <fieldset class="opcoes-filtros">
         <legend>Filtros</legend>
         <div class="filter-wrapper">
             <div class="selecoes-wrapper">
@@ -38,45 +40,43 @@
         </div>
     </fieldset>
 
-    <fieldset>
+    <fieldset class="opcoes-vis">
         <legend>Visualização</legend>
+        
+        <nav class="mission-control mode-control"
 
+        data-mode = "agregado | detalhado"
+        data-anexo = "todos | Anexo II | Anexo III | etc."
+        data-agregador = "todos | agregador tal | etc."
+        data-overview-focus = "true|false"
+        data-overview-focus-selection = "none"
+        data-detail-criteria = "changes|new"  
+        data-detail-focus = "true|false"
+        data-detail-focus-selection = "none"
+        data-detail-color-criteria = "pct|abs|funcao_tipica">
 
+            <button id="agregado">Agregado</button>
+            <button id="detalhado">Detalhado</button>
 
-    <nav class="mission-control mode-control"
+        </nav>
 
-     data-mode = "agregado | detalhado"
-     data-anexo = "todos | Anexo II | Anexo III | etc."
-     data-agregador = "todos | agregador tal | etc."
-     data-overview-focus = "true|false"
-     data-overview-focus-selection = "none"
-     data-detail-criteria = "changes|new"  
-     data-detail-focus = "true|false"
-     data-detail-focus-selection = "none"
-     data-detail-color-criteria = "pct|abs|funcao_tipica">
+        <nav class="mission-control option-control show-on-mode hidden" 
+        data-visible-on-mode="agregado" 
+        data-mode = "agregado"
+        data-option = "agregador|funcao_tipica">
+            <button id="orgao_decreto">Por Órgão</button>
+            <button id="anexo">Por Anexo</button>
+            <button id="agregador">Por Agregador</button>
+            <button id="funcao_tipica">Por Função Típica</button>
+        </nav>
 
-        <button id="agregado">Agregado</button>
-        <button id="detalhado">Detalhado</button>
-
-    </nav>
-
-    <nav class="mission-control option-control show-on-mode hidden" 
-     data-visible-on-mode="agregado" 
-     data-mode = "agregado"
-     data-option = "agregador|funcao_tipica">
-        <button id="orgao_decreto">Por Órgão</button>
-        <button id="anexo">Por Anexo</button>
-        <button id="agregador">Por Agregador</button>
-        <button id="funcao_tipica">Por Função Típica</button>
-    </nav>
-
-    <nav class="mission-control option-control show-on-mode hidden" 
-     data-visible-on-mode="detalhado" 
-     data-mode = "detalhado"
-     data-option = "variacao|acao_nova">
-        <button id="variacao">Variação</button>
-        <button id="acao_nova">Ações novas</button>
-    </nav>
+        <nav class="mission-control option-control show-on-mode hidden" 
+        data-visible-on-mode="detalhado" 
+        data-mode = "detalhado"
+        data-option = "variacao|acao_nova">
+            <button id="variacao">Variação</button>
+            <button id="acao_nova">Ações novas</button>
+        </nav>
 
     </fieldset>
 </div>
