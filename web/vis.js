@@ -784,6 +784,35 @@ const vis = {
 
 
 
+                        },
+
+                        "anexo" : {
+
+                            set_scales : [
+
+                                { dimension: "x" , 
+                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
+                                    axis     : true },
+    
+                                { dimension : "y_cat" ,  
+                                    variable  : "anexo",
+                                    axis      : true },
+    
+                                { dimension : "w" ,
+                                    variable  : "agregado", //"atu_total",
+                                    axis      : false }
+        
+                                ],
+        
+                            render : function(option) {
+
+                                console.log(this);
+
+                                vis.draw.agregado.desenha_barras(option);
+                                
+                            }
+
+
                         }
     
     
