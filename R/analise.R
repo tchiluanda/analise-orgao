@@ -432,20 +432,20 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
     str_sub(mod,1,1) == "9" ~ "Direta",
     TRUE ~ "Transferencia"))
 
-base_anexos_todos_orgaos <- base_anexos_sumarizada %>%
-  group_by_at(vars(-orgao_decreto, -orgao_decreto_nome, -valor)) %>%
-  summarise(valor = sum(valor)) %>%
-  mutate(orgao_decreto = "Todos", orgao_decreto_nome = "Todos")
+# base_anexos_todos_orgaos <- base_anexos_sumarizada %>%
+#   group_by_at(vars(-orgao_decreto, -orgao_decreto_nome, -valor)) %>%
+#   summarise(valor = sum(valor)) %>%
+#   mutate(orgao_decreto = "Todos", orgao_decreto_nome = "Todos")
 
-base_completa <- bind_rows(
-  base_anexos_sumarizada,
-  base_anexos_todos_orgaos
-)
+# base_completa <- bind_rows(
+#   base_anexos_sumarizada,
+#   base_anexos_todos_orgaos
+# )
 
 # testes vis
 
-ggplot(base_anexos_sumarizada %>% filter(variavel == "PLOA")) +
-  geom_col(aes(y = valor, x = reorder(agregador, valor))) +
+ggplot(base_anexos_sumarizada %>% filter(variavel %in% c("PLOA","dot_atu"))) +
+  geom_col(aes(y = valor, x = reorder(orgao_decreto, valor), fill = variavel), position = position_dodge()) +
   coord_flip()
 
 ggplot(base_anexos_sumarizada %>% filter(variavel == "PLOA")) +
@@ -513,21 +513,23 @@ titulo_acao <- ploa %>%
   select(acao, tituloacao) %>%
   distinct()
 
-# calcula posições iniciais -----------------------------------------------
 
-base_variacoes <- base_completa %>%
-  group_by(orgao_decreto, orgao_decreto_nome, agregador, 
-           #anexo, ### sem anexo, por enquanto, pq senão teremos ações fragmentadas 
-           acao, funcao_tipica, variavel) %>%
-  summarise(valor = sum(valor)) %>%
-  ungroup() %>%
-  spread(variavel, valor) %>%
-  filter(!is.na(PLOA)) %>% # (1)
-  mutate(
-    var_abs = PLOA - dot_atu,
-    var_pct = (PLOA / dot_atu - 1)*100,
-    acao_nova = dot_atu == 0 | is.na(dot_atu)
-  )
+# calcula variacoes -------------------------------------------------------
+
+# calcular isso no JS? pq vai depender da visão...
+# base_variacoes <- base_anexos_sumarizada %>%
+#   group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo,
+#            #anexo, ### sem anexo, por enquanto, pq senão teremos ações fragmentadas 
+#            acao, funcao_tipica, variavel) %>%
+#   summarise(valor = sum(valor)) %>%
+#   ungroup() %>%
+#   spread(variavel, valor) %>%
+#   filter(!is.na(PLOA)) %>% # (1)
+#   mutate(
+#     var_abs = PLOA - dot_atu,
+#     var_pct = (PLOA / dot_atu - 1)*100,
+#     acao_nova = dot_atu == 0 | is.na(dot_atu)
+#   )
  
  # (1) tira ações que não estão no PLOA
 
@@ -545,11 +547,11 @@ base_variacoes <- base_completa %>%
 #   mutate(varia = atu_total - ref_total,
 #          varia_pct = (atu_total / ref_total - 1) * 100)
 
-base_pre_stack <- base_variacoes %>%
-  left_join(perfil_gnd) %>%
-  left_join(perfil_mod) %>%
-  left_join(principais_orgaos) %>%
-  left_join(titulo_acao)
+# base_pre_stack <- base_anexos_sumarizada #base_variacoes %>%
+#   left_join(perfil_gnd) %>%
+#   left_join(perfil_mod) %>%
+#   left_join(principais_orgaos) %>%
+#   left_join(titulo_acao)
 
 # variaveis_de_interesse <- c("agregador")
 # 
@@ -564,11 +566,38 @@ base_pre_stack <- base_variacoes %>%
 #     ungroup()
 # }
 
-base_export <- base_pre_stack %>%
+base_export <- base_anexos_sumarizada %>% #base_variacoes %>%
+  mutate(marcador = case_when(
+    uo == "75101" ~ "divida",
+    uo == "25917" ~ "rgps",
+    TRUE ~ "demais")) %>%
+  group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo, marcador,
+           acao, funcao_tipica, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  spread(variavel, valor) %>%
+  filter(!is.na(PLOA)) %>% # (1)
+  left_join(perfil_gnd) %>%
+  left_join(perfil_mod) %>%
+  left_join(principais_orgaos) %>%
+  left_join(titulo_acao) %>%
   mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
          desp_paga = ifelse(is.na(desp_paga), 0, desp_paga))
 
+  # (1) tira ações que não estão no PLOA
+  
 write.csv(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
+
+ggplot(base_export, aes(x = orgao_decreto)) +
+  geom_col(aes(y = dot_atu), fill = "purple") +
+  geom_col(aes(y = PLOA), fill = "goldenrod") +
+  coord_flip()
+
+base_export %>% 
+  group_by(orgao_decreto) %>%
+  summarise_at(vars(PLOA, dot_atu), .funs = ~sum(.)) %>%
+  arrange(desc(PLOA))
+
 
 # exploracao --------------------------------------------------------------
 
