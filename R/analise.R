@@ -567,7 +567,10 @@ titulo_acao <- ploa %>%
 # }
 
 base_export <- base_anexos_sumarizada %>% #base_variacoes %>%
-  mutate(marcador = case_when(
+  mutate(
+    orgao_decreto_cod = orgao_decreto,
+    orgao_decreto = paste(orgao_decreto_cod, orgao_decreto_nome, sep = " - "),  
+    marcador = case_when(
     uo == "75101" ~ "divida",
     uo == "25917" ~ "rgps",
     TRUE ~ "demais")) %>%
