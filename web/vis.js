@@ -55,7 +55,7 @@ const vis = {
 
             top: 10,
             left: 200,
-            right: 20,
+            right: 50,
             bottom: 20
 
         }
@@ -1190,6 +1190,12 @@ const vis = {
                             mode = vis.control.current_state.mode, 
                             option = vis.control.current_state.option
                         );
+
+                        // if (vis.sels.linhas_referencia) {
+                        //     vis.draw.agregado.desenha_linhas_referencia(
+                        //         cat_variable = vis.control.current_state.variavel_detalhamento,num_variable = vis.control.current_state.option
+                        //     )
+                        // }
 
                     }
 
