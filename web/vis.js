@@ -96,7 +96,7 @@ const vis = {
 
         main_variable : "PLOA",
 
-        categorical_vars : ["orgao_decreto", "anexo", "funcao_tipica"],
+        categorical_vars : ["orgao_decreto", "anexo", "agregador", "funcao_tipica"],
         // also, those are the variables used for evaluating summaries in the "agregado" mode.
 
         // this will serve to determine axis
@@ -813,8 +813,35 @@ const vis = {
                             }
 
 
-                        }
+                        },
+
+                        "agregador" : {
+
+                            set_scales : [
+
+                                { dimension: "x" , 
+                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
+                                    axis     : true },
     
+                                { dimension : "y_cat" ,  
+                                    variable  : "agregador",
+                                    axis      : true },
+    
+                                { dimension : "w" ,
+                                    variable  : "agregado", //"atu_total",
+                                    axis      : false }
+        
+                                ],
+        
+                            render : function(option) {
+
+                                console.log(this);
+
+                                vis.draw.agregado.desenha_barras(option);
+                                
+                            }
+
+                        }
     
                     }
     
