@@ -103,10 +103,10 @@ const vis = {
 
         variables_type : {
 
-            atu_total         : "numerical",
+            PLOA              : "numerical",
             varia             : "numerical",
             varia_pct         : "percent",
-            pos_ini_agregador : "numerical",
+            dot_atu           : "numerical",
             agregado          : "numerical",
             agregador         : "categorical",
             funcao_tipica     : "categorical"
@@ -562,7 +562,7 @@ const vis = {
                 switch (type) {
 
                     case 'numerical' :  
-                        this[dimension].tickFormat(d => utils.formataBR(d/1e6));
+                        this[dimension].tickFormat(d => utils.formataBR(d/1e9));
                         break;
 
                     case 'percent' :
