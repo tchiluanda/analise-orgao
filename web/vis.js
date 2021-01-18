@@ -8,8 +8,9 @@ const vis = {
         option_button: "nav.option-control",
         mode_dependent_controls: "[data-visible-on-mode]",
         comparison_selector: "[name='seletor-comparacao']",
-        filter_selector_orgao_decreto : "#selecao-orgao",
-        filter_selector_anexo : "#selecao-tipo",
+        selectors_wrapper: ".selecoes-wrapper",
+        selector_orgao_decreto : "#selecao-orgao",
+        selector_anexo : "#selecao-tipo",
         barras: "rect.barras",
         linhas_referencia: "line.ref",
         data: "./dados/dados.csv",
@@ -204,22 +205,49 @@ const vis = {
 
         },
 
-        evaluate_dataset : function(modo, var_filtro, valor_filtro, var_detalhamento) {
+        evaluate_dataset : function(modo, selecao_orgao, selecao_anexo, filtro_divida, filtro_rgps, var_detalhamento) {
 
-            console.log(vis.params.variables);
+            console.log(selecao_orgao, selecao_anexo, filtro_divida, filtro_rgps);
+
+            let dados = vis.data.raw;
+
+            console.log("inicial", dados)
+
+            if (selecao_orgao != "todos") {
+                dados = dados
+                          .filter(d => d.orgao_decreto == selecao_orgao)
+            }
+
+            console.log("aplicou selecao_orgao", dados)
+
+            if (selecao_anexo != "todos") {
+                dados = dados
+                          .filter(d => d.anexo == selecao_anexo)
+            }
+
+            console.log("aplicou selecao_anexo", dados)
+
+            if (filtro_divida) {
+                dados = dados
+                          .filter(d => d.marcador != "divida")
+            }
+
+            if (filtro_rgps) {
+                dados = dados
+                          .filter(d => d.marcador != "rgps")
+            }
 
             vis.data.processed = utils.group_by_sum_cols(
 
-                objeto = vis.data.raw
-                           .filter(d => d[var_filtro] != valor_filtro), //temp
-                           // por exemplo, var_filtro = "orgao_decreto",
-                           //valor_filtro = "todos"
+                objeto = dados,
                 coluna_categoria = var_detalhamento,
                 colunas_valor = vis.params.variables,
                 ordena_decrescente = true,
                 coluna_ordem = vis.params.main_variable
 
             );
+
+            // trata o caso de o dataset ficar com uma lista muito grande
 
             if (vis.data.processed.length > 16) {
 
@@ -252,7 +280,7 @@ const vis = {
 
         populates_filter_selector : function(seletor) { // orgao_decreto ou anexo
 
-            const selector = document.querySelector(vis.refs["filter_selector_" + seletor]);
+            const selector = document.querySelector(vis.refs["selector_" + seletor]);
 
             const valores_unicos = utils.unique(vis.data.raw, seletor);
 
@@ -316,6 +344,10 @@ const vis = {
                 vis.params.colors[color] = getComputedStyle(document.documentElement).getPropertyValue(vis.refs.colors[color]).slice(1);
             });
 
+        },
+
+        desabilita_opcao : function(opcao) {
+            document.querySelector("button#" + opcao).classList.add("disabled");
         }
     },
 
@@ -718,9 +750,16 @@ const vis = {
     control : {
 
         current_state : {
+
             mode : null,
+            option : null,
             variavel_detalhamento : null,
-            variavel_comparacao : null
+            variavel_comparacao : null,
+            selecao_orgao_decreto : "todos",
+            selecao_anexo : "todos",
+            filtro_divida : false,
+            filtro_rgps : false
+
         },
 
         states : {
@@ -957,6 +996,7 @@ const vis = {
             vis.control.monitor_mode_button();
             vis.control.monitor_option_button();
             vis.control.monitora_seletor_comparacao();
+            vis.control.monitora_seletores_filtros();
 
             //vis.control.draw_state("agregado", "orgao_decreto");
 
@@ -967,10 +1007,14 @@ const vis = {
             // mode é se é agregado ou detalhado
             // option é a variável de detalhamento (no caso do agregado)
 
+            console.log(vis.control.current_state);
+
             vis.f.evaluate_dataset(
                 modo = null,
-                var_filtro = "orgao_decreto",
-                valor_filtro = "Todos",
+                selecao_orgao = vis.control.current_state.selecao_orgao_decreto,
+                selecao_anexo = vis.control.current_state.selecao_anexo,
+                filtro_divida = vis.control.current_state.filtro_divida,
+                filtro_rgps = vis.control.current_state.filtro_rgps,
                 var_detalhamento = option
             );
 
@@ -1077,7 +1121,10 @@ const vis = {
 
                     if (this.dataset.option != option) {
 
+                        // depois tem que ajeitar isso aqui
                         this.dataset.option = option;
+
+                        vis.control.current_state.option = option;
 
                         let mode = this.dataset.mode;
 
@@ -1123,6 +1170,36 @@ const vis = {
 
             })
 
+
+        },
+
+        monitora_seletores_filtros : function() {
+
+            let seletores = document.querySelector(vis.refs.selectors_wrapper);
+
+            seletores.addEventListener("change", function(e) {
+
+                const seletor = e.target.name; // pra saber se foi no de orgao_decreto ou anexo
+                const valor_selecionado = e.target.value//.slice(0,5);
+
+                if (valor_selecionado != vis.control.current_state["selecao_" + seletor]) {
+
+                    vis.control.current_state["selecao_" + seletor] = valor_selecionado;
+
+                    if (vis.control.current_state.option != null) {
+
+                        console.log("desenha");
+
+                        vis.control.draw_state(
+                            mode = vis.control.current_state.mode, 
+                            option = vis.control.current_state.option
+                        );
+
+                    }
+
+                }
+
+            });
 
         },
 
