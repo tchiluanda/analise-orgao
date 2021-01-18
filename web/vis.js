@@ -66,7 +66,12 @@ const vis = {
 
         raw : null,
 
-        processed : null
+        processed : {
+            
+            agregado : null,
+
+            detalhado : null 
+        }
         
         //{
 
@@ -196,7 +201,7 @@ const vis = {
 
             vis.params.categorical_vars.forEach(categorical_variable => {
 
-                vis.data.processed[categorical_variable] =
+                vis.data.processed.agregado[categorical_variable] =
                 utils.group_by_sum(
                     objeto = vis.data.raw, 
                     coluna_categoria = categorical_variable, 
@@ -232,7 +237,7 @@ const vis = {
                           .filter(d => d.marcador != "rgps")
             }
 
-            vis.data.processed = utils.group_by_sum_cols(
+            vis.data.processed.agregado = utils.group_by_sum_cols(
 
                 objeto = dados,
                 coluna_categoria = var_detalhamento,
@@ -244,11 +249,11 @@ const vis = {
 
             // trata o caso de o dataset ficar com uma lista muito grande
 
-            if (vis.data.processed.length > 16) {
+            if (vis.data.processed.agregado.length > 16) {
 
-                let bottom_dataset = vis.data.processed.slice(15);
+                let bottom_dataset = vis.data.processed.agregado.slice(15);
 
-                // var_detalhamento vai ser a variável usada no detalhamento, então vai ser o nome da coluna/variável no dataset sumarizado que foi armazenado em vis.data.processed.
+                // var_detalhamento vai ser a variável usada no detalhamento, então vai ser o nome da coluna/variável no dataset sumarizado que foi armazenado em vis.data.processed.agregado.
 
                 //bottom_dataset.forEach(el => el[var_detalhamento] = vis.params.nomes_demais[var_detalhamento]);
 
@@ -263,10 +268,10 @@ const vis = {
                       .reduce((acu , atu) => acu + atu)
                 );
 
-                vis.data.processed = vis.data.processed
+                vis.data.processed.agregado = vis.data.processed.agregado
                   .slice(0,15);
 
-                vis.data.processed.push(elemento_demais);
+                vis.data.processed.agregado.push(elemento_demais);
                 // não dá para encadear aqui
 
             }
@@ -379,7 +384,7 @@ const vis = {
                 // function initialize_domain_agregado() {
 
                 //     const maxs = vis.params.categorical_vars.map(
-                //         cat => d3.max(vis.data.processed[cat],
+                //         cat => d3.max(vis.data.processed.agregado[cat],
                 //             d => +d.subtotal)
                 //     )
     
@@ -400,7 +405,7 @@ const vis = {
                 let current_variable = vis.control.current_state.variavel_detalhamento;
 
                 let subtotais = utils.group_by_sum(
-                    objeto = vis.data.processed,
+                    objeto = vis.data.processed.agregado,
                     coluna_categoria = current_variable,
                     coluna_valor = vis.params.main_variable,
                     ordena_decrescente = true
@@ -420,7 +425,7 @@ const vis = {
                 // maximos dos dados selecionados atuais
 
                 const maxs = vis.params.variables.map(
-                    variable => d3.max(vis.data.processed, d => d[variable])
+                    variable => d3.max(vis.data.processed.agregado, d => d[variable])
                 );
 
                 vis.draw.domains.agregado = [
@@ -635,7 +640,7 @@ const vis = {
 
                 vis.sels.svg
                 .selectAll("rect.barras")
-                .data(vis.data.processed, d => d[variable])
+                .data(vis.data.processed.agregado, d => d[variable])
                 .join("rect")
                 .classed("barras", true)
                 .attr("x", vis.dims.margins.left)
@@ -654,7 +659,7 @@ const vis = {
 
                 vis.sels.cont
                 .selectAll("p.labels-valores-barras")
-                .data(vis.data.processed, d => d[variable])
+                .data(vis.data.processed.agregado, d => d[variable])
                 .join("p")
                 .classed("labels-valores-barras", true)
                 .style("top", d => (vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top) + "px")
@@ -673,7 +678,7 @@ const vis = {
 
                 vis.sels.svg
                 .selectAll("line.ref")
-                .data(vis.data.processed, d => d[cat_variable])
+                .data(vis.data.processed.agregado, d => d[cat_variable])
                 .join(
                     enter => enter.append("line")
                       .attr("x1", vis.dims.margins.left)
