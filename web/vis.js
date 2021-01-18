@@ -11,6 +11,9 @@ const vis = {
         selectors_wrapper: ".selecoes-wrapper",
         selector_orgao_decreto : "#selecao-orgao",
         selector_anexo : "#selecao-tipo",
+        exclusoes_wrapper: ".exclusoes-wrapper",
+        exclui_divida: "#exclui-divida",
+        exclui_rgps: "#exclui-rgps",
         barras: "rect.barras",
         linhas_referencia: "line.ref",
         data: "./dados/dados.csv",
@@ -205,34 +208,26 @@ const vis = {
 
         },
 
-        evaluate_dataset : function(modo, selecao_orgao, selecao_anexo, filtro_divida, filtro_rgps, var_detalhamento) {
-
-            console.log(selecao_orgao, selecao_anexo, filtro_divida, filtro_rgps);
+        evaluate_dataset : function(modo, selecao_orgao, selecao_anexo, exclui_divida, exclui_rgps, var_detalhamento) {
 
             let dados = vis.data.raw;
-
-            console.log("inicial", dados)
 
             if (selecao_orgao != "todos") {
                 dados = dados
                           .filter(d => d.orgao_decreto == selecao_orgao)
             }
 
-            console.log("aplicou selecao_orgao", dados)
-
             if (selecao_anexo != "todos") {
                 dados = dados
                           .filter(d => d.anexo == selecao_anexo)
             }
 
-            console.log("aplicou selecao_anexo", dados)
-
-            if (filtro_divida) {
+            if (exclui_divida) {
                 dados = dados
                           .filter(d => d.marcador != "divida")
             }
 
-            if (filtro_rgps) {
+            if (exclui_rgps) {
                 dados = dados
                           .filter(d => d.marcador != "rgps")
             }
@@ -757,8 +752,8 @@ const vis = {
             variavel_comparacao : null,
             selecao_orgao_decreto : "todos",
             selecao_anexo : "todos",
-            filtro_divida : false,
-            filtro_rgps : false
+            exclui_divida : false,
+            exclui_rgps : false
 
         },
 
@@ -997,6 +992,7 @@ const vis = {
             vis.control.monitor_option_button();
             vis.control.monitora_seletor_comparacao();
             vis.control.monitora_seletores_filtros();
+            vis.control.monitora_exclusoes();
 
             //vis.control.draw_state("agregado", "orgao_decreto");
 
@@ -1013,8 +1009,8 @@ const vis = {
                 modo = null,
                 selecao_orgao = vis.control.current_state.selecao_orgao_decreto,
                 selecao_anexo = vis.control.current_state.selecao_anexo,
-                filtro_divida = vis.control.current_state.filtro_divida,
-                filtro_rgps = vis.control.current_state.filtro_rgps,
+                exclui_divida = vis.control.current_state.exclui_divida,
+                exclui_rgps = vis.control.current_state.exclui_rgps,
                 var_detalhamento = option
             );
 
@@ -1185,6 +1181,38 @@ const vis = {
                 if (valor_selecionado != vis.control.current_state["selecao_" + seletor]) {
 
                     vis.control.current_state["selecao_" + seletor] = valor_selecionado;
+
+                    if (vis.control.current_state.option != null) {
+
+                        console.log("desenha");
+
+                        vis.control.draw_state(
+                            mode = vis.control.current_state.mode, 
+                            option = vis.control.current_state.option
+                        );
+
+                    }
+
+                }
+
+            });
+
+        },
+
+        monitora_exclusoes : function() {
+
+            let checkboxes = document.querySelector(vis.refs.exclusoes_wrapper);
+
+            checkboxes.addEventListener("change", function(e) {
+
+                const opcao = e.target.name; // pra saber se foi no de divida ou rgps
+                const checked = e.target.checked//.slice(0,5);
+
+                console.log("Monitor exclusoes", opcao, checked)
+
+                if (checked != vis.control.current_state["exclui_" + opcao]) {
+
+                    vis.control.current_state["exclui_" + opcao] = checked;
 
                     if (vis.control.current_state.option != null) {
 
