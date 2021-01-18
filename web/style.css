@@ -157,6 +157,15 @@ rect.acoes {
     fill : var(--pink);
 }
 
+/* labels valor barras */
+
+p.labels-valores-barras {
+    position: absolute;
+    font-family: var(--main-font);
+    margin: 0;
+    margin-left: .5rem;
+}
+
 /* linhas de referência */
 line.ref {
     stroke-width: 2px;

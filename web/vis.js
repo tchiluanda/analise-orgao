@@ -652,6 +652,21 @@ const vis = {
 
                 vis.sels.barras = d3.selectAll(vis.refs.barras);
 
+                vis.sels.cont
+                .selectAll("p.labels-valores-barras")
+                .data(vis.data.processed, d => d[variable])
+                .join("p")
+                .classed("labels-valores-barras", true)
+                .style("top", d => (vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top) + "px")
+                .style("left", vis.dims.margins.left + "px")
+                .style("font-size", vis.dims.bar_height + "px")
+                .style("line-height", vis.dims.bar_height + "px")
+                .text(d => utils.valor_formatado(d[vis.params.main_variable]))
+                .transition()
+                .duration(vis.params.transitions_duration)
+                .style("left", d => (vis.dims.margins.left + vis.draw.scales.w(d[vis.params.main_variable])) + "px")
+
+
             },
 
             desenha_linhas_referencia : function(cat_variable, num_variable) {
