@@ -67,6 +67,8 @@ const vis = {
         raw : null,
 
         processed : {
+
+            filtered : null,
             
             agregado : null,
 
@@ -237,9 +239,25 @@ const vis = {
                           .filter(d => d.marcador != "rgps")
             }
 
+            vis.data.processed.filtered = dados;
+
+            // dividir aqui conforme o modo
+
+            if (modo == agregado) {
+
+                this.summarise_dataset_agregado(var_detalhamento);
+            
+            }
+
+        },
+
+        summarise_dataset_agregado : function(var_detalhamento) {
+
+            // agregado
+
             vis.data.processed.agregado = utils.group_by_sum_cols(
 
-                objeto = dados,
+                objeto = vis.data.processed.filtered,
                 coluna_categoria = var_detalhamento,
                 colunas_valor = vis.params.variables,
                 ordena_decrescente = true,
@@ -264,17 +282,18 @@ const vis = {
                 vis.params.variables.forEach(
                     variable => elemento_demais[variable] = 
                     bottom_dataset
-                      .map(d => +d[variable])
-                      .reduce((acu , atu) => acu + atu)
+                    .map(d => +d[variable])
+                    .reduce((acu , atu) => acu + atu)
                 );
 
                 vis.data.processed.agregado = vis.data.processed.agregado
-                  .slice(0,15);
+                .slice(0,15);
 
                 vis.data.processed.agregado.push(elemento_demais);
                 // não dá para encadear aqui
 
             }
+
 
         },
 
@@ -1026,7 +1045,7 @@ const vis = {
             console.log(vis.control.current_state);
 
             vis.f.evaluate_dataset(
-                modo = null,
+                modo = mode,
                 selecao_orgao = vis.control.current_state.selecao_orgao_decreto,
                 selecao_anexo = vis.control.current_state.selecao_anexo,
                 exclui_divida = vis.control.current_state.exclui_divida,
