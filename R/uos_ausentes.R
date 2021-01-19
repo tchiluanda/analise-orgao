@@ -40,3 +40,4 @@ tab_uo <- bind_rows(tab_uo_cofin, tab_uo_ploa) %>%
 write.csv2(tab_uo, file = "./dados/dados_intermediarios/uos_ploa_fora_tabela.csv")
 
 tab_uo %>% select(uo, cofin, ploa, nomeuo, valor)
+tab_uo$uo

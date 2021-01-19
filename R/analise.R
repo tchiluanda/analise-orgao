@@ -14,9 +14,9 @@ library(readxl)
 ploa_raw <- readxl::read_excel("./dados/dados_originais/SOF_PLOA_2021_STN_ajustada_gepla.xlsx", sheet = "ajustada")
 
 arquivos <- c(
-  "./dados/dados_originais/dot_2020_ate26000.xlsx",
-  "./dados/dados_originais/dot_2020_so26000.xlsx",
-  "./dados/dados_originais/dot_2020_maior26000.xlsx",
+  # "./dados/dados_originais/dot_2020_ate26000.xlsx",
+  # "./dados/dados_originais/dot_2020_so26000.xlsx",
+  # "./dados/dados_originais/dot_2020_maior26000.xlsx",
   "./dados/dados_originais/pago_2020_menor_igual26000.xlsx",
   "./dados/dados_originais/pago_2020_26001_36000.xlsx",
   "./dados/dados_originais/pago_2020_36001_53000.xlsx",
@@ -26,6 +26,8 @@ arquivos <- c(
 dados_adicionais_raw <- 
   purrr::map(.x = arquivos, .f = readxl::read_excel, skip = 8) %>%
   bind_rows()
+
+dados_adicionais_raw %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum()
 
 colnames(dados_adicionais_raw) <- c(
   "exercicio", 
@@ -51,12 +53,13 @@ colnames(dados_adicionais_raw) <- c(
 
 tab_funcao <- readxl::read_excel("./dados/dados_originais/tabela_funcao.xlsx") %>%
   select(subfuncao = cod_subfuncao,
-         funcao_tipica = Funcao)
+         funcao_tipica = Funcao) %>%
+  distinct()
 
-orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin.xlsx", skip = 5) %>%
+orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin_2021.xlsx", skip = 5) %>%
   select(uo = `uo Código`,
-         #orgao = `orgao Código`,
-         orgao_decreto = `Órgãos Poder Executivo 2020`) %>%
+         orgao = `orgao Código`,
+         orgao_decreto = `Órgãos Poder Executivo 2021`) %>%
   mutate(
     orgao_decreto_nome = stringr::str_sub(orgao_decreto, 9),
     orgao_decreto = stringr::str_sub(orgao_decreto, 1, 5),
@@ -64,14 +67,22 @@ orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin.xlsx", 
       orgao_decreto_nome == "abinete da Vice-Presidência da República",
       "Gabinete da Vice-Presidência da República",
       orgao_decreto_nome)
-    )
+    ) %>%
+  distinct() %>%
+  group_by(uo, orgao) %>%
+  summarise(orgao_decreto = last(orgao_decreto),
+            orgao_decreto_nome = last(orgao_decreto_nome))
+
+orgaos %>% count(uo, orgao) %>% arrange(desc(n)) %>% filter(n>1) 
+# uos em mais de um órgão (saco)
 
 agrupadores <- readxl::read_excel("./dados/dados_originais/Novos Agregadores Min. Economia.xlsx") %>%
   select(
     acao = `Rótulos de Linha`,
     #tituloacao = `Nome Ação Governo`,
     agregador = `Agregadores Novos`
-  )
+  ) %>% 
+  distinct()
 
 
 # prepara tabelas com informacoes principais ------------------------------
@@ -95,18 +106,18 @@ dados_combinados_raw <-
 
 # reúne informações na tabela ---------------------------------------------
 
+tabela_uo_ploa <- ploa %>% select(uo, nomeuo) %>% distinct()
+tabela_orgao_ploa <- ploa %>% select(orgao, nomeorgao) %>% distinct()
+
 dados_combinados <-
   dados_combinados_raw %>%
   group_by(exercicio,
            tipo_valor,
            uo,
-           nomeuo,
            orgao,
-           nomeorgao,
            fonte,
            programa,
            acao,
-           tituloacao,
            funcao,
            subfuncao,
            gnd,
@@ -115,7 +126,9 @@ dados_combinados <-
            credito,
            ied) %>%
   summarise(valor = sum(valor)) %>%
-  ungroup()
+  ungroup() %>%
+  left_join(tabela_uo_ploa) %>%
+  left_join(tabela_orgao_ploa)
     
 #exercicio_ref <- 2021
 
@@ -129,6 +142,11 @@ base <- dados_combinados %>%
   ) #%>%
   #filter(orgao_decreto == "25000")
 
+dados_combinados %>% filter(tipo_valor == "PLOA") %>% select(valor) %>% sum(.)
+base %>% filter(tipo_valor == "PLOA") %>% select(valor) %>% sum(.)
+
+dados_combinados %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum(.)
+base %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum(.)
 
 # Incorpora informação dos anexos -----------------------------------------
 
@@ -385,7 +403,7 @@ base_anexos_verifica %>%
   arrange(desc(n)) %>%
   filter(n>1)
 
-# verifica se cada acao está vinculada apenas em um único anexo
+# verifica se cada acao está vinculada apenas em um único anexo (nao precisa estar)
 base_anexos_verifica %>% 
   filter(pertence) %>%
   select(acao, anexo) %>%
@@ -413,7 +431,7 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
     anexo, 
     agregador, 
     uo, nomeuo,
-    acao, tituloacao, 
+    acao,
     fonte, 
     gnd, 
     mod, 
@@ -430,7 +448,15 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
     TRUE ~ "Dívida")) %>%
   mutate(mod = case_when(
     str_sub(mod,1,1) == "9" ~ "Direta",
-    TRUE ~ "Transferencia"))
+    TRUE ~ "Transferencia")) %>%
+  mutate(fonte = case_when(
+    fonte %in% fontes_proprias ~ "Fontes próprias",
+    fonte %in% c("43","44") ~ "Fontes de Emissão",
+    TRUE ~ "Fontes Tesouro"
+  ))
+
+base_anexos_sumarizada %>% filter(variavel == "PLOA") %>% group_by(fonte) %>% summarise(sum(valor))
+base_anexos_sumarizada %>% group_by(variavel) %>% summarise(sum(valor))
 
 # base_anexos_todos_orgaos <- base_anexos_sumarizada %>%
 #   group_by_at(vars(-orgao_decreto, -orgao_decreto_nome, -valor)) %>%
@@ -509,9 +535,6 @@ principais_orgaos <- base_anexos_sumarizada %>%
   unite("uo_valor", c(uo, valor), sep = "_", remove = TRUE) %>%
   spread(ranking, uo_valor)
     
-titulo_acao <- ploa %>%
-  select(acao, tituloacao) %>%
-  distinct()
 
 
 # calcula variacoes -------------------------------------------------------
@@ -566,6 +589,13 @@ titulo_acao <- ploa %>%
 #     ungroup()
 # }
 
+
+# exporta -----------------------------------------------------------------
+
+titulo_acao <- ploa %>%
+  select(acao, tituloacao) %>%
+  distinct()
+
 base_export <- base_anexos_sumarizada %>% #base_variacoes %>%
   mutate(
     orgao_decreto_cod = orgao_decreto,
@@ -590,6 +620,37 @@ base_export <- base_anexos_sumarizada %>% #base_variacoes %>%
   # (1) tira ações que não estão no PLOA
   
 write.csv(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
+
+
+# tab_fonte <- ploa %>%
+#   select(fonte, descricaofonte) %>%
+#   distinct() %>%
+#   mutate(fonte = str_sub(fonte, 1, 3))
+
+base_export_longa <- base_anexos_sumarizada %>% #base_variacoes %>%
+  mutate(
+    orgao_decreto_cod = orgao_decreto,
+    orgao_decreto = paste(orgao_decreto_cod, orgao_decreto_nome, sep = " - "),  
+    marcador = case_when(
+      uo == "75101" ~ "divida",
+      uo == "25917" ~ "rgps",
+      TRUE ~ "demais")) %>%
+  group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo, marcador,
+           acao, uo, nomeuo, fonte, gnd, mod, funcao_tipica, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  spread(variavel, valor, fill = 0) %>%
+  filter(!is.na(PLOA)) %>% # (1)
+  left_join(titulo_acao) %>%
+  mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
+         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga)) 
+
+sum(base_export_longa$PLOA)
+sum(base_export_longa$dot_atu)
+sum(base_export_longa$desp_paga)
+
+write.csv(base_export_longa, file = "./dados/dados.csv", fileEncoding = "utf-8")
+
+
 
 ggplot(base_export, aes(x = orgao_decreto)) +
   geom_col(aes(y = dot_atu), fill = "purple") +
@@ -646,15 +707,16 @@ ggplot(ploa_funcao_tipica %>% filter(str_sub(Orgao,1,1) %in% c("2","3"),
   facet_wrap(~Orgao, scales = "free") +
   theme(legend.position = "none")
 
-# limita escopo ao ME -----------------------------------------------------
+# acoes sem agregadores ---------------------------------------------------
 
-ploa_ME <- ploa %>%
-  filter(orgao_decreto == "25000")
+
+ploa_ME <- base %>%
+  filter(orgao_decreto == "25000", tipo_valor == "PLOA")
 
 acoes_ME_sem_agregadores <- ploa_ME %>%
   filter(is.na(agregador)) %>%
-  select(acao, tituloacao) %>%
-  unique()
+  group_by(acao, tituloacao) %>%
+  summarise(valor = sum(valor))
 
 write.csv2(acoes_ME_sem_agregadores, 
            file = "./dados/dados_intermediarios/acoes_ME_sem_agregadores.csv",
@@ -689,6 +751,7 @@ ploa_ME_clean_funcoes <- ploa_ME %>% #_clean %>%
   summarise(valor = sum(valor))
 
 write.csv(ploa_ME_clean_funcoes, "./dados/dados_intermediarios/funcoes.csv")
+
 
 # estrutura dados para grafo ----------------------------------------------
 

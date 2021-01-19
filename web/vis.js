@@ -711,7 +711,7 @@ const vis = {
             colore_barras : function(variavel_comparacao) {
 
                 vis.sels.barras.each(function(d,i) {
-                    console.log(d, this);
+                    // console.log(d, this);
                     // d vai trazer o dado amarrado ao elemento; this, o próprio elemento.
 
                     // // em vez de vis.control.current_state.variavel_comparacao, poderia fazer a própria função de desenhar as linhas de referência chamar esta função aqui, passando a variável numérica usada

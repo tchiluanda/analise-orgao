@@ -1,19 +1,19 @@
-"";"acao";"tituloacao"
-"1";"21C5";"Elaboração de Estudos e Avaliação de Projetos de Investimentos do Governo Federal"
-"2";"20TP";"Ativos Civis da União"
-"3";"216Z";"Gestão e Promoção do Programa de Parcerias de Investimentos"
-"4";"21AX";"Gestão das políticas de previdência e trabalho"
-"5";"21BW";"Bônus de Eficiência e Produtividade de Servidores Inativos e Pensionistas da União"
-"6";"21BX";"Bônus de Eficiência e Produtividade de Servidores Ativos da União"
-"7";"09HB";"Contribuição da União, de suas Autarquias e Fundações para o Custeio do Regime de Previdência dos Servidores Públicos Federais"
-"8";"21AZ";"Sistema de Escrituração Digital das Obrigações Fiscais, Previdenciárias e Trabalhistas - eSocial"
-"9";"21B0";"Promoção da Concorrência, Competitividade e Melhoria Regulatória"
-"10";"00R0";"Pagamento de acordo homologado em juízo - Serviço Federal de Processamento de Dados - Ação Trabalhista 204700-25.1989.5.02.0039"
-"11";"00RR";"Cumprimento de Obrigações Decorrentes da Reestruturação da Participação do Estado no Setor Econômico"
-"12";"21B1";"Formulação da Política Monetária Cambial e de Crédito e Supervisão do Sistema Financeiro Nacional"
-"13";"21AY";"Prevenção à Lavagem de Dinheiro e ao Financiamento do Terrorismo"
-"14";"21B2";"Gestão e Modernização dos Recursos de Tecnologia da Informação e Comunicação"
-"15";"0181";"Aposentadorias e Pensões Civis da União"
-"16";"00QG";"Anistiados Políticos - Retroativos Concedidos por Decisões Judiciais"
-"17";"00S6";"Benefício Especial e Demais Complementações de Aposentadorias"
-"18";"00SA";"Pagamento de honorários periciais nas ações em que o INSS figure como parte e que sejam de competência da Justiça Federal"
+"";"acao";"tituloacao";"valor"
+"1";"00QG";"Anistiados Políticos - Retroativos Concedidos por Decisões Judiciais";10836385
+"2";"00R0";"Pagamento de acordo homologado em juízo - Serviço Federal de Processamento de Dados - Ação Trabalhista 204700-25.1989.5.02.0039";54608663
+"3";"00RR";"Cumprimento de Obrigações Decorrentes da Reestruturação da Participação do Estado no Setor Econômico";6e+06
+"4";"00S6";"Benefício Especial e Demais Complementações de Aposentadorias";571810693
+"5";"00SA";"Pagamento de honorários periciais nas ações em que o INSS figure como parte e que sejam de competência da Justiça Federal";336422195
+"6";"0181";"Aposentadorias e Pensões Civis da União";17167343553
+"7";"09HB";"Contribuição da União, de suas Autarquias e Fundações para o Custeio do Regime de Previdência dos Servidores Públicos Federais";3185355537
+"8";"20TP";"Ativos Civis da União";10872493930
+"9";"216Z";"Gestão e Promoção do Programa de Parcerias de Investimentos";1e+06
+"10";"21AX";"Gestão das políticas de previdência e trabalho";11115384
+"11";"21AY";"Prevenção à Lavagem de Dinheiro e ao Financiamento do Terrorismo";1090455
+"12";"21AZ";"Sistema de Escrituração Digital das Obrigações Fiscais, Previdenciárias e Trabalhistas - eSocial";49202020
+"13";"21B0";"Promoção da Concorrência, Competitividade e Melhoria Regulatória";285761
+"14";"21B1";"Formulação da Política Monetária Cambial e de Crédito e Supervisão do Sistema Financeiro Nacional";87534957
+"15";"21B2";"Gestão e Modernização dos Recursos de Tecnologia da Informação e Comunicação";23255773
+"16";"21BW";"Bônus de Eficiência e Produtividade de Servidores Inativos e Pensionistas da União";443952972
+"17";"21BX";"Bônus de Eficiência e Produtividade de Servidores Ativos da União";529606980
+"18";"21C5";"Elaboração de Estudos e Avaliação de Projetos de Investimentos do Governo Federal";27497422
