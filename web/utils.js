@@ -78,6 +78,48 @@ const utils = {
     return resultado;
   },
 
+  group_by_sum_cols : function(
+    objeto, coluna_categoria, colunas_valor, 
+    ordena_decrescente = false, coluna_ordem) {
+
+      //depois incluir teste para verificar se o usuário (você mesmo!) passou uma coluna_ordem quando pediu para ordenar
+
+      //se o usuário esquecer da coluna de ordenacao e tiver pedido para ordenar, vou usar a primeira coluna;
+
+      //if (ordena_decrescente & !coluna_ordem) coluna_ordem = colunas_valor[0];
+
+      //console.log(colunas_valor, colunas_valor.length);
+
+      //console.log(objeto);
+
+    const resultado = []; 
+    const categorias_unicas = objeto
+                                .map(d => d[coluna_categoria])
+                                .filter((v, i, a) => a.indexOf(v) === i);
+
+    for (cat of categorias_unicas) {
+
+      let elemento_atual = {};
+
+      elemento_atual[coluna_categoria] = cat;
+
+      for (coluna of colunas_valor) {
+
+        const soma = objeto
+          .filter(d => d[coluna_categoria] === cat)
+          .map(d => +d[coluna])
+          .reduce((valor_acum, valor_atual) => valor_acum + valor_atual)
+        ;
+
+        elemento_atual[coluna] = soma;
+      }
+
+      resultado.push(elemento_atual);   
+    }
+    if (ordena_decrescente) resultado.sort((a,b) => b[coluna_ordem] - a[coluna_ordem])
+    return resultado;
+  },
+
   unique : function(obj, col) {
     return obj
       .map(d => d[col])
