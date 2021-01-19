@@ -13,7 +13,21 @@ library(readxl)
 
 ploa_raw <- readxl::read_excel("./dados/dados_originais/SOF_PLOA_2021_STN_ajustada_gepla.xlsx", sheet = "ajustada")
 
-dados_adicionais_raw <- readxl::read_excel("./dados/dados_originais/d2019_ploa.xlsx", skip = 8)
+arquivos <- c(
+  # "./dados/dados_originais/dot_2020_ate26000.xlsx",
+  # "./dados/dados_originais/dot_2020_so26000.xlsx",
+  # "./dados/dados_originais/dot_2020_maior26000.xlsx",
+  "./dados/dados_originais/pago_2020_menor_igual26000.xlsx",
+  "./dados/dados_originais/pago_2020_26001_36000.xlsx",
+  "./dados/dados_originais/pago_2020_36001_53000.xlsx",
+  "./dados/dados_originais/pago_2020_maior53000.xlsx"
+)
+
+dados_adicionais_raw <- 
+  purrr::map(.x = arquivos, .f = readxl::read_excel, skip = 8) %>%
+  bind_rows()
+
+dados_adicionais_raw %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum()
 
 colnames(dados_adicionais_raw) <- c(
   "exercicio", 
@@ -28,7 +42,7 @@ colnames(dados_adicionais_raw) <- c(
   "iduso", "descricaoiduso", 
   "gnd", "gnd_descricao",
   "mod", "mod_descricao",
-  "elemento", "elemento_descricao",
+  #"elemento", "elemento_descricao",
   "fonte", 
   "resultadoprimario", "descricaoresultadoprimario", 
   "resultadoprimariolei", "descricaoresultadoprimariolei", 
@@ -39,12 +53,13 @@ colnames(dados_adicionais_raw) <- c(
 
 tab_funcao <- readxl::read_excel("./dados/dados_originais/tabela_funcao.xlsx") %>%
   select(subfuncao = cod_subfuncao,
-         funcao_tipica = Funcao)
+         funcao_tipica = Funcao) %>%
+  distinct()
 
-orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin.xlsx", skip = 5) %>%
+orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin_2021.xlsx", skip = 5) %>%
   select(uo = `uo Código`,
          orgao = `orgao Código`,
-         orgao_decreto = `Órgãos Poder Executivo 2020`) %>%
+         orgao_decreto = `Órgãos Poder Executivo 2021`) %>%
   mutate(
     orgao_decreto_nome = stringr::str_sub(orgao_decreto, 9),
     orgao_decreto = stringr::str_sub(orgao_decreto, 1, 5),
@@ -52,14 +67,22 @@ orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin.xlsx", 
       orgao_decreto_nome == "abinete da Vice-Presidência da República",
       "Gabinete da Vice-Presidência da República",
       orgao_decreto_nome)
-    )
+    ) %>%
+  distinct() %>%
+  group_by(uo, orgao) %>%
+  summarise(orgao_decreto = last(orgao_decreto),
+            orgao_decreto_nome = last(orgao_decreto_nome))
+
+orgaos %>% count(uo, orgao) %>% arrange(desc(n)) %>% filter(n>1) 
+# uos em mais de um órgão (saco)
 
 agrupadores <- readxl::read_excel("./dados/dados_originais/Novos Agregadores Min. Economia.xlsx") %>%
   select(
     acao = `Rótulos de Linha`,
     #tituloacao = `Nome Ação Governo`,
     agregador = `Agregadores Novos`
-  )
+  ) %>% 
+  distinct()
 
 
 # prepara tabelas com informacoes principais ------------------------------
@@ -69,11 +92,11 @@ ploa <- ploa_raw %>%
   rename(valor = `PLOA 2020 Mensagem Modificativa`) %>%
   mutate(tipo_valor = "PLOA",
          gnd = str_sub(naturezadespesa,2,2),
-         mod = str_sub(naturezadespesa,3,4))
+         mod = str_sub(naturezadespesa,3,4),
+         fonte = str_sub(fonte, 2, 3))
 
 dados_adicionais <- dados_adicionais_raw %>%
-  mutate(tipo_valor = "PLOA",
-         fonte = str_sub(fonte, 3, 4))
+  mutate(fonte = str_sub(fonte, 3, 4))
 
 dados_combinados_raw <-
   bind_rows(
@@ -83,17 +106,18 @@ dados_combinados_raw <-
 
 # reúne informações na tabela ---------------------------------------------
 
+tabela_uo_ploa <- ploa %>% select(uo, nomeuo) %>% distinct()
+tabela_orgao_ploa <- ploa %>% select(orgao, nomeorgao) %>% distinct()
+
 dados_combinados <-
   dados_combinados_raw %>%
   group_by(exercicio,
            tipo_valor,
            uo,
            orgao,
-           nomeorgao,
            fonte,
            programa,
            acao,
-           tituloacao,
            funcao,
            subfuncao,
            gnd,
@@ -102,10 +126,11 @@ dados_combinados <-
            credito,
            ied) %>%
   summarise(valor = sum(valor)) %>%
-  ungroup()
+  ungroup() %>%
+  left_join(tabela_uo_ploa) %>%
+  left_join(tabela_orgao_ploa)
     
-
-exercicio_ref <- 2021
+#exercicio_ref <- 2021
 
 base <- dados_combinados %>%
   left_join(orgaos) %>%
@@ -113,13 +138,15 @@ base <- dados_combinados %>%
   left_join(tab_funcao) %>%
   mutate(
     orgao_decreto = ifelse(is.na(orgao_decreto), orgao, orgao_decreto),
-    orgao_decreto_nome = ifelse(is.na(orgao_decreto_nome), nomeorgao, orgao_decreto_nome),
-    id_info = case_when(
-      tipo_valor == "PLOA" & exercicio == "2019" ~ "ref",
-      tipo_valor == "PLOA" & exercicio == "2021" ~ "atu"
-    )
-  )
+    orgao_decreto_nome = ifelse(is.na(orgao_decreto_nome), nomeorgao, orgao_decreto_nome)
+  ) #%>%
+  #filter(orgao_decreto == "25000")
 
+dados_combinados %>% filter(tipo_valor == "PLOA") %>% select(valor) %>% sum(.)
+base %>% filter(tipo_valor == "PLOA") %>% select(valor) %>% sum(.)
+
+dados_combinados %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum(.)
+base %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum(.)
 
 # Incorpora informação dos anexos -----------------------------------------
 
@@ -349,13 +376,24 @@ base_anexos <- base_marcadores %>%
         custeio_investimento &
         (!credito_extraordinario) &
         eof_obrigatorias
-      )
+      ),
+    
+    anexo_nenhum = !(
+      anexo_II | anexo_III | anexo_IV | anexo_V | anexo_VI | anexo_VIa | anexo_VII | anexo_VIII | anexo_IX | anexo_X | anexo_XI | anexo_XII | anexo_XIIa | anexo_XIII | anexo_XIV
+    )
+    
   )
 
+tab_anexos <- data.frame(
+  Anexo = base_anexos %>% select(starts_with("anexo_")) %>% colnames(),
+  anexo = c("Anexo II", "Anexo III", "Anexo IV", "Anexo V", "Anexo VI", "Anexo VI-A", "Anexo VII", "Anexo VIII", "Anexo IX", "Anexo X", "Anexo XI", "Anexo XII", "Anexo XII-A", "Anexo XIII", "Anexo XIV", "Obrigatórias")
+  )
 
 base_anexos_verifica <- base_anexos %>%
   mutate(celula = row_number()) %>%
-  gather(starts_with("anexo_"), key = "anexo", value = "pertence")
+  gather(starts_with("anexo_"), key = "Anexo", value = "pertence") %>%
+  filter(pertence) %>%
+  left_join(tab_anexos)
 
 # verifica se cada celula de despesa só está marcada em um único anexo
 base_anexos_verifica %>% 
@@ -365,81 +403,265 @@ base_anexos_verifica %>%
   arrange(desc(n)) %>%
   filter(n>1)
 
-base_anexos_filtrada <- base_anexos_verifica %>%
+# verifica se cada acao está vinculada apenas em um único anexo (nao precisa estar)
+base_anexos_verifica %>% 
   filter(pertence) %>%
-  select(-pertence)
+  select(acao, anexo) %>%
+  distinct() %>%
+  count(acao) %>%
+  arrange(desc(n)) %>%
+  filter(n>1)
+  # group_by(acao) %>%
+  # count(anexo) %>%
+  # arrange(desc(n)) %>%
+  # filter(n>1)
 
-# computar informacoes necessarias para a vis, por orgao e acao
 
-perfil_gnd <- base %>%
-  filter(orgao_decreto == "25000") %>%
-  mutate(grupo = case_when(
+
+# sumariza a base ---------------------------------------------------------
+
+tipos_de_valor <- data.frame(
+  tipo_valor = base_anexos_verifica %>% select(tipo_valor) %>% unique() %>% unlist(),
+  variavel = c("desp_paga", "dot_atu", "PLOA") #c("desp_emp", "desp_liq", "desp_paga", "dot_atu", "RAP_inscritos", "RAP_pagos", "PLOA")
+)
+
+base_anexos_sumarizada <- base_anexos_verifica %>%
+  group_by(
+    orgao_decreto, orgao_decreto_nome, 
+    anexo, 
+    agregador, 
+    uo, nomeuo,
+    acao,
+    fonte, 
+    gnd, 
+    mod, 
+    funcao_tipica,
+    tipo_valor) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  left_join(tipos_de_valor) %>%
+  select(-tipo_valor) %>%
+  mutate(gnd = case_when(
     gnd == "1" ~ "Pessoal",
     gnd == "3" ~ "Custeio",
     gnd %in% c("4", "5") ~ "Investimento",
     TRUE ~ "Dívida")) %>%
-  group_by(id_info, acao) %>%
-  mutate(total_acao = sum(valor)) %>%
-  group_by(id_info, acao, grupo) %>%
-  mutate(total_gnd = sum(valor)) %>%
-  group_by(id_info, acao, grupo) %>%
-  summarise(percent_gnd = first(total_gnd / total_acao)) %>%
-  ungroup() %>%
-  unite("classificador", c(id_info,grupo), remove = TRUE) %>%
-  spread(classificador, percent_gnd)
-  
-perfil_mod <- base %>%
-  filter(orgao_decreto == "25000") %>%
-  mutate(modalidade = case_when(
+  mutate(mod = case_when(
     str_sub(mod,1,1) == "9" ~ "Direta",
     TRUE ~ "Transferencia")) %>%
-  group_by(id_info, acao) %>%
+  mutate(fonte = case_when(
+    fonte %in% fontes_proprias ~ "Fontes próprias",
+    fonte %in% c("43","44") ~ "Fontes de Emissão",
+    TRUE ~ "Fontes Tesouro"
+  ))
+
+base_anexos_sumarizada %>% filter(variavel == "PLOA") %>% group_by(fonte) %>% summarise(sum(valor))
+base_anexos_sumarizada %>% group_by(variavel) %>% summarise(sum(valor))
+
+# base_anexos_todos_orgaos <- base_anexos_sumarizada %>%
+#   group_by_at(vars(-orgao_decreto, -orgao_decreto_nome, -valor)) %>%
+#   summarise(valor = sum(valor)) %>%
+#   mutate(orgao_decreto = "Todos", orgao_decreto_nome = "Todos")
+
+# base_completa <- bind_rows(
+#   base_anexos_sumarizada,
+#   base_anexos_todos_orgaos
+# )
+
+# testes vis
+
+ggplot(base_anexos_sumarizada %>% filter(variavel %in% c("PLOA","dot_atu"))) +
+  geom_col(aes(y = valor, x = reorder(orgao_decreto, valor), fill = variavel), position = position_dodge()) +
+  coord_flip()
+
+ggplot(base_anexos_sumarizada %>% filter(variavel == "PLOA")) +
+  geom_col(aes(y = valor, x = anexo)) +
+  coord_flip()
+
+base_anexos_sumarizada %>% 
+  filter(variavel == "desp_paga") %>%
+  group_by(anexo) %>%
+  summarise(sum(valor))
+
+# Para ter ideia do máximo de fontes por ação
+base_anexos_sumarizada %>% select(acao, fonte) %>% distinct() %>% count(acao) %>% arrange(desc(n))
+
+# para ter ideia da quantidade acoes por anexo e por agrupador
+base_anexos_sumarizada %>% select(acao, anexo) %>% distinct() %>% count(acao) %>% arrange(desc(n))
+base_anexos_sumarizada %>% select(agregador, acao) %>% distinct() %>% count(acao) %>% arrange(desc(n))
+
+# subtotais por orgao
+ggplot(base_anexos_sumarizada %>% filter(variavel == "dot_atu")) + geom_col(aes(x = orgao_decreto, y = valor)) + coord_flip()
+
+# computa dados para os cards das ações -----------------------------------
+
+variavel_principal <- "PLOA" # eventualmente pode se algo mais sofisticado aqui, tipo um id que podemos criar para identificar um tipo de valor de um determinado exercício
+
+perfil_gnd <- base_completa %>%
+  filter(variavel == variavel_principal) %>%
+  group_by(orgao_decreto, acao) %>%
   mutate(total_acao = sum(valor)) %>%
-  group_by(id_info, acao, modalidade) %>%
+  group_by(orgao_decreto, acao, gnd) %>%
+  mutate(total_gnd = sum(valor)) %>%
+  group_by(orgao_decreto, acao, gnd) %>%
+  summarise(percent_gnd = first(total_gnd / total_acao)) %>%
+  ungroup() %>%
+  #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
+  spread(gnd, percent_gnd)
+  
+perfil_mod <- base_anexos_sumarizada %>%
+  filter(variavel == variavel_principal) %>%
+  group_by(orgao_decreto, acao) %>%
+  mutate(total_acao = sum(valor)) %>%
+  group_by(orgao_decreto, acao, mod) %>%
   mutate(total_mod = sum(valor)) %>%
-  group_by(id_info, acao, modalidade) %>%
+  group_by(orgao_decreto, acao, mod) %>%
   summarise(percent_mod = first(total_mod / total_acao)) %>%
   ungroup() %>%
-  unite("classificador", c(id_info, modalidade), remove = TRUE) %>%
-  spread(classificador, percent_mod)
+  #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
+  spread(mod, percent_mod)
 
-base_acao <- base %>%
-  filter(orgao_decreto == "25000") %>%
-  group_by(agregador, funcao_tipica, acao, id_info) %>%
-  summarise(total = sum(valor)) %>%
+principais_orgaos <- base_anexos_sumarizada %>%
+  group_by(orgao_decreto, acao, uo, nomeuo) %>%
+  summarise(valor = sum(valor)) %>%
+  arrange(desc(valor)) %>%
+  group_by(orgao_decreto, acao) %>%
+  mutate(ranking = paste0("uo_valor_", ifelse(row_number()>5, 6, row_number())),
+         uo = ifelse(row_number()>5, "Demais", paste(uo,"-",nomeuo))) %>%
+  group_by(orgao_decreto, acao, uo, ranking) %>%
+  summarize(valor = sum(valor)) %>%
   ungroup() %>%
-  mutate(id_info = paste(id_info, "total", sep = "_")) %>%
-  spread(id_info, total) %>%
-  mutate(acao_nova = is.na(ref_total),
-         acao_extinta = is.na(atu_total)) %>%
-  filter(!acao_extinta) %>%
-  mutate(varia = atu_total - ref_total,
-         varia_pct = (atu_total / ref_total - 1) * 100)
+  arrange(ranking) %>%
+  unite("uo_valor", c(uo, valor), sep = "_", remove = TRUE) %>%
+  spread(ranking, uo_valor)
+    
 
-base_pre_stack <- base_acao %>%
+
+# calcula variacoes -------------------------------------------------------
+
+# calcular isso no JS? pq vai depender da visão...
+# base_variacoes <- base_anexos_sumarizada %>%
+#   group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo,
+#            #anexo, ### sem anexo, por enquanto, pq senão teremos ações fragmentadas 
+#            acao, funcao_tipica, variavel) %>%
+#   summarise(valor = sum(valor)) %>%
+#   ungroup() %>%
+#   spread(variavel, valor) %>%
+#   filter(!is.na(PLOA)) %>% # (1)
+#   mutate(
+#     var_abs = PLOA - dot_atu,
+#     var_pct = (PLOA / dot_atu - 1)*100,
+#     acao_nova = dot_atu == 0 | is.na(dot_atu)
+#   )
+ 
+ # (1) tira ações que não estão no PLOA
+
+
+
+# base_variacoes <- base_anexos_sumarizada %>%
+#   group_by(agregador, anexo, acao, tipo_valor) %>%
+#   summarise(total = sum(valor)) %>%
+#   ungroup() %>%
+#   mutate(id_info = paste(id_info, "total", sep = "_")) %>%
+#   spread(id_info, total) %>%
+#   mutate(acao_nova = is.na(ref_total),
+#          acao_extinta = is.na(atu_total)) %>%
+#   filter(!acao_extinta) %>%
+#   mutate(varia = atu_total - ref_total,
+#          varia_pct = (atu_total / ref_total - 1) * 100)
+
+# base_pre_stack <- base_anexos_sumarizada #base_variacoes %>%
+#   left_join(perfil_gnd) %>%
+#   left_join(perfil_mod) %>%
+#   left_join(principais_orgaos) %>%
+#   left_join(titulo_acao)
+
+# variaveis_de_interesse <- c("agregador")
+# 
+# base_stack <- base_pre_stack
+# 
+# for (var in variaveis_de_interesse) {
+#   quo_var <- sym(var) # transforma "var", que é string, num símbolo
+#   
+#   base_stack <- base_stack %>%
+#     group_by(!! quo_var) %>%
+#     mutate(!! paste0("pos_ini_", var) := cumsum(PLOA) - PLOA) %>%
+#     ungroup()
+# }
+
+
+# exporta -----------------------------------------------------------------
+
+titulo_acao <- ploa %>%
+  select(acao, tituloacao) %>%
+  distinct()
+
+base_export <- base_anexos_sumarizada %>% #base_variacoes %>%
+  mutate(
+    orgao_decreto_cod = orgao_decreto,
+    orgao_decreto = paste(orgao_decreto_cod, orgao_decreto_nome, sep = " - "),  
+    marcador = case_when(
+    uo == "75101" ~ "divida",
+    uo == "25917" ~ "rgps",
+    TRUE ~ "demais")) %>%
+  group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo, marcador,
+           acao, funcao_tipica, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  spread(variavel, valor) %>%
+  filter(!is.na(PLOA)) %>% # (1)
   left_join(perfil_gnd) %>%
-  left_join(perfil_mod)
+  left_join(perfil_mod) %>%
+  left_join(principais_orgaos) %>%
+  left_join(titulo_acao) %>%
+  mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
+         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga))
 
-
-
-
-
-variaveis_de_interesse <- c("agregador", "funcao_tipica")
-
-base_stack <- base_pre_stack
-
-for (var in variaveis_de_interesse) {
-  quo_var <- sym(var) # transforma "var", que é string, num símbolo
+  # (1) tira ações que não estão no PLOA
   
-  base_stack <- base_stack %>%
-    group_by(!! quo_var) %>%
-    mutate(!! paste0("pos_ini_", var) := cumsum(atu_total) - atu_total) %>%
-    ungroup()
-}
-
-base_export <- base_stack
-
 write.csv(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
+
+
+# tab_fonte <- ploa %>%
+#   select(fonte, descricaofonte) %>%
+#   distinct() %>%
+#   mutate(fonte = str_sub(fonte, 1, 3))
+
+base_export_longa <- base_anexos_sumarizada %>% #base_variacoes %>%
+  mutate(
+    orgao_decreto_cod = orgao_decreto,
+    orgao_decreto = paste(orgao_decreto_cod, orgao_decreto_nome, sep = " - "),  
+    marcador = case_when(
+      uo == "75101" ~ "divida",
+      uo == "25917" ~ "rgps",
+      TRUE ~ "demais")) %>%
+  group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo, marcador,
+           acao, uo, nomeuo, fonte, gnd, mod, funcao_tipica, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  spread(variavel, valor, fill = 0) %>%
+  filter(!is.na(PLOA)) %>% # (1)
+  left_join(titulo_acao) %>%
+  mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
+         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga)) 
+
+sum(base_export_longa$PLOA)
+sum(base_export_longa$dot_atu)
+sum(base_export_longa$desp_paga)
+
+write.csv(base_export_longa, file = "./dados/dados.csv", fileEncoding = "utf-8")
+
+
+
+ggplot(base_export, aes(x = orgao_decreto)) +
+  geom_col(aes(y = dot_atu), fill = "purple") +
+  geom_col(aes(y = PLOA), fill = "goldenrod") +
+  coord_flip()
+
+base_export %>% 
+  group_by(orgao_decreto) %>%
+  summarise_at(vars(PLOA, dot_atu), .funs = ~sum(.)) %>%
+  arrange(desc(PLOA))
+
 
 # exploracao --------------------------------------------------------------
 
@@ -485,15 +707,16 @@ ggplot(ploa_funcao_tipica %>% filter(str_sub(Orgao,1,1) %in% c("2","3"),
   facet_wrap(~Orgao, scales = "free") +
   theme(legend.position = "none")
 
-# limita escopo ao ME -----------------------------------------------------
+# acoes sem agregadores ---------------------------------------------------
 
-ploa_ME <- ploa %>%
-  filter(orgao_decreto == "25000")
+
+ploa_ME <- base %>%
+  filter(orgao_decreto == "25000", tipo_valor == "PLOA")
 
 acoes_ME_sem_agregadores <- ploa_ME %>%
   filter(is.na(agregador)) %>%
-  select(acao, tituloacao) %>%
-  unique()
+  group_by(acao, tituloacao) %>%
+  summarise(valor = sum(valor))
 
 write.csv2(acoes_ME_sem_agregadores, 
            file = "./dados/dados_intermediarios/acoes_ME_sem_agregadores.csv",
@@ -528,6 +751,7 @@ ploa_ME_clean_funcoes <- ploa_ME %>% #_clean %>%
   summarise(valor = sum(valor))
 
 write.csv(ploa_ME_clean_funcoes, "./dados/dados_intermediarios/funcoes.csv")
+
 
 # estrutura dados para grafo ----------------------------------------------
 

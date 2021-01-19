@@ -6,7 +6,23 @@ const vis = {
         cont: "div.vis-container",
         mode_button: "nav.mode-control",
         option_button: "nav.option-control",
-        data: "./dados/dados.csv"
+        mode_dependent_controls: "[data-visible-on-mode]",
+        comparison_selector: "[name='seletor-comparacao']",
+        selectors_wrapper: ".selecoes-wrapper",
+        selector_orgao_decreto : "#selecao-orgao",
+        selector_anexo : "#selecao-tipo",
+        exclusoes_wrapper: ".exclusoes-wrapper",
+        exclui_divida: "#exclui-divida",
+        exclui_rgps: "#exclui-rgps",
+        barras: "rect.barras",
+        linhas_referencia: "line.ref",
+        data: "./dados/dados.csv",
+
+        colors : {
+            destaque_barra : "--cor-barra-destaque",
+
+            barra_normal : "--cor-barra-normal"
+        }
 
     },
 
@@ -15,7 +31,9 @@ const vis = {
         svg : null,
         cont : null,
         rects_acoes : null,
-        axis : {}
+        axis : {},
+        barras : null,
+        linhas_referencia : null
 
     },
 
@@ -23,7 +41,8 @@ const vis = {
 
         svg:  null,
         cont: null,
-        mode_button: null
+        mode_button: null,
+        seletor_comparacao: null
 
     },
 
@@ -36,7 +55,7 @@ const vis = {
 
             top: 10,
             left: 200,
-            right: 20,
+            right: 50,
             bottom: 20
 
         }
@@ -46,36 +65,77 @@ const vis = {
     data : {
 
         raw : null,
-        processed : {}
+
+        processed : {
+            
+            agregado : null,
+
+            detalhado : null 
+        }
+        
+        //{
+
+            // geral : {
+
+            //     por_orgao : {}
+
+            // },
+
+            // detalhado : {}
+
+        //}
 
     },
 
     params : {
 
+        colors : {},
+
         transitions_duration: 1000,
 
-        modes : ["agregado", "detalhado"],
+        modes : ["anexo", "agregador", "acao"],
 
-        variables : ["atu_total", "varia", "varia_pct", "pos_ini_agregador"],
+        variables : ["PLOA", "dot_atu", "desp_paga"], // mudar esse nome aqui depois
 
-        categorical_vars : ["agregador", "funcao_tipica"],
+        variables_names : {
+
+            PLOA : "PLOA",
+            dot_atu : "Dotação atualizada do ano anterior",
+            desp_paga : "Despesa paga no ano anterior"
+
+        },
+
+        main_variable : "PLOA",
+
+        categorical_vars : ["orgao_decreto", "anexo", "agregador", "funcao_tipica"],
         // also, those are the variables used for evaluating summaries in the "agregado" mode.
 
         // this will serve to determine axis
 
         variables_type : {
 
-            atu_total         : "numerical",
+            PLOA              : "numerical",
             varia             : "numerical",
             varia_pct         : "percent",
-            pos_ini_agregador : "numerical",
+            dot_atu           : "numerical",
             agregado          : "numerical",
             agregador         : "categorical",
             funcao_tipica     : "categorical"
 
         },
 
-        dimensions : ["x", "y", "y_cat", "y_anexos", "w", "r"]
+        dimensions : ["x", "y", "y_cat", "w", "r"],
+
+        //dimensions : ["x", "y", "y_cat", "y_anexos", "w", "r"]
+
+        nomes_demais : { // aqui preciso de um registro para cada variável que pode ser usada como critério de detalhamento
+
+            anexo: "Demais anexos",
+            agregador: "Demais agregadores",
+            funcao_tipica: "Demais funções",
+            orgao_decreto: "Demais órgãos"
+
+        }
 
     },
 
@@ -141,7 +201,7 @@ const vis = {
 
             vis.params.categorical_vars.forEach(categorical_variable => {
 
-                vis.data.processed[categorical_variable] =
+                vis.data.processed.agregado[categorical_variable] =
                 utils.group_by_sum(
                     objeto = vis.data.raw, 
                     coluna_categoria = categorical_variable, 
@@ -153,8 +213,141 @@ const vis = {
 
         },
 
+        evaluate_dataset : function(modo, selecao_orgao, selecao_anexo, exclui_divida, exclui_rgps, var_detalhamento) {
+
+            let dados = vis.data.raw;
+
+            if (selecao_orgao != "todos") {
+                dados = dados
+                          .filter(d => d.orgao_decreto == selecao_orgao)
+            }
+
+            if (selecao_anexo != "todos") {
+                dados = dados
+                          .filter(d => d.anexo == selecao_anexo)
+            }
+
+            if (exclui_divida) {
+                dados = dados
+                          .filter(d => d.marcador != "divida")
+            }
+
+            if (exclui_rgps) {
+                dados = dados
+                          .filter(d => d.marcador != "rgps")
+            }
+
+            vis.data.processed.agregado = utils.group_by_sum_cols(
+
+                objeto = dados,
+                coluna_categoria = var_detalhamento,
+                colunas_valor = vis.params.variables,
+                ordena_decrescente = true,
+                coluna_ordem = vis.params.main_variable
+
+            );
+
+            // trata o caso de o dataset ficar com uma lista muito grande
+
+            if (vis.data.processed.agregado.length > 16) {
+
+                let bottom_dataset = vis.data.processed.agregado.slice(15);
+
+                // var_detalhamento vai ser a variável usada no detalhamento, então vai ser o nome da coluna/variável no dataset sumarizado que foi armazenado em vis.data.processed.agregado.
+
+                //bottom_dataset.forEach(el => el[var_detalhamento] = vis.params.nomes_demais[var_detalhamento]);
+
+                const elemento_demais = {
+                    [var_detalhamento] : vis.params.nomes_demais[var_detalhamento]
+                };
+
+                vis.params.variables.forEach(
+                    variable => elemento_demais[variable] = 
+                    bottom_dataset
+                      .map(d => +d[variable])
+                      .reduce((acu , atu) => acu + atu)
+                );
+
+                vis.data.processed.agregado = vis.data.processed.agregado
+                  .slice(0,15);
+
+                vis.data.processed.agregado.push(elemento_demais);
+                // não dá para encadear aqui
+
+            }
+
+        },
+
+        populates_filter_selector : function(seletor) { // orgao_decreto ou anexo
+
+            const selector = document.querySelector(vis.refs["selector_" + seletor]);
+
+            const valores_unicos = utils.unique(vis.data.raw, seletor);
+
+            valores_unicos.forEach(variable => {
+
+                let new_option = document.createElement("option");
+
+                new_option.setAttribute("value", variable);
+                new_option.innerText = variable;
+
+                selector.append(new_option);
+            });
+
+        },
+
+        populates_comparison_selector : function() {
+
+            const selector = document.querySelector(vis.refs.comparison_selector);
+
+            const comparison_variables = [...vis.params.variables];
+
+            
+            // vou tirar a main_variable, PLOA, dessa lista.
+
+            // hmm essa combinação de indexOf e splice poderia virar uma função.
+
+            const pos_main_variable = comparison_variables.indexOf(vis.params.main_variable);
+
+            comparison_variables.splice(pos_main_variable, 1);
+
+            console.log(comparison_variables, "depois");
+
+
+            comparison_variables.forEach(variable => {
+
+                let new_option = document.createElement("option");
+
+                new_option.setAttribute("value", variable);
+                new_option.innerText = vis.params.variables_names[variable];
+
+                selector.append(new_option);
+            });
+
+        },
+
+        reinicia_seletor_comparacao : function() {
+
+            vis.elems.seletor_comparacao.value = "nada";
+            vis.draw.agregado.remove_linhas_referencia();
+        },
+
         update_positions : {
             // para quando for disparado um resize
+        },
+
+        update_colors : function() {
+
+            const colors = Object.keys(vis.refs.colors);
+
+            colors.forEach(color => {
+                vis.params.colors[color] = getComputedStyle(document.documentElement).getPropertyValue(vis.refs.colors[color]).slice(1);
+            });
+
+        },
+
+        desabilita_opcao : function(opcao) {
+            document.querySelector("button#" + opcao).classList.add("disabled");
         }
     },
 
@@ -162,7 +355,7 @@ const vis = {
 
         domains : {
 
-            initialize : function() {
+            initialize_categorical : function() {
 
                 function generate(data, variable, categorical = false) {
 
@@ -179,38 +372,84 @@ const vis = {
         
                 }
 
-                vis.params.variables.forEach(variable => {
-                    vis.draw.domains[variable] = generate(vis.data.raw, variable,
-                        categorical = false);
-                });
+                // vis.params.variables.forEach(variable => {
+                //     vis.draw.domains[variable] = generate(vis.data.raw, variable,
+                //         categorical = false);
+                // });
 
                 vis.params.categorical_vars.forEach(variable => {
                     vis.draw.domains[variable] = generate(vis.data.raw, variable, categorical = true);
                 });
 
-                function initialize_domain_agregado() {
+                // function initialize_domain_agregado() {
 
-                    const maxs = vis.params.categorical_vars.map(
-                        cat => d3.max(vis.data.processed[cat],
-                            d => +d.subtotal)
-                    )
+                //     const maxs = vis.params.categorical_vars.map(
+                //         cat => d3.max(vis.data.processed.agregado[cat],
+                //             d => +d.subtotal)
+                //     )
     
-                    vis.draw.domains["agregado"] = [
-                        0, 
-                        d3.max(maxs, d => d)
-                    ];
-                    // Math.max(...maxs)
-                    // ES6
-                }
+                //     vis.draw.domains["agregado"] = [
+                //         0, 
+                //         d3.max(maxs, d => d)
+                //     ];
+                //     // Math.max(...maxs)
+                //     // ES6
+                // }
 
-                initialize_domain_agregado();
+                // initialize_domain_agregado();
 
-            }
-            // variables will be properties
+            },
+
+            evaluate_domain_categorical : function() {
+
+                let current_variable = vis.control.current_state.variavel_detalhamento;
+
+                let subtotais = utils.group_by_sum(
+                    objeto = vis.data.processed.agregado,
+                    coluna_categoria = current_variable,
+                    coluna_valor = vis.params.main_variable,
+                    ordena_decrescente = true
+                );
+
+                console.log(subtotais);
+
+                vis.draw.domains[current_variable] = utils.unique(
+                    obj = subtotais,
+                    col = "categoria"
+                ).reverse();
+
+            },
+
+            evaluate_domain_agregado : function(){
+
+                // maximos dos dados selecionados atuais
+
+                const maxs = vis.params.variables.map(
+                    variable => d3.max(vis.data.processed.agregado, d => d[variable])
+                );
+
+                vis.draw.domains.agregado = [
+                    0,
+                    Math.max(...maxs)
+                ];
+
+            },
+
+            agregado : null, // trocar esse nome
+
+            // categorical variables will be properties
 
         },
 
         ranges : {
+
+            x : null,
+            y : null,
+            y_cat : null,
+            //y_anexos : null,
+            //y_agregadores : null,
+            w : null,
+            r : [1,30],
 
             update : function() {
 
@@ -230,18 +469,17 @@ const vis = {
 
                 return([vis.dims.margins.top, vis.dims.margins.top + comprimento_necessario]);
 
-            },
-
-            x : null,
-            y : null,
-            y_anexos : null,
-            y_agregadores : null,
-            w : null,
-            r : [1,30]
+            }
 
         },
 
         scales : {
+
+            x: d3.scaleLinear().clamp(true),
+            y: d3.scaleLinear().clamp(true),
+            y_cat: d3.scaleBand(),
+            w: d3.scaleLinear().clamp(true),
+            r: d3.scaleSqrt(),
 
             initialize : function() {
                 
@@ -255,10 +493,10 @@ const vis = {
     
             },
 
-            set_domain : function(dimension, option) {
+            set_domain : function(dimension, variable) {
 
                 vis.draw.scales[dimension]
-                  .domain(vis.draw.domains[option]);
+                  .domain(vis.draw.domains[variable]);
     
             },
 
@@ -281,17 +519,7 @@ const vis = {
 
                     // ISSUE : testar em algum momento se o domínio permanece igual? vale a pena em termos de performance? poderia ter um "current" em vis.control.states
 
-            },
-
-            x: d3.scaleLinear().clamp(true),
-
-            y: d3.scaleLinear().clamp(true),
-
-            y_cat: d3.scaleBand(),
-
-            w: d3.scaleLinear().clamp(true),
-
-            r: d3.scaleSqrt()
+            }
 
         },
 
@@ -386,7 +614,7 @@ const vis = {
                 switch (type) {
 
                     case 'numerical' :  
-                        this[dimension].tickFormat(d => utils.formataBR(d/1e6));
+                        this[dimension].tickFormat(d => utils.formataBR(d/1e9));
                         break;
 
                     case 'percent' :
@@ -408,7 +636,95 @@ const vis = {
 
         agregado : {
 
+            desenha_barras : function(variable) {
 
+                vis.sels.svg
+                .selectAll("rect.barras")
+                .data(vis.data.processed.agregado, d => d[variable])
+                .join("rect")
+                .classed("barras", true)
+                .attr("x", vis.dims.margins.left)
+                .attr("width", 0)
+                .attr("height", vis.dims.bar_height)
+                .attr("y", d => vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top)
+                .transition()
+                .duration(vis.params.transitions_duration)
+                .attr("width", d => vis.draw.scales.w(d[vis.params.main_variable]))
+                .attr("fill", vis.params.colors.barra_normal);
+
+                // a main_variable é o PLOA
+                // a variable vai ser o critério de detalhamento: orgao, função etc.
+
+                vis.sels.barras = d3.selectAll(vis.refs.barras);
+
+                vis.sels.cont
+                .selectAll("p.labels-valores-barras")
+                .data(vis.data.processed.agregado, d => d[variable])
+                .join("p")
+                .classed("labels-valores-barras", true)
+                .style("top", d => (vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top) + "px")
+                .style("left", vis.dims.margins.left + "px")
+                .style("font-size", vis.dims.bar_height + "px")
+                .style("line-height", vis.dims.bar_height + "px")
+                .text(d => utils.valor_formatado(d[vis.params.main_variable]))
+                .transition()
+                .duration(vis.params.transitions_duration)
+                .style("left", d => (vis.dims.margins.left + vis.draw.scales.w(d[vis.params.main_variable])) + "px")
+
+
+            },
+
+            desenha_linhas_referencia : function(cat_variable, num_variable) {
+
+                vis.sels.svg
+                .selectAll("line.ref")
+                .data(vis.data.processed.agregado, d => d[cat_variable])
+                .join(
+                    enter => enter.append("line")
+                      .attr("x1", vis.dims.margins.left)
+                      .attr("x2", vis.dims.margins.left))
+                .classed("ref", true)
+                .attr("y1", d => vis.draw.scales.y_cat(d[cat_variable]) + vis.dims.margins.top - vis.dims.bar_height/2)
+                .attr("y2", d => vis.draw.scales.y_cat(d[cat_variable]) + vis.dims.margins.top + vis.dims.bar_height*1.5)
+                .transition()
+                .duration(vis.params.transitions_duration)
+                .attr("x1", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
+                .attr("x2", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
+                .attr("stroke", "red");
+
+                vis.sels.linhas_referencia = d3.selectAll(vis.refs.linhas_referencia);
+
+                vis.draw.agregado.colore_barras(num_variable);
+
+            },
+
+            remove_linhas_referencia : function() {
+
+                if (vis.sels.linhas_referencia) {
+                    vis.sels.linhas_referencia.remove();
+                }
+
+                if (vis.sels.barras) vis.sels.barras.attr("fill", vis.params.colors.barra_normal);
+
+            },
+
+            colore_barras : function(variavel_comparacao) {
+
+                vis.sels.barras.each(function(d,i) {
+                    // console.log(d, this);
+                    // d vai trazer o dado amarrado ao elemento; this, o próprio elemento.
+
+                    // // em vez de vis.control.current_state.variavel_comparacao, poderia fazer a própria função de desenhar as linhas de referência chamar esta função aqui, passando a variável numérica usada
+                    // if (d[vis.control.current_state.variavel_comparacao] > d[vis.params.main_variable]) {
+
+
+                    d3.select(this)
+                        .transition()
+                        .duration(vis.params.transitions_duration)
+                        .attr("fill", (d[variavel_comparacao] < d[vis.params.main_variable]) ? vis.params.colors.destaque_barra : vis.params.colors.barra_normal);
+                });
+
+            }
 
         },
 
@@ -448,6 +764,19 @@ const vis = {
 
     control : {
 
+        current_state : {
+
+            mode : null,
+            option : null,
+            variavel_detalhamento : null,
+            variavel_comparacao : null,
+            selecao_orgao_decreto : "todos",
+            selecao_anexo : "todos",
+            exclui_divida : false,
+            exclui_rgps : false
+
+        },
+
         states : {
 
             modes: {
@@ -456,42 +785,107 @@ const vis = {
     
                     options : {
     
-                        "funcao_tipica" : {
+                        "orgao_decreto" : {
     
                             set_scales : [
 
-                                { dimension: "x" , 
-                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
-                                    axis     : true 
-                                },
-    
-                                { dimension : "y_cat" ,  
-                                    variable  : "funcao_tipica",
+                                { 
+                                    dimension : "x" , 
+                                    variable  : "agregado",
                                     axis      : true 
                                 },
     
-                                { dimension : "w" ,
+                                { 
+                                    dimension : "y_cat" ,  
+                                    variable  : "orgao_decreto",
+                                    axis      : true 
+                                },
+    
+                                { 
+                                    dimension : "w" ,
                                     variable  : "agregado", //"atu_total",
                                     axis      : false 
                                 }
 
                             ],
     
-                            render : function() {
+                            render : function(option) {
 
                                 console.log(this);
 
-                                vis.sels.rects_acoes
-                                    .transition()
-                                    .duration(vis.params.transitions_duration)
-                                    .attr("x", d => vis.draw.scales.x(+d.pos_ini_funcao_tipica) )
-                                    .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica) )
-                                    .attr("height", vis.dims.bar_height )
-                                    .attr("width", d => vis.draw.scales.w(+d.atu_total))
-                                    .attr("rx", 0)
+                                vis.draw.agregado.desenha_barras(option);
+
+
+                                // vis.sels.rects_acoes
+                                //     .transition()
+                                //     .duration(vis.params.transitions_duration)
+                                //     .attr("x", d => vis.draw.scales.x(+d.pos_ini_funcao_tipica) )
+                                //     .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica) )
+                                //     .attr("height", vis.dims.bar_height )
+                                //     .attr("width", d => vis.draw.scales.w(+d.atu_total))
+                                //     .attr("rx", 0)
                                 ;
 
                             }
+
+                        },
+
+                        "funcao_tipica" : {
+
+                            set_scales : [
+
+                                { dimension: "x" , 
+                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
+                                    axis     : true },
+    
+                                { dimension : "y_cat" ,  
+                                    variable  : "funcao_tipica",
+                                    axis      : true },
+    
+                                { dimension : "w" ,
+                                    variable  : "agregado", //"atu_total",
+                                    axis      : false }
+        
+                                ],
+        
+                            render : function(option) {
+
+                                console.log(this);
+
+                                vis.draw.agregado.desenha_barras(option);
+                                
+                            }
+
+
+
+                        },
+
+                        "anexo" : {
+
+                            set_scales : [
+
+                                { dimension: "x" , 
+                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
+                                    axis     : true },
+    
+                                { dimension : "y_cat" ,  
+                                    variable  : "anexo",
+                                    axis      : true },
+    
+                                { dimension : "w" ,
+                                    variable  : "agregado", //"atu_total",
+                                    axis      : false }
+        
+                                ],
+        
+                            render : function(option) {
+
+                                console.log(this);
+
+                                vis.draw.agregado.desenha_barras(option);
+                                
+                            }
+
 
                         },
 
@@ -513,26 +907,15 @@ const vis = {
         
                                 ],
         
-                            render : function() {
+                            render : function(option) {
 
                                 console.log(this);
 
-                                vis.sels.rects_acoes
-                                    .transition()
-                                    .duration(vis.params.transitions_duration)
-                                    .attr("x", d => vis.draw.scales.x(+d.pos_ini_agregador) )
-                                    .attr("y", d => vis.draw.scales.y_cat(d.agregador) )
-                                    .attr("height", 10 )
-                                    .attr("width", d => vis.draw.scales.w(+d.atu_total))
-                                    .attr("rx", 0)
-                                ;
+                                vis.draw.agregado.desenha_barras(option);
                                 
                             }
 
-
-
                         }
-    
     
                     }
     
@@ -595,12 +978,22 @@ const vis = {
             // saves data as a property to make it easier to access it elsewhere
             vis.data.raw = data;
 
-            // summarise data for categorical variables
-            vis.f.summarise_categorical(
-                numerical_variable = "atu_total");
+            // // summarise data for categorical variables
+            // vis.f.summarise_categorical(
+            //     numerical_variable = "atu_total");
+
+            //updates colors
+            vis.f.update_colors();
+
+            // populates comparison selector
+            vis.f.populates_comparison_selector();
+            // populates filters
+            vis.f.populates_filter_selector("orgao_decreto");
+            vis.f.populates_filter_selector("anexo");
+
 
             // evaluates domains for selected variables
-            vis.draw.domains.initialize();
+            vis.draw.domains.initialize_categorical();
 
             // updates ranges
             vis.draw.ranges.update();
@@ -612,15 +1005,37 @@ const vis = {
             vis.draw.axis.initialize();
 
             // add rects/bubbles
-            vis.draw.bubbles.add();
+            //vis.draw.bubbles.add();
 
             // starts monitoring button clicks
             vis.control.monitor_mode_button();
             vis.control.monitor_option_button();
+            vis.control.monitora_seletor_comparacao();
+            vis.control.monitora_seletores_filtros();
+            vis.control.monitora_exclusoes();
+
+            //vis.control.draw_state("agregado", "orgao_decreto");
 
         },
 
         draw_state : function(mode, option) {
+
+            // mode é se é agregado ou detalhado
+            // option é a variável de detalhamento (no caso do agregado)
+
+            console.log(vis.control.current_state);
+
+            vis.f.evaluate_dataset(
+                modo = null,
+                selecao_orgao = vis.control.current_state.selecao_orgao_decreto,
+                selecao_anexo = vis.control.current_state.selecao_anexo,
+                exclui_divida = vis.control.current_state.exclui_divida,
+                exclui_rgps = vis.control.current_state.exclui_rgps,
+                var_detalhamento = option
+            );
+
+            vis.draw.domains.evaluate_domain_agregado();
+            vis.draw.domains.evaluate_domain_categorical();
 
             vis.draw.scales.set(
                 mode = mode, 
@@ -630,7 +1045,7 @@ const vis = {
             vis.control.states
               .modes[mode]
               .options[option]
-              .render()
+              .render(option)
             ;
 
         },
@@ -661,7 +1076,7 @@ const vis = {
 
                         this.dataset.mode = mode;
 
-                        vis.control.show_option_buttons(mode);
+                        vis.control.show_mode_dependent_controls(mode);
 
                         /*
 
@@ -703,6 +1118,7 @@ const vis = {
 
             vis.elems.option_button = buttons;
 
+
             buttons.addEventListener("click", function(e) {
 
                 //console.log(this.children, e.target, this.children[0] == e.target);
@@ -721,17 +1137,121 @@ const vis = {
 
                     if (this.dataset.option != option) {
 
+                        // depois tem que ajeitar isso aqui
                         this.dataset.option = option;
+
+                        vis.control.current_state.option = option;
 
                         let mode = this.dataset.mode;
 
                         console.log("hi", mode, option);
+
+                        // fazer esse controle nos data-attributes?
+                        vis.control.current_state.mode = mode;
+                        vis.control.current_state.variavel_detalhamento = option;
+
+                        vis.f.reinicia_seletor_comparacao();
 
                         vis.control.draw_state(mode, option);
 
                     } else {console.log("ô, camarada, vc já está nesse modo :)")}
 
                 } else {console.log("Clique num botão, meu filho.")}
+
+            });
+
+        },
+
+        monitora_seletor_comparacao : function() {
+
+            const selector = document.querySelector(vis.refs.comparison_selector);
+
+            vis.elems.seletor_comparacao = selector;
+
+            selector.addEventListener("change", function(e) {
+
+                const opcao_selecionada = e.target.value;
+
+                vis.control.current_state.variavel_comparacao = opcao_selecionada;
+
+                if (opcao_selecionada == "nada") {
+                    vis.draw.agregado.remove_linhas_referencia();
+                } else {
+                    vis.draw.agregado.desenha_linhas_referencia(
+                        cat_variable = vis.control.current_state.variavel_detalhamento,
+
+                    num_variable = opcao_selecionada
+                    );
+                }
+
+            })
+
+
+        },
+
+        monitora_seletores_filtros : function() {
+
+            let seletores = document.querySelector(vis.refs.selectors_wrapper);
+
+            seletores.addEventListener("change", function(e) {
+
+                const seletor = e.target.name; // pra saber se foi no de orgao_decreto ou anexo
+                const valor_selecionado = e.target.value//.slice(0,5);
+
+                if (valor_selecionado != vis.control.current_state["selecao_" + seletor]) {
+
+                    vis.control.current_state["selecao_" + seletor] = valor_selecionado;
+
+                    if (vis.control.current_state.option != null) {
+
+                        console.log("desenha");
+
+                        vis.control.draw_state(
+                            mode = vis.control.current_state.mode, 
+                            option = vis.control.current_state.option
+                        );
+
+                        // if (vis.sels.linhas_referencia) {
+                        //     vis.draw.agregado.desenha_linhas_referencia(
+                        //         cat_variable = vis.control.current_state.variavel_detalhamento,num_variable = vis.control.current_state.option
+                        //     )
+                        // }
+
+                    }
+
+                }
+
+            });
+
+        },
+
+        monitora_exclusoes : function() {
+
+            let checkboxes = document.querySelector(vis.refs.exclusoes_wrapper);
+
+            checkboxes.addEventListener("change", function(e) {
+
+                const opcao = e.target.name; // pra saber se foi no de divida ou rgps
+                const checked = e.target.checked//.slice(0,5);
+
+                console.log("Monitor exclusoes", opcao, checked)
+
+                if (checked != vis.control.current_state["exclui_" + opcao]) {
+
+                    vis.control.current_state["exclui_" + opcao] = checked;
+
+                    if (vis.control.current_state.option != null) {
+
+                        console.log("desenha");
+
+                        vis.control.draw_state(
+                            mode = vis.control.current_state.mode, 
+                            option = vis.control.current_state.option
+                        );
+
+                    }
+
+                }
 
             });
 
@@ -750,20 +1270,22 @@ const vis = {
             
         },
 
-        show_option_buttons : function(mode) {
+        show_mode_dependent_controls : function(mode) {
 
-            let nav_options = document.querySelectorAll(vis.refs.option_button);
+            let mode_controls = document.querySelectorAll(vis.refs.mode_dependent_controls);
 
-            nav_options.forEach(nav => nav.classList.add("hidden"));
+            mode_controls.forEach(control => control.classList.add("hidden"));
 
-            let active_nav = document.querySelector(
+            let active_controls = document.querySelectorAll(
                 '[data-visible-on-mode="' +
                 mode +
                 '"]' );
+            
+            // mudei para querySelectorAll para selecionar o seletor de comparação também
 
-            active_nav.classList.remove("hidden");
+            active_controls.forEach(control => control.classList.remove("hidden"));
 
-        }
+        },
 
     }
 

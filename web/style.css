@@ -10,6 +10,10 @@
 
     --main-font: "Inter";
 
+    /*vis*/
+    --cor-barra-normal: goldenrod;
+    --cor-barra-destaque: rebeccapurple;
+
 }
 
 * {
@@ -32,11 +36,60 @@ h1 {
     font-size: 1rem;
 }
 
+/* filtros e visualização */
+
+.fieldsets-wrapper {
+    display: flex;
+    flex-direction: row;
+}
+
+fieldset.opcoes-filtros {
+    order : 2;
+}
+
+fieldset.opcoes-vis {
+    order : 1;
+}
+
+
+/* botoes filtro */
+
+fieldset {
+    flex: 1;
+}
+
+select {
+    background-color: transparent;
+    border: 2px solid currentColor;
+    font-family: var(--main-font);
+}
+
+.filter-wrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    font-size: .8rem;
+}
+
+.selecoes-wrapper {
+    display: flex;
+    flex-direction: column;
+    margin-right: 1rem;
+}
+
+.selecoes-wrapper select + select {
+    margin-top: .5rem;
+}
+
+.selecoes-wrapper select {
+    width: 20vw;
+}
+
 /* botoes controle */
 
 .mission-control {
     display: flex;
-    justify-content: center;
+    justify-content: left;
 }
 
 .mission-control button {
@@ -47,6 +100,7 @@ h1 {
     border-radius: 1.5em;
     color: var(--dark);
     background-color: var(--light);
+    cursor: pointer;
 }
 
 .mission-control button.selected.selected {
@@ -67,6 +121,26 @@ h1 {
     font-size: .8rem;
 }
 
+div.controle-comparacao {
+    max-width: 90vw;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.mission-control button.disabled {
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/*
+[name='seletor-comparacao'] {
+    background-color: transparent;
+    border: 2px solid currentColor;
+    /* border-radius: 10px; 
+    font-family: var(--main-font);
+} 
+*/
+
 /* vis */
 
 svg {
@@ -83,11 +157,25 @@ svg {
     stroke: var(--ligther);
 }
 
-/* rects */
+/* barras */
 
 rect.acoes {
     stroke : coral;
     fill : var(--pink);
+}
+
+/* labels valor barras */
+
+p.labels-valores-barras {
+    position: absolute;
+    font-family: var(--main-font);
+    margin: 0;
+    margin-left: .5rem;
+}
+
+/* linhas de referência */
+line.ref {
+    stroke-width: 2px;
 }
 
 /* card */

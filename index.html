@@ -10,43 +10,89 @@
 <body>
     <header>
         <h1>
-            Análise do PLOA &mdash; Despesas discricionárias
+            Análise do PLOA &mdash; Visão do Decreto
         </h1>
     </header>
-    <nav class="mission-control mode-control"
 
-     data-mode = "agregado|detalhado"
-     data-overview-focus = "true|false"
-     data-overview-focus-selection = "none"
-     data-detail-criteria = "changes|new"  
-     data-detail-focus = "true|false"
-     data-detail-focus-selection = "none"
-     data-detail-color-criteria = "pct|abs|funcao_tipica">
+    <div class="fieldsets-wrapper">
 
-        <button id="agregado">Valores Agregados</button>
-        <button id="detalhado">Valores Detalhados</button>
+    <fieldset class="opcoes-filtros">
+        <legend>Filtros</legend>
+        <div class="filter-wrapper">
+            <div class="selecoes-wrapper">
+                <select name="orgao_decreto" id="selecao-orgao">
+                    <option value="todos">Todos os órgãos</option>
+                </select>
+                <select name="anexo" id="selecao-tipo">
+                    <option value="todos">Todas as despesas</option>
+                </select>
+            </div>
+            <div class="exclusoes-wrapper">
+                <div>
+                    <input type="checkbox" id="exclui-divida" name="divida">
+                    <label for="exclui-divida">Exclui Dívida Mobiliária</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="exclui-rgps" name="rgps">
+                    <label for="exclui-rgps">Exclui RGPS</label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
 
-    </nav>
+    <fieldset class="opcoes-vis">
+        <legend>Visualização</legend>
+        
+        <nav class="mission-control mode-control"
 
-    <nav class="mission-control option-control hidden" 
-     data-visible-on-mode="agregado" 
-     data-mode = "agregado"
-     data-option = "agregador|funcao_tipica">
-        <button id="agregador">Por agregador</button>
-        <button id="funcao_tipica">Por função típica</button>
-    </nav>
+        data-mode = "agregado | detalhado"
+        data-anexo = "todos | Anexo II | Anexo III | etc."
+        data-agregador = "todos | agregador tal | etc."
+        data-overview-focus = "true|false"
+        data-overview-focus-selection = "none"
+        data-detail-criteria = "changes|new"  
+        data-detail-focus = "true|false"
+        data-detail-focus-selection = "none"
+        data-detail-color-criteria = "pct|abs|funcao_tipica">
 
-    <nav class="mission-control option-control hidden" 
-     data-visible-on-mode="detalhado" 
-     data-mode = "detalhado"
-     data-option = "variacao|acao_nova">
-        <button id="variacao">Variação</button>
-        <button id="acao_nova">Ações novas</button>
-    </nav>
+            <button id="agregado">Agregado</button>
+            <button id="detalhado">Detalhado</button>
+
+        </nav>
+
+        <nav class="mission-control option-control show-on-mode hidden" 
+        data-visible-on-mode="agregado" 
+        data-mode = "agregado"
+        data-option = "agregador|funcao_tipica">
+            <button id="orgao_decreto">Por Órgão</button>
+            <button id="anexo">Por Anexo</button>
+            <button id="agregador">Por Agregador</button>
+            <button id="funcao_tipica">Por Função Típica</button>
+        </nav>
+
+        <nav class="mission-control option-control show-on-mode hidden" 
+        data-visible-on-mode="detalhado" 
+        data-mode = "detalhado"
+        data-option = "variacao|acao_nova">
+            <button id="variacao">Variação</button>
+            <button id="acao_nova">Ações novas</button>
+        </nav>
+
+    </fieldset>
+</div>
 
     <main>
 
-        Aqui vai ficar a visualização.
+        <div class="controle-comparacao hidden"
+          data-visible-on-mode="agregado"
+          >
+          <p>
+          Valores do PLOA. Comparar com 
+          <select name="seletor-comparacao" id="">
+              <option value="nada">nada</option>
+          </select>
+          </p>
+        </div>
         <div class="vis-container">
             <svg class="vis">
 
