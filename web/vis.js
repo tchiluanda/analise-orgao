@@ -491,16 +491,19 @@ const vis = {
 
                 vis.params.variables_detalhado.forEach(
                     variavel => {
-                        vis.draw.domains.detalhado[variavel] = d3.extent(vis.data.processed.detalhado, d => d[variavel]);
+                        vis.draw.domains[variavel] = d3.extent(vis.data.processed.detalhado, d => d[variavel]);
                     }
-                )
+                );
+
+                vis.draw.domains[vis.params.main_variable] = [0, d3.max(vis.data.processed.detalhado, d => d[vis.params.main_variable])];
+                // a main variable é o PLOA
 
             },
 
             agregado : null, // trocar esse nome
-            detalhado : {}
 
             // categorical variables will be properties
+            // numerical também
 
         },
 
@@ -797,22 +800,17 @@ const vis = {
 
                 let svg = vis.sels.svg;
 
-                let r = 2;
-
-                vis.sels.rects_acoes = svg
-                  .selectAll("rect")
-                  .data(vis.data.raw)
-                  .join("rect")
+                vis.sels.circles_acoes = svg
+                  .selectAll("circle")
+                  .data(vis.data.processed.detalhado)
+                  .join("circle")
                   .classed("acoes", true)
-                  .attr("x", vis.dims.h/2)
-                  .attr("y", vis.dims.w/2)
-                  .attr("height", 1)
-                  .attr("width", 1)
-                  .attr("rx", 0)
+                  .attr("cx", vis.dims.h/2)
+                  .attr("cy", vis.dims.w/2)
+                  .attr("r", 1)
                 ;
 
             }
-
 
         },
 
@@ -993,32 +991,47 @@ const vis = {
                             set_scales : [
     
                                 { dimension: "x" , 
-                                  variable : "varia",
+                                  variable : "var_abs",
                                   axis     : true },
     
                                 { dimension : "y" ,  
-                                  variable  : "varia_pct",
+                                  variable  : "var_pct",
                                   axis      : true },
     
                                 { dimension : "r" , 
-                                  variable  : "atu_total",
+                                  variable  : "PLOA",
                                   axis      : false }
     
                             ],
         
                             render : function() {
     
-                                vis.sels.rects_acoes
+                                vis.sels.circles_acoes
                                   .transition()
                                   .duration(vis.params.transitions_duration)
-                                  .attr("x", d => vis.draw.scales.x(+d.varia) 
-                                                - vis.draw.scales.r(+d.atu_total))
-                                  .attr("y", d => vis.draw.scales.y(+d.varia_pct) 
-                                                - vis.draw.scales.r(+d.atu_total))
-                                  .attr("height", d => 2*vis.draw.scales.r(+d.atu_total))
-                                  .attr("width", d => 2*vis.draw.scales.r(+d.atu_total))
-                                  .attr("rx", d => 2*vis.draw.scales.r(+d.atu_total))
+                                  .attr("cx", d => vis.draw.scales.x(+d.var_abs) )
+                                  .attr("cy", d => vis.draw.scales.y(+d.varia_pct) )
+                                  .attr("r", d => vis.draw.scales.r(+d.PLOA))
                                 ;
+
+                            }
+    
+    
+                        },
+
+                        "inicial" : {
+    
+                            set_scales : [
+    
+                                { dimension : "r" , 
+                                  variable  : "PLOA",
+                                  axis      : false }
+    
+                            ],
+        
+                            render : function() {
+
+                                vis.draw.bubbles.add();
 
                             }
     
