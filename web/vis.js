@@ -5,7 +5,7 @@ const vis = {
         svg: "svg.vis",
         cont: "div.vis-container",
         mode_button: "nav.mode-control",
-        option_button: "nav.option-control",
+        option_button: "div.option-control",
         mode_dependent_controls: "[data-visible-on-mode]",
         comparison_selector: "[name='seletor-comparacao']",
         selectors_wrapper: ".selecoes-wrapper",
@@ -98,6 +98,8 @@ const vis = {
         modes : ["anexo", "agregador", "acao"],
 
         variables : ["PLOA", "dot_atu", "desp_paga"], // mudar esse nome aqui depois
+
+        variables_detalhado : ["var_pct", "var_abs"],
 
         variables_names : {
 
@@ -243,10 +245,13 @@ const vis = {
 
             // dividir aqui conforme o modo
 
-            if (modo == agregado) {
+            if (modo == "agregado") {
 
                 this.summarise_dataset_agregado(var_detalhamento);
             
+            } else {
+
+                this.summarise_dataset_detalhado();
             }
 
         },
@@ -254,6 +259,8 @@ const vis = {
         summarise_dataset_agregado : function(var_detalhamento) {
 
             // agregado
+
+            console.log("Estou aqui", var_detalhamento);
 
             vis.data.processed.agregado = utils.group_by_sum_cols(
 
@@ -294,6 +301,32 @@ const vis = {
 
             }
 
+
+        },
+
+        summarise_dataset_detalhado : function() {
+
+            vis.data.processed.detalhado = utils.group_by_sum_cols(
+
+                objeto = vis.data.processed.filtered.filter(d => d[vis.params.main_variable] > 0),
+                coluna_categoria = "acao",
+                colunas_valor = vis.params.variables,
+                ordena_decrescente = false,
+                coluna_ordem = null
+
+            );
+
+            vis.data.processed.detalhado.forEach(el => {
+                const acao_nova = (+el.dot_atu == 0 & +el.desp_paga == 0);
+
+                el["acao_nova"] = acao_nova;
+
+                if (!acao_nova) {
+                    el["var_pct"] = (el.PLOA / el.dot_atu) - 1;
+                    el["var_abs"] = el.PLOA -el.dot_atu;
+                }
+                
+            });
 
         },
 
@@ -454,7 +487,18 @@ const vis = {
 
             },
 
+            evaluate_domain_detalhado : function(){
+
+                vis.params.variables_detalhado.forEach(
+                    variavel => {
+                        vis.draw.domains.detalhado[variavel] = d3.extent(vis.data.processed.detalhado, d => d[variavel]);
+                    }
+                )
+
+            },
+
             agregado : null, // trocar esse nome
+            detalhado : {}
 
             // categorical variables will be properties
 
@@ -1053,8 +1097,14 @@ const vis = {
                 var_detalhamento = option
             );
 
-            vis.draw.domains.evaluate_domain_agregado();
-            vis.draw.domains.evaluate_domain_categorical();
+            if (mode == "agregado") {
+
+                vis.draw.domains.evaluate_domain_agregado();
+                vis.draw.domains.evaluate_domain_categorical();
+
+            } else {
+                vis.draw.domains.evaluate_domain_detalhado();
+            }
 
             vis.draw.scales.set(
                 mode = mode, 
@@ -1147,21 +1197,24 @@ const vis = {
                 if (e.target.tagName == "BUTTON") {
                     //ou (e.target.matches("button"))
 
+                    const button_container = e.target.parentElement;
+                    console.log(button_container);
+
                     vis.control.activates_button(
-                        all_buttons = this.children,
+                        all_buttons = button_container.children,
                         clicked = e.target
                     );
 
                     let option = e.target.id;
 
-                    if (this.dataset.option != option) {
+                    if (button_container.dataset.option != option) {
 
                         // depois tem que ajeitar isso aqui
-                        this.dataset.option = option;
+                        button_container.dataset.option = option;
 
                         vis.control.current_state.option = option;
 
-                        let mode = this.dataset.mode;
+                        let mode = button_container.dataset.mode;
 
                         console.log("hi", mode, option);
 
