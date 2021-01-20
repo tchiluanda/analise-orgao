@@ -30,7 +30,7 @@ const vis = {
 
         svg : null,
         cont : null,
-        rects_acoes : null,
+        circles_acoes : null,
         axis : {},
         barras : null,
         linhas_referencia : null
@@ -515,7 +515,7 @@ const vis = {
             //y_anexos : null,
             //y_agregadores : null,
             w : null,
-            r : [1,30],
+            r : [2,40],
 
             update : function() {
 
@@ -805,11 +805,42 @@ const vis = {
                   .data(vis.data.processed.detalhado)
                   .join("circle")
                   .classed("acoes", true)
-                  .attr("cx", vis.dims.h/2)
-                  .attr("cy", vis.dims.w/2)
+                  .attr("cx", d => vis.dims.w * Math.random())
+                  .attr("cy", d => vis.dims.h * Math.random())
                   .attr("r", 1)
+                  .attr("stroke", d => d.acao_nova ? "#4B0082" : "#fada5e")
                   .text(d => d.acao)
                 ;
+
+            },
+
+            simulation : null,
+
+            config_simulation : function() {
+
+                const magnitudeForca = 0.04;
+
+                const carga = function(d) {
+                    return -Math.pow(vis.draw.scales.r(+d.PLOA), 2.0) * magnitudeForca;
+                }
+
+                const atualiza_tick = function() {
+                    vis.sels.circles_acoes
+                      .attr("cx", d => d.x) // -d.raio pq são retângulos
+                      .attr("cy", d => d.y);
+                };
+                
+                vis.draw.bubbles.simulation = d3.forceSimulation()
+                    .velocityDecay(0.2)
+                    .force('x', d3.forceX().strength(magnitudeForca).x(vis.dims.w/2))
+                    .force('y', d3.forceY().strength(magnitudeForca).y(vis.dims.h/2))
+                    .force('charge', d3.forceManyBody().strength(carga))
+                    //.force('colisao', d3.forceCollide().radius(d => vis.draw.scales.r(+d.PLOA)))
+                    //.alphaMin(0.25)
+                    .on('tick', atualiza_tick);
+                
+                vis.draw.bubbles.simulation.stop()
+                vis.draw.bubbles.simulation.nodes(vis.data.processed.detalhado);
 
             }
 
@@ -1034,6 +1065,15 @@ const vis = {
                             render : function() {
 
                                 vis.draw.bubbles.add();
+                                vis.sels.circles_acoes
+                                  .transition()
+                                  .duration(vis.params.transitions_duration)
+                                  .attr("r", d => vis.draw.scales.r(+d.PLOA))
+                                  .attr("fill", d => d.acao_nova ? "#4B008250" : "#fada5e50")
+
+                                vis.draw.bubbles.config_simulation();
+
+                                vis.draw.bubbles.simulation.alpha(1).restart();
 
                             }
     
