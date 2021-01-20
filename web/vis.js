@@ -1075,13 +1075,17 @@ const vis = {
 
                                 // atualizei os nodes para tirar as ações novas, mas os círculos que correspondem a esses nodes continuam existindo. vou fazê-los sumir aqui: (depois tenho que retorná-los se voltar ao estado inicial)
 
+                                //vis.sels.circles_acoes
+                                //   .each(function(d) {
+                                //       if (d.acao_nova) d3.select(this)
+                                //         .transition()
+                                //         .duration(vis.params.transitions_duration)
+                                //         .attr("opacity", 0);
+                                //   })
                                 vis.sels.circles_acoes
-                                  .each(function(d) {
-                                      if (d.acao_nova) d3.select(this)
-                                        .transition()
-                                        .duration(vis.params.transitions_duration)
-                                        .attr("opacity", 0);
-                                  })
+                                  .transition()
+                                  .duration(vis.params.transitions_duration)
+                                  .attr("opacity", d => d.acao_nova ? 0 : 1);
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
