@@ -808,6 +808,7 @@ const vis = {
                   .attr("cx", vis.dims.h/2)
                   .attr("cy", vis.dims.w/2)
                   .attr("r", 1)
+                  .text(d => d.acao)
                 ;
 
             }
@@ -834,7 +835,8 @@ const vis = {
             selecao_orgao_decreto : "todos",
             selecao_anexo : "todos",
             exclui_divida : false,
-            exclui_rgps : false
+            exclui_rgps : false,
+            precisa_atualizar_dataset_detalhado : true
 
         },
 
@@ -1010,7 +1012,7 @@ const vis = {
                                   .transition()
                                   .duration(vis.params.transitions_duration)
                                   .attr("cx", d => vis.draw.scales.x(+d.var_abs) )
-                                  .attr("cy", d => vis.draw.scales.y(+d.varia_pct) )
+                                  .attr("cy", d => vis.draw.scales.y(+d.var_pct) )
                                   .attr("r", d => vis.draw.scales.r(+d.PLOA))
                                 ;
 
@@ -1101,14 +1103,20 @@ const vis = {
 
             console.log(vis.control.current_state);
 
-            vis.f.evaluate_dataset(
-                modo = mode,
-                selecao_orgao = vis.control.current_state.selecao_orgao_decreto,
-                selecao_anexo = vis.control.current_state.selecao_anexo,
-                exclui_divida = vis.control.current_state.exclui_divida,
-                exclui_rgps = vis.control.current_state.exclui_rgps,
-                var_detalhamento = option
-            );
+            if (mode == "detalhado" & !vis.control.current_state.precisa_atualizar_dataset_detalhado) {
+
+            } else {
+
+                vis.f.evaluate_dataset(
+                    modo = mode,
+                    selecao_orgao = vis.control.current_state.selecao_orgao_decreto,
+                    selecao_anexo = vis.control.current_state.selecao_anexo,
+                    exclui_divida = vis.control.current_state.exclui_divida,
+                    exclui_rgps = vis.control.current_state.exclui_rgps,
+                    var_detalhamento = option
+                );
+
+            }
 
             if (mode == "agregado") {
 
@@ -1116,7 +1124,9 @@ const vis = {
                 vis.draw.domains.evaluate_domain_categorical();
 
             } else {
+
                 vis.draw.domains.evaluate_domain_detalhado();
+
             }
 
             vis.draw.scales.set(
@@ -1157,6 +1167,7 @@ const vis = {
                     if (this.dataset.mode != mode) {
 
                         this.dataset.mode = mode;
+                        vis.control.current_state.mode = mode;
 
                         vis.control.show_mode_dependent_controls(mode);
 
@@ -1238,6 +1249,9 @@ const vis = {
                         vis.f.reinicia_seletor_comparacao();
 
                         vis.control.draw_state(mode, option);
+
+                        if (mode == "detalhado") {vis.control.current_state.precisa_atualizar_dataset_detalhado = false} 
+                        // agora só precisa voltar para true depois de algum filtro ser aplicado
 
                     } else {console.log("ô, camarada, vc já está nesse modo :)")}
 
