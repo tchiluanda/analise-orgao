@@ -822,15 +822,28 @@ const vis = {
 
             },
 
+            parametros_simulation : {
+
+                force_charge : function() {
+
+                    const magnitudeForca = this.magnitudeForca;
+
+                    const carga = function(d) {
+                        return -Math.pow(vis.draw.scales.r(+d.PLOA), 2.0) * magnitudeForca;
+                    };
+
+                    return d3.forceManyBody().strength(carga);
+                },
+
+                magnitudeForca : 0.04
+
+            },
+
             simulation : null,
 
             config_simulation : function() {
 
-                const magnitudeForca = 0.04;
-
-                const carga = function(d) {
-                    return -Math.pow(vis.draw.scales.r(+d.PLOA), 2.0) * magnitudeForca;
-                }
+                const magnitudeForca = this.parametros_simulation.magnitudeForca;
 
                 const atualiza_tick = function() {
                     vis.sels.circles_acoes
@@ -842,13 +855,13 @@ const vis = {
                     .velocityDecay(0.2)
                     .force('x', d3.forceX().strength(magnitudeForca).x(vis.dims.w/2))
                     .force('y', d3.forceY().strength(magnitudeForca).y(vis.dims.h/2))
-                    .force('charge', d3.forceManyBody().strength(carga))
-                    //.force('colisao', d3.forceCollide().radius(d => vis.draw.scales.r(+d.PLOA)))
-                    //.alphaMin(0.25)
+                    .force('charge', vis.draw.bubbles.parametros_simulation.force_charge())
+                    .alphaMin(0.25)
                     .on('tick', atualiza_tick);
                 
                 vis.draw.bubbles.simulation.stop()
                 vis.draw.bubbles.simulation.nodes(vis.data.processed.detalhado);
+                vis.control.current_state.simulation_started = true;
 
             }
 
@@ -875,7 +888,8 @@ const vis = {
             selecao_anexo : "todos",
             exclui_divida : false,
             exclui_rgps : false,
-            precisa_atualizar_dataset_detalhado : true
+            precisa_atualizar_dataset_detalhado : true,
+            simulation_started : false
 
         },
 
@@ -1046,14 +1060,29 @@ const vis = {
                             ],
         
                             render : function() {
-    
+
+                                console.log("let's go!")
+
+                                const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
+
+                                vis.draw.bubbles.simulation
+                                  .nodes(vis.data.processed.detalhado.filter(d => !d.acao_nova))
+                                  .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales.x(+d.var_abs)))
+                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales.y(+d.var_pct)))
+                                  .force("charge", null)
+                                  .force('colisao', d3.forceCollide().radius(d => vis.draw.scales.r(+d.PLOA)));
+
+                                // atualizei os nodes para tirar as ações novas, mas os círculos que correspondem a esses nodes continuam existindo. vou fazê-los sumir aqui: (depois tenho que retorná-los se voltar ao estado inicial)
+
                                 vis.sels.circles_acoes
-                                  .transition()
-                                  .duration(vis.params.transitions_duration)
-                                  .attr("cx", d => vis.draw.scales.x(+d.var_abs) )
-                                  .attr("cy", d => vis.draw.scales.y(+d.var_pct) )
-                                  .attr("r", d => vis.draw.scales.r(+d.PLOA))
-                                ;
+                                  .each(function(d) {
+                                      if (d.acao_nova) d3.select(this)
+                                        .transition()
+                                        .duration(vis.params.transitions_duration)
+                                        .attr("opacity", 0);
+                                  })
+
+                                vis.draw.bubbles.simulation.alpha(1).restart();
 
                             }
     
@@ -1072,14 +1101,38 @@ const vis = {
         
                             render : function() {
 
-                                vis.draw.bubbles.add();
-                                vis.sels.circles_acoes
-                                  .transition()
-                                  .duration(vis.params.transitions_duration)
-                                  .attr("r", d => vis.draw.scales.r(+d.PLOA))
-                                  .attr("fill", d => d.acao_nova ? "#4B008250" : "#fada5e50")
+                                const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
 
-                                vis.draw.bubbles.config_simulation();
+                                if (!vis.control.current_state.simulation_started) {
+
+                                    vis.draw.bubbles.add();
+                                    vis.sels.circles_acoes
+                                      .transition()
+                                      .duration(vis.params.transitions_duration)
+                                      .attr("r", d => vis.draw.scales.r(+d.PLOA))
+                                      .attr("fill", d => d.acao_nova ? "#4B008250" : "#fada5e50")
+    
+                                    vis.draw.bubbles.config_simulation();
+
+                                } else {
+
+                                    vis.draw.bubbles.simulation
+                                      .nodes(vis.data.processed.detalhado)
+                                      .force('colisao', null)
+                                      .force('charge', vis.draw.bubbles.parametros_simulation.force_charge())
+                                      .force('x', d3.forceX().strength(magnitudeForca).x(vis.dims.w/2))
+                                      .force('y', d3.forceY().strength(magnitudeForca).y(vis.dims.h/2));
+
+                                    // fazer todo mundo reaparecer.
+
+                                    vis.sels.circles_acoes
+                                      .transition()
+                                      .duration(vis.params.transitions_duration)
+                                      .attr("opacity", 1);
+
+                                }
+
+
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
