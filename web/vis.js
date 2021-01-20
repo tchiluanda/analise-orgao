@@ -817,6 +817,7 @@ const vis = {
                     })
                   .attr("r", 1)
                   .attr("stroke", d => d.acao_nova ? "#4B0082" : "#fada5e")
+                  .attr("opacity", 1)
                   .text(d => d.acao)
                 ;
 
@@ -1079,7 +1080,7 @@ const vis = {
                                       if (d.acao_nova) d3.select(this)
                                         .transition()
                                         .duration(vis.params.transitions_duration)
-                                        .style("opacity", 0);
+                                        .attr("opacity", 0);
                                   })
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
@@ -1128,7 +1129,7 @@ const vis = {
                                     vis.sels.circles_acoes
                                       .transition()
                                       .duration(vis.params.transitions_duration)
-                                      .style("opacity", 1);
+                                      .attr("opacity", 1);
 
                                 }
 
