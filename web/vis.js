@@ -805,8 +805,16 @@ const vis = {
                   .data(vis.data.processed.detalhado)
                   .join("circle")
                   .classed("acoes", true)
-                  .attr("cx", d => vis.dims.w * Math.random())
-                  .attr("cy", d => vis.dims.h * Math.random())
+                  .attr("cx", function(d) {
+                      let random = vis.dims.w * Math.random();
+                      d.x = random; // para inicializar a posição na simulação
+                      return random;
+                    })
+                  .attr("cy", function(d) {
+                      let random = vis.dims.h * Math.random();
+                      d.y = random;
+                      return random;
+                    })
                   .attr("r", 1)
                   .attr("stroke", d => d.acao_nova ? "#4B0082" : "#fada5e")
                   .text(d => d.acao)
