@@ -650,7 +650,27 @@ sum(base_export_longa$desp_paga)
 
 write.csv(base_export_longa, file = "./dados/dados.csv", fileEncoding = "utf-8")
 
+novas <- base_export %>% filter(PLOA > 0, dot_atu == 0) %>%
+  group_by(acao) %>%
+  summarise(sum(PLOA))
 
+var <- base_export %>% filter(PLOA > 0, dot_atu > 0) %>%
+  group_by(acao) %>%
+  summarise_at(vars(PLOA, dot_atu), ~sum(.)) %>%
+  ungroup() %>%
+  mutate(var_pct = PLOA/dot_atu - 1) %>%
+  mutate(aumento = ifelse(var_pct>0, "aumento", "diminuicao"),
+         var_pct_mod = abs(var_pct),
+         var_alt = ifelse(aumento == "aumento", PLOA/dot_atu, dot_atu/PLOA),
+         var_abs = ifelse(aumento == "aumento", PLOA-dot_atu, dot_atu-PLOA) )
+
+var %>% count(aumento)
+
+ggplot(var) + 
+  geom_jitter(aes(x = var_abs,#var_alt, 
+                  y = aumento, color = aumento)) + 
+  scale_x_log10()
+  #xlim(0,1e10)
 
 ggplot(base_export, aes(x = orgao_decreto)) +
   geom_col(aes(y = dot_atu), fill = "purple") +
