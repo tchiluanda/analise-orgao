@@ -1079,7 +1079,7 @@ const vis = {
                                       if (d.acao_nova) d3.select(this)
                                         .transition()
                                         .duration(vis.params.transitions_duration)
-                                        .attr("opacity", 0);
+                                        .style("opacity", 0);
                                   })
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
@@ -1128,7 +1128,7 @@ const vis = {
                                     vis.sels.circles_acoes
                                       .transition()
                                       .duration(vis.params.transitions_duration)
-                                      .attr("opacity", 1);
+                                      .style("opacity", 1);
 
                                 }
 
