@@ -50,7 +50,7 @@ const vis = {
 
         h: null,
         w: null,
-        bar_height: 10,
+        bar_height: 16,
         margins: {
 
             top: 10,
@@ -128,6 +128,7 @@ const vis = {
             agregado          : "numerical",
             agregador         : "categorical",
             funcao_tipica     : "categorical",
+            orgao_decreto     : "categorical",
             var_tipo          : "categorical"
 
         },
@@ -569,13 +570,13 @@ const vis = {
     
             },
 
-            calcula_range_var_categorica : function(categorical_var) {
+            calcula_range_var_categorical : function(categorical_var) {
 
                 let qde_categorias = vis.draw.domains[categorical_var].length;
 
-                let comprimento_necessario = vis.dims.bar_height * qde_categorias;
+                let comprimento_necessario = vis.dims.bar_height * qde_categorias * 1.5;
 
-                return([vis.dims.margins.top, vis.dims.margins.top + comprimento_necessario]);
+                return([vis.dims.margins.top + comprimento_necessario, vis.dims.margins.top]);
 
             }
 
@@ -599,6 +600,7 @@ const vis = {
                     
                     if (!dimension_range) dimension_range = dimension;
                     // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
+                    
 
                     vis.draw.scales[dimension]
                     .range(vis.draw.ranges[dimension_range]);
@@ -612,6 +614,19 @@ const vis = {
 
                 vis.draw.scales[dimension]
                   .domain(vis.draw.domains[variable]);
+
+                console.log("set_domain", variable);
+
+                //new range
+                if (vis.params.variables_type[variable] == "categorical") {
+
+                    const new_range = vis.draw.ranges.calcula_range_var_categorical(variable);
+
+                    console.log("calcula novo range. velho: ", vis.draw.scales[dimension].range(), new_range);
+
+                    vis.draw.scales[dimension].range(new_range);
+
+                }
     
             },
 
@@ -780,7 +795,7 @@ const vis = {
                 .attr("x", vis.dims.margins.left)
                 .attr("width", 0)
                 .attr("height", vis.dims.bar_height)
-                .attr("y", d => vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top)
+                .attr("y", d => vis.draw.scales.y_cat(d[variable])) //+ vis.dims.margins.top)
                 .transition()
                 .duration(vis.params.transitions_duration)
                 .attr("width", d => vis.draw.scales.w(d[vis.params.main_variable]))
@@ -796,14 +811,14 @@ const vis = {
                 .data(vis.data.processed.agregado, d => d[variable])
                 .join("p")
                 .classed("labels-valores-barras", true)
-                .style("top", d => (vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top) + "px")
+                .style("top", d => (vis.draw.scales.y_cat(d[variable]))) //+ vis.dims.margins.top) + "px")
                 .style("left", vis.dims.margins.left + "px")
                 .style("font-size", vis.dims.bar_height + "px")
                 .style("line-height", vis.dims.bar_height + "px")
                 .text(d => utils.valor_formatado(d[vis.params.main_variable]))
                 .transition()
                 .duration(vis.params.transitions_duration)
-                .style("left", d => (vis.dims.margins.left + vis.draw.scales.w(d[vis.params.main_variable])) + "px")
+                .style("left", d => (vis.dims.margins.left + vis.draw.scales.w(d[vis.params.main_variable])) + "px");
 
 
             },
