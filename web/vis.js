@@ -113,22 +113,26 @@ const vis = {
 
         categorical_vars : ["orgao_decreto", "anexo", "agregador", "funcao_tipica"],
         // also, those are the variables used for evaluating summaries in the "agregado" mode.
+        // não inclui o var_tipo aqui, pq a função atual vai procurar a variável em vis.data.raw... e o var_tipo só aparece quando é calculado o dataset detalhado.
+
+        
 
         // this will serve to determine axis
 
         variables_type : {
 
             PLOA              : "numerical",
-            varia_abs_mod     : "numerical",
-            varia_pct_mod     : "percent",
+            var_abs_mod       : "numerical",
+            var_pct_mod       : "log",
             dot_atu           : "numerical",
             agregado          : "numerical",
             agregador         : "categorical",
-            funcao_tipica     : "categorical"
+            funcao_tipica     : "categorical",
+            var_tipo          : "categorical"
 
         },
 
-        dimensions : ["x", "x_log", "y", "y_cat", "w", "r"],
+        dimensions : ["x", "x_log", "y", "y_cat", "y_var", "w", "r"],
 
         dims_vs_visual_dims : {
 
@@ -433,6 +437,8 @@ const vis = {
 
                 function generate(data, variable, categorical = false) {
 
+                    console.log(variable);
+
                     if (!categorical) {
                         return d3.extent(data, d => +d[variable])
                     }
@@ -514,7 +520,7 @@ const vis = {
                 vis.params.variables_detalhado.forEach(
                     variavel => {
                         vis.draw.domains[variavel] = [
-                            0,
+                            vis.params.variables_type[variavel] == "log" ? 1 : 0,
                             d3.max(vis.data.processed.detalhado, d => d[variavel])
                         ]
                         
