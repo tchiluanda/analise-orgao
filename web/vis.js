@@ -99,7 +99,7 @@ const vis = {
 
         variables : ["PLOA", "dot_atu", "desp_paga"], // mudar esse nome aqui depois
 
-        variables_detalhado : ["var_pct", "var_abs"],
+        variables_detalhado : ["var_pct_mod", "var_abs_mod"],
 
         variables_names : {
 
@@ -119,8 +119,8 @@ const vis = {
         variables_type : {
 
             PLOA              : "numerical",
-            varia             : "numerical",
-            varia_pct         : "percent",
+            varia_abs_mod     : "numerical",
+            varia_pct_mod     : "percent",
             dot_atu           : "numerical",
             agregado          : "numerical",
             agregador         : "categorical",
@@ -128,7 +128,21 @@ const vis = {
 
         },
 
-        dimensions : ["x", "y", "y_cat", "w", "r"],
+        dimensions : ["x", "x_log", "y", "y_cat", "w", "r"],
+
+        dims_vs_visual_dims : {
+
+            // pq algumas dimensões têm escalas diferentes (às vezes o y vai ser ordinal, às vezes numérico... às vezes x vai ser numérico linear, às vezes numérico log etc. essa é uma forma de ter à mão as diversas escalas, mas manter sempre apenas os eixos x e y.)
+
+            // logical dimension : physical dimension
+
+            // incluí uma lógica para considerar a dimensão física como a própria dimensão lógica se ele não achar a correspondência no lookup a este objeto. tipo, "x" vai ser "x" mesmo. só preciso especificar aqui as exceções.
+
+            "x_log" : "x",
+            "y_cat" : "y",
+            "y_var" : "y"
+
+        },
 
         //dimensions : ["x", "y", "y_cat", "y_anexos", "w", "r"]
 
@@ -322,8 +336,16 @@ const vis = {
                 el["acao_nova"] = acao_nova;
 
                 if (!acao_nova) {
-                    el["var_pct"] = (el.PLOA / el.dot_atu) - 1;
-                    el["var_abs"] = el.PLOA -el.dot_atu;
+                    const var_pct = (el.PLOA / el.dot_atu);
+                    const var_abs = (el.PLOA - el.dot_atu);
+                    const aumento = var_pct > 1;
+
+                    el["var_tipo"] = aumento ? "aumento" : "redução";
+
+                    el["var_pct_mod"] = aumento ? var_pct : (1/var_pct);
+                    el["var_abs_mod"] = Math.abs(var_abs);
+
+                    // essas variáveis criadas aqui devem ser informadas lá em vis.params.variables_detalhado
                 }
                 
             });
@@ -491,7 +513,12 @@ const vis = {
 
                 vis.params.variables_detalhado.forEach(
                     variavel => {
-                        vis.draw.domains[variavel] = d3.extent(vis.data.processed.detalhado, d => d[variavel]);
+                        vis.draw.domains[variavel] = [
+                            0,
+                            d3.max(vis.data.processed.detalhado, d => d[variavel])
+                        ]
+                        
+                        //d3.extent(vis.data.processed.detalhado, d => d[variavel]);
                     }
                 );
 
@@ -505,23 +532,32 @@ const vis = {
             // categorical variables will be properties
             // numerical também
 
+            var_tipo : ["aumento", "redução"]
+
         },
 
         ranges : {
 
             x : null,
+            x_log : null,
             y : null,
             y_cat : null,
             //y_anexos : null,
             //y_agregadores : null,
             w : null,
             r : [2,40],
+            y_var : null,
+            // o do modo detalhado, opcao variação
 
             update : function() {
 
                 vis.draw.ranges.x = [ vis.dims.margins.left, vis.dims.w - vis.dims.margins.right ];
+
+                vis.draw.ranges.x_log = [ vis.dims.margins.left/2, vis.dims.w - vis.dims.margins.right ];
     
                 vis.draw.ranges.y = [ vis.dims.h - vis.dims.margins.bottom, vis.dims.margins.top ];
+
+                vis.draw.ranges.y_var = [vis.dims.h/4, vis.dims.h*3/4];
 
                 vis.draw.ranges.w = [ 0, vis.dims.w - vis.dims.margins.left - vis.dims.margins.right];
     
@@ -542,8 +578,10 @@ const vis = {
         scales : {
 
             x: d3.scaleLinear().clamp(true),
+            x_log : d3.scaleLog(),
             y: d3.scaleLinear().clamp(true),
             y_cat: d3.scaleBand(),
+            y_var: d3.scaleBand(),
             w: d3.scaleLinear().clamp(true),
             r: d3.scaleSqrt(),
 
@@ -551,10 +589,15 @@ const vis = {
                 
                 vis.params.dimensions.forEach(dimension => {
 
-                    let dimension_range = dimension == "y_cat" ? "y" : dimension;
+                    let dimension_range = vis.params.dims_vs_visual_dims[dimension];
+                    
+                    if (!dimension_range) dimension_range = dimension;
+                    // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
 
                     vis.draw.scales[dimension]
                     .range(vis.draw.ranges[dimension_range]);
+
+                    console.log("Inicializando scales", dimension, vis.draw.scales[dimension]);
                 });
     
             },
@@ -595,9 +638,12 @@ const vis = {
 
             update_axis_scale : function(dimension) {
 
-                let dimension_axis = dimension == "y_cat" ? "y" : dimension;
+                let dimension_axis = vis.params.dims_vs_visual_dims[dimension];
+                    
+                if (!dimension_axis) dimension_axis = dimension;
+                // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
 
-                console.log("Updating o axis_scale da dimensao", dimension, dimension_axis)
+                console.log("Updating o axis_scale da dimensao", dimension, dimension_axis);
 
                 vis.draw.axis[dimension_axis].scale(
                     vis.draw.scales[dimension]
@@ -626,7 +672,10 @@ const vis = {
 
             update : function(dimension, variable) {
 
-                let dimension_axis = dimension == "y_cat" ? "y" : dimension;
+                let dimension_axis = vis.params.dims_vs_visual_dims[dimension];
+                    
+                if (!dimension_axis) dimension_axis = dimension;
+                // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
 
                 console.log("Vamos dar um update no eixo", dimension_axis, variable);
 
@@ -644,9 +693,13 @@ const vis = {
 
             initialize : function() {
 
+                //fazer um forEach aqui... armazenar essas variáveis
+
                 vis.draw.axis.update_axis_scale("x");
+                vis.draw.axis.update_axis_scale("x_log");
                 vis.draw.axis.update_axis_scale("y");
                 vis.draw.axis.update_axis_scale("y_cat");
+                vis.draw.axis.update_axis_scale("y_var");
     
                 vis.draw.axis.create(
                     desloc_x = 0,
@@ -1046,12 +1099,12 @@ const vis = {
     
                             set_scales : [
     
-                                { dimension: "x" , 
-                                  variable : "var_abs",
+                                { dimension: "x_log" , 
+                                  variable : "var_pct_mod",
                                   axis     : true },
     
-                                { dimension : "y" ,  
-                                  variable  : "var_pct",
+                                { dimension : "y_var" ,  
+                                  variable  : "var_tipo",
                                   axis      : true },
     
                                 { dimension : "r" , 
@@ -1068,8 +1121,8 @@ const vis = {
 
                                 vis.draw.bubbles.simulation
                                   .nodes(vis.data.processed.detalhado.filter(d => !d.acao_nova))
-                                  .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales.x(+d.var_abs)))
-                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales.y(+d.var_pct)))
+                                  .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales.x_log(+d.var_pct_mod)))
+                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales.y_var(d.var_tipo)))
                                   .force("charge", null)
                                   .force('colisao', d3.forceCollide().radius(d => vis.draw.scales.r(+d.PLOA)));
 
