@@ -122,7 +122,7 @@ const vis = {
         variables_type : {
 
             PLOA              : "numerical",
-            var_abs_mod       : "numerical",
+            var_abs_mod       : "log",
             var_pct_mod       : "log",
             dot_atu           : "numerical",
             agregado          : "numerical",
@@ -1101,7 +1101,7 @@ const vis = {
     
                     options : {
     
-                        "variacao" : {
+                        "var-pct" : {
     
                             set_scales : [
     
@@ -1144,12 +1144,56 @@ const vis = {
                                 vis.sels.circles_acoes
                                   .transition()
                                   .duration(vis.params.transitions_duration)
-                                  .attr("opacity", d => d.acao_nova ? 0 : 1);
+                                  .attr("opacity", d => d.acao_nova ? 0 : 1)
+                                  .attr("fill", d => d.var_tipo == "aumento" ? "dodgerblue" : "tomato");
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
                             }
     
+    
+                        },
+
+                        "var-abs" : {
+    
+                            set_scales : [
+    
+                                { dimension: "x_log" , 
+                                  variable : "var_abs_mod",
+                                  axis     : true },
+    
+                                { dimension : "y_var" ,  
+                                  variable  : "var_tipo",
+                                  axis      : true },
+    
+                                { dimension : "r" , 
+                                  variable  : "PLOA",
+                                  axis      : false }
+    
+                            ],
+        
+                            render : function() {
+
+                                console.log("let's go!")
+
+                                const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
+
+                                vis.draw.bubbles.simulation
+                                  .nodes(vis.data.processed.detalhado.filter(d => !d.acao_nova))
+                                  .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales.x(+d.var_abs_mod)))
+                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales.y_var(d.var_tipo)))
+                                  .force("charge", null)
+                                  .force('colisao', d3.forceCollide().radius(d => vis.draw.scales.r(+d.PLOA)));
+
+                                vis.sels.circles_acoes
+                                  .transition()
+                                  .duration(vis.params.transitions_duration)
+                                  .attr("opacity", d => d.acao_nova ? 0 : 1)
+                                  .attr("fill", d => d.var_tipo == "aumento" ? "dodgerblue" : "tomato");
+
+                                vis.draw.bubbles.simulation.alpha(1).restart();
+
+                            }
     
                         },
 
