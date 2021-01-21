@@ -144,7 +144,7 @@ const vis = {
 
             "x_log" : "x",
             "y_cat" : "y",
-            "y_var" : "y"
+            "y_var" : "y_var"
 
         },
 
@@ -587,7 +587,7 @@ const vis = {
             x_log : d3.scaleLog(),
             y: d3.scaleLinear().clamp(true),
             y_cat: d3.scaleBand(),
-            y_var: d3.scaleBand(),
+            y_var: d3.scaleOrdinal(),
             w: d3.scaleLinear().clamp(true),
             r: d3.scaleSqrt(),
 
@@ -706,6 +706,8 @@ const vis = {
                 vis.draw.axis.update_axis_scale("y");
                 vis.draw.axis.update_axis_scale("y_cat");
                 vis.draw.axis.update_axis_scale("y_var");
+
+                // aqui tb... evitar superposição de eixos tb.
     
                 vis.draw.axis.create(
                     desloc_x = 0,
@@ -716,6 +718,11 @@ const vis = {
                     desloc_x = vis.dims.margins.left,
                     desloc_y = 0,
                     "y");
+
+                vis.draw.axis.create(
+                    desloc_x = vis.dims.margins.left/2,
+                    desloc_y = 0,
+                    "y_var");
                 
             },
 
@@ -755,7 +762,9 @@ const vis = {
 
             x :  d3.axisBottom(),
 
-            y :  d3.axisLeft()
+            y :  d3.axisLeft(),
+
+            y_var : d3.axisLeft()
 
         },
 
