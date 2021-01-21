@@ -667,7 +667,7 @@ var <- base_export %>% filter(PLOA > 0, dot_atu > 0) %>%
 var %>% count(aumento)
 
 ggplot(var) + 
-  geom_jitter(aes(x = var_abs,#var_alt, 
+  geom_jitter(aes(x = var_alt, #var_abs, 
                   y = aumento, color = aumento)) + 
   scale_x_log10()
   #xlim(0,1e10)
