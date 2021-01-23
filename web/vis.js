@@ -1604,6 +1604,16 @@ const vis = {
 
         },
 
+        monitora_tooltips : function() {
+
+            // usando listener de D3
+
+            vis.sels.circles_acoes
+              .on('mouseover', vis.f.mostraTooltip)
+              .on('mouseout',  vis.f.escondeTooltip);
+
+        }
+
     }
 
 }
