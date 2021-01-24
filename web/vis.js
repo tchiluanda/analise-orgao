@@ -425,8 +425,76 @@ const vis = {
         },
 
         desabilita_opcao : function(opcao) {
+
             document.querySelector("button#" + opcao).classList.add("disabled");
+
+        },
+
+        mostraTooltip : function(d) {
+
+            let dados = d3.select(this).datum();
+
+            let x_bubble = +d3.select(this).attr('cx');
+            let y_bubble = +d3.select(this).attr('cy');
+
+            console.log(x_bubble, y_bubble);
+        
+            const $tooltip = d3.select("div#card");
+            
+            let largura_tooltip_css = +$tooltip.style("width").substring(0, $tooltip.style("width").length-2);
+            
+            $tooltip.classed("hidden", false);
+        
+            // popula informacao
+
+            // parametrizar isso em vis.params
+      
+            const infos_tooltip = ["acao", "tituloacao", "PLOA", "dot_atu", "aumento"];
+        
+            infos_tooltip.forEach(function(info) {
+                let text = "";
+                if (vis.params.variables_type[info] == "numerical") text = utils.valor_formatado(dados[info])
+                else text = dados[info];
+                $tooltip.select("#tt-"+info).text(text);
+            })
+        
+            // now that the content is populated, we can capture the tooltip
+            // height, so that we can optime the tt position.
+        
+            const altura_tooltip = $tooltip.node().getBoundingClientRect().height;
+            //console.log(tooltip_height);
+        
+            // calculate positions
+        
+            const pad = 10;
+    
+            //console.log(x_tooltip, largura_tooltip_css, pad, dimensoes["principal"].w_numerico);
+        
+            if (x_bubble + largura_tooltip_css + pad > vis.dims.w) {
+                x_bubble = x_bubble - largura_tooltip_css - pad;
+            } else {
+                x_bubble = x_bubble + pad
+            }
+        
+            if (y_bubble + altura_tooltip + pad > vis.dims.h) {
+                y_bubble = y_bubble - altura_tooltip - pad;
+            } else {
+                y_bubble = y_bubble + pad
+            }
+        
+            $tooltip
+              .style('left', x_bubble + 'px')
+              .style('top', y_bubble + 'px');
+
+        },
+
+        escondeTooltip : function(d) {
+
+            d3.select("div#card").classed("hidden", true);
+
         }
+
+
     },
 
     draw: {
@@ -1357,6 +1425,8 @@ const vis = {
               .options[option]
               .render(option)
             ;
+
+            if (mode == "detalhado") {vis.control.monitora_tooltips()}
 
         },
 
