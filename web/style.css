@@ -148,6 +148,10 @@ svg {
     height: 100%;
 }
 
+.silent {
+    pointer-events: none;
+}
+
 .axis {
     font-family: "Inter";
     color: var(--ligther);

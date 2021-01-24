@@ -1219,6 +1219,7 @@ const vis = {
                                 //         .attr("opacity", 0);
                                 //   })
                                 vis.sels.circles_acoes
+                                  .classed("silent", d => d.acao_nova)
                                   .transition()
                                   .duration(vis.params.transitions_duration)
                                   .attr("opacity", d => d.acao_nova ? 0 : 1)
@@ -1263,6 +1264,7 @@ const vis = {
                                   .force('colisao', d3.forceCollide().radius(d => vis.draw.scales.r(+d.PLOA)));
 
                                 vis.sels.circles_acoes
+                                  .classed("silent", d => d.acao_nova)
                                   .transition()
                                   .duration(vis.params.transitions_duration)
                                   .attr("opacity", d => d.acao_nova ? 0 : 1)
@@ -1311,6 +1313,7 @@ const vis = {
                                     // fazer todo mundo reaparecer.
 
                                     vis.sels.circles_acoes
+                                      .classed("silent", false)
                                       .transition()
                                       .duration(vis.params.transitions_duration)
                                       .attr("opacity", 1);
