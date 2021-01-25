@@ -111,7 +111,7 @@ const vis = {
 
         main_variable : "PLOA",
 
-        categorical_vars : ["orgao_decreto", "anexo", "agregador", "funcao_tipica"],
+        categorical_vars : ["orgao_decreto", "anexo", "agregador"],
         // also, those are the variables used for evaluating summaries in the "agregado" mode.
         // não inclui o var_tipo aqui, pq a função atual vai procurar a variável em vis.data.raw... e o var_tipo só aparece quando é calculado o dataset detalhado.
 
@@ -127,7 +127,6 @@ const vis = {
             dot_atu           : "numerical",
             agregado          : "numerical",
             agregador         : "categorical",
-            funcao_tipica     : "categorical",
             var_tipo          : "categorical"
 
         },
@@ -154,7 +153,6 @@ const vis = {
 
             anexo: "Demais anexos",
             agregador: "Demais agregadores",
-            funcao_tipica: "Demais funções",
             orgao_decreto: "Demais órgãos"
 
         }
@@ -1068,48 +1066,7 @@ const vis = {
 
                                 vis.draw.agregado.desenha_barras(option);
 
-
-                                // vis.sels.rects_acoes
-                                //     .transition()
-                                //     .duration(vis.params.transitions_duration)
-                                //     .attr("x", d => vis.draw.scales.x(+d.pos_ini_funcao_tipica) )
-                                //     .attr("y", d => vis.draw.scales.y_cat(d.funcao_tipica) )
-                                //     .attr("height", vis.dims.bar_height )
-                                //     .attr("width", d => vis.draw.scales.w(+d.atu_total))
-                                //     .attr("rx", 0)
-                                ;
-
                             }
-
-                        },
-
-                        "funcao_tipica" : {
-
-                            set_scales : [
-
-                                { dimension: "x" , 
-                                    variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
-                                    axis     : true },
-    
-                                { dimension : "y_cat" ,  
-                                    variable  : "funcao_tipica",
-                                    axis      : true },
-    
-                                { dimension : "w" ,
-                                    variable  : "agregado", //"atu_total",
-                                    axis      : false }
-        
-                                ],
-        
-                            render : function(option) {
-
-                                console.log(this);
-
-                                vis.draw.agregado.desenha_barras(option);
-                                
-                            }
-
-
 
                         },
 

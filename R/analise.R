@@ -605,14 +605,14 @@ base_export <- base_anexos_sumarizada %>% #base_variacoes %>%
     uo == "25917" ~ "rgps",
     TRUE ~ "demais")) %>%
   group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo, marcador,
-           acao, funcao_tipica, variavel) %>%
+           acao, fonte, variavel) %>%
   summarise(valor = sum(valor)) %>%
   ungroup() %>%
   spread(variavel, valor) %>%
   filter(!is.na(PLOA)) %>% # (1)
-  left_join(perfil_gnd) %>%
-  left_join(perfil_mod) %>%
-  left_join(principais_orgaos) %>%
+  # left_join(perfil_gnd) %>%
+  # left_join(perfil_mod) %>%
+  # left_join(principais_orgaos) %>%
   left_join(titulo_acao) %>%
   mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
          desp_paga = ifelse(is.na(desp_paga), 0, desp_paga))
@@ -636,7 +636,7 @@ base_export_longa <- base_anexos_sumarizada %>% #base_variacoes %>%
       uo == "25917" ~ "rgps",
       TRUE ~ "demais")) %>%
   group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo, marcador,
-           acao, uo, nomeuo, fonte, gnd, mod, funcao_tipica, variavel) %>%
+           acao, uo, nomeuo, fonte, gnd, mod, variavel) %>%
   summarise(valor = sum(valor)) %>%
   spread(variavel, valor, fill = 0) %>%
   filter(!is.na(PLOA)) %>% # (1)
@@ -647,6 +647,8 @@ base_export_longa <- base_anexos_sumarizada %>% #base_variacoes %>%
 sum(base_export_longa$PLOA)
 sum(base_export_longa$dot_atu)
 sum(base_export_longa$desp_paga)
+
+base_export_longa %>% ungroup() %>% select(acao, funcao_tipica) %>% distinct() %>% count(acao) %>% filter(n > 1)
 
 write.csv(base_export_longa, file = "./dados/dados.csv", fileEncoding = "utf-8")
 
@@ -682,6 +684,10 @@ base_export %>%
   summarise_at(vars(PLOA, dot_atu), .funs = ~sum(.)) %>%
   arrange(desc(PLOA))
 
+
+teste <- base_export %>%
+  group_by(orgao_decreto, orgao_decreto_nome, agregador, marcador) %>%
+  summarise(PLOA = sum(PLOA))
 
 # exploracao --------------------------------------------------------------
 
