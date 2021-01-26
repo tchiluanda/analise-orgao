@@ -17,6 +17,9 @@ const vis = {
         barras: "rect.barras",
         linhas_referencia: "line.ref",
         data: "./dados/dados.csv",
+        objetos_atuais : "svg *", // para limpar o canvas
+        rotulos_atuais : "div.vis-container .rotulos",
+
 
         colors : {
             destaque_barra : "--cor-barra-destaque",
@@ -862,6 +865,7 @@ const vis = {
                 .data(vis.data.processed.agregado, d => d[variable])
                 .join("p")
                 .classed("labels-valores-barras", true)
+                .classed("rotulos", true)
                 .style("top", d => (vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top) + "px")
                 .style("left", vis.dims.margins.left + "px")
                 .style("font-size", vis.dims.bar_height + "px")
@@ -1418,6 +1422,9 @@ const vis = {
                         vis.control.current_state.mode = mode;
 
                         vis.control.show_mode_dependent_controls(mode);
+
+                        d3.selectAll(vis.refs.objetos_atuais).remove();
+                        d3.selectAll(vis.refs.rotulos_atuais).remove();
 
                         /*
 
