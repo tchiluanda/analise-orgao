@@ -16,7 +16,10 @@ const vis = {
         exclui_rgps: "#exclui-rgps",
         barras: "rect.barras",
         linhas_referencia: "line.ref",
-        data: "./dados/dados.csv",
+        data: {
+            agregado : "./dados/dados.csv",
+            detalhado : "./dados/dados_acoes.csv"
+        },
         objetos_atuais : "svg *", // para limpar o canvas
         rotulos_atuais : "div.vis-container .rotulos",
 
@@ -67,7 +70,12 @@ const vis = {
 
     data : {
 
-        raw : null,
+        raw : {
+
+            agregado : null,
+            detalhado : null
+
+        },
 
         processed : {
 
@@ -98,11 +106,11 @@ const vis = {
 
         transitions_duration: 1000,
 
-        modes : ["anexo", "agregador", "acao"],
+        modes : ["agregado", "detalhado"],
 
         variables : ["PLOA", "dot_atu", "desp_paga"], // mudar esse nome aqui depois
 
-        variables_detalhado : ["var_pct_mod", "var_abs_mod"],
+        variables_detalhado : ["PLOA", "var_pct_mod", "var_abs_mod"],
 
         variables_names : {
 
@@ -134,7 +142,11 @@ const vis = {
 
         },
 
-        dimensions : ["x", "x_log", "y", "y_cat", "y_var", "w", "r"],
+        dimensions : ["x", 
+        //"x_log", 
+        "y", 
+        //"y_cat", 
+        "y_var", "w", "r"],
 
         dims_vs_visual_dims : {
 
@@ -144,9 +156,9 @@ const vis = {
 
             // incluí uma lógica para considerar a dimensão física como a própria dimensão lógica se ele não achar a correspondência no lookup a este objeto. tipo, "x" vai ser "x" mesmo. só preciso especificar aqui as exceções.
 
-            "x_log" : "x",
-            "y_cat" : "y",
-            "y_var" : "y_var"
+            //"x_log" : "x",
+            //"y_cat" : "y",
+            "y_var" : "y"
 
         },
 
@@ -212,10 +224,16 @@ const vis = {
 
         },
 
-        read_data : function(url) {
+        read_data : function() {
 
-            d3.csv(vis.refs.data).then(
-                data => vis.control.begin(data)
+            // d3.csv(vis.refs.data).then(
+            //     data => vis.control.begin(data)
+            // );
+            Promise.all([
+                d3.csv(vis.refs.data.agregado),
+                d3.csv(vis.refs.data.detalhado)
+            ]).then(
+                files => vis.control.begin(files)
             );
 
         },
@@ -226,7 +244,7 @@ const vis = {
 
                 vis.data.processed.agregado[categorical_variable] =
                 utils.group_by_sum(
-                    objeto = vis.data.raw, 
+                    objeto = vis.data.raw.agregado, 
                     coluna_categoria = categorical_variable, 
                     coluna_valor = numerical_variable, 
                     ordena_decrescente = true
@@ -238,7 +256,7 @@ const vis = {
 
         evaluate_dataset : function(modo, selecao_orgao, selecao_anexo, exclui_divida, exclui_rgps, var_detalhamento) {
 
-            let dados = vis.data.raw;
+            let dados = vis.data.raw.agregado;
 
             if (selecao_orgao != "todos") {
                 dados = dados
@@ -325,15 +343,17 @@ const vis = {
 
         summarise_dataset_detalhado : function() {
 
-            vis.data.processed.detalhado = utils.group_by_sum_cols(
+            vis.data.processed.detalhado = vis.data.raw.detalhado;
+            
+            // utils.group_by_sum_cols(
 
-                objeto = vis.data.processed.filtered.filter(d => d[vis.params.main_variable] > 0),
-                coluna_categoria = "acao",
-                colunas_valor = vis.params.variables,
-                ordena_decrescente = false,
-                coluna_ordem = null
+            //     objeto = vis.data.processed.filtered.filter(d => d[vis.params.main_variable] > 0),
+            //     coluna_categoria = "acao",
+            //     colunas_valor = vis.params.variables,
+            //     ordena_decrescente = false,
+            //     coluna_ordem = null
 
-            );
+            // );
 
             vis.data.processed.detalhado.forEach(el => {
                 const acao_nova = (+el.dot_atu == 0 & +el.desp_paga == 0);
@@ -361,7 +381,7 @@ const vis = {
 
             const selector = document.querySelector(vis.refs["selector_" + seletor]);
 
-            const valores_unicos = utils.unique(vis.data.raw, seletor);
+            const valores_unicos = utils.unique(vis.data.raw.agregado, seletor);
 
             valores_unicos.forEach(variable => {
 
@@ -527,7 +547,7 @@ const vis = {
                 // });
 
                 vis.params.categorical_vars.forEach(variable => {
-                    vis.draw.domains[variable] = generate(vis.data.raw, variable, categorical = true);
+                    vis.draw.domains[variable] = generate(vis.data.raw.agregado, variable, categorical = true);
                 });
 
                 // function initialize_domain_agregado() {
@@ -590,7 +610,7 @@ const vis = {
                     variavel => {
                         vis.draw.domains[variavel] = [
                             vis.params.variables_type[variavel] == "log" ? 1 : 0,
-                            d3.max(vis.data.processed.detalhado, d => d[variavel])
+                            d3.max(vis.data.processed.detalhado, d => +d[variavel])
                         ]
                         
                         //d3.extent(vis.data.processed.detalhado, d => d[variavel]);
@@ -614,9 +634,9 @@ const vis = {
         ranges : {
 
             x : null,
-            x_log : null,
+            //x_log : null,
             y : null,
-            y_cat : null,
+            //y_cat : null,
             //y_anexos : null,
             //y_agregadores : null,
             w : null,
@@ -628,7 +648,7 @@ const vis = {
 
                 vis.draw.ranges.x = [ vis.dims.margins.left, vis.dims.w - vis.dims.margins.right ];
 
-                vis.draw.ranges.x_log = [ vis.dims.margins.left/2, vis.dims.w - vis.dims.margins.right ];
+                //vis.draw.ranges.x_log = [ vis.dims.margins.left/2, vis.dims.w - vis.dims.margins.right ];
     
                 vis.draw.ranges.y = [ vis.dims.h - vis.dims.margins.bottom, vis.dims.margins.top ];
 
@@ -652,13 +672,22 @@ const vis = {
 
         scales : {
 
-            x: d3.scaleLinear().clamp(true),
-            x_log : d3.scaleLog(),
-            y: d3.scaleLinear().clamp(true),
-            y_cat: d3.scaleBand(),
-            y_var: d3.scaleOrdinal(),
-            w: d3.scaleLinear().clamp(true),
-            r: d3.scaleSqrt(),
+            agregado : {
+
+                x: d3.scaleLinear().clamp(true),
+                y: d3.scaleBand(),
+                w: d3.scaleLinear().clamp(true),
+
+            },
+
+            detalhado : {
+
+                x : d3.scaleLog(),
+                y: d3.scaleLinear().clamp(true),
+                y_var: d3.scaleOrdinal(),
+                r: d3.scaleSqrt()
+
+            },
 
             initialize : function() {
                 
@@ -669,17 +698,22 @@ const vis = {
                     if (!dimension_range) dimension_range = dimension;
                     // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
 
-                    vis.draw.scales[dimension]
-                    .range(vis.draw.ranges[dimension_range]);
+                    vis.params.modes.forEach(mode => {
+                        if (vis.draw.scales[mode][dimension]) {
+                            vis.draw.scales[mode][dimension]
+                              .range(vis.draw.ranges[dimension_range])
+                        }
+                        console.log("Inicializando scales", dimension, vis.draw.scales[mode][dimension]);
+                    });
 
-                    console.log("Inicializando scales", dimension, vis.draw.scales[dimension]);
+
                 });
     
             },
 
-            set_domain : function(dimension, variable) {
+            set_domain : function(mode, dimension, variable) {
 
-                vis.draw.scales[dimension]
+                vis.draw.scales[mode][dimension]
                   .domain(vis.draw.domains[variable]);
     
             },
@@ -690,13 +724,17 @@ const vis = {
                   .modes[mode]
                   .options[option]
                   .set_scales.forEach(scale => {
+
+                      console.log(mode, scale);
+
                     vis.draw.scales.set_domain(
+                        mode,
                         scale.dimension, 
                         scale.variable)
 
                     if (scale.axis == true) {
 
-                        vis.draw.axis.update(scale.dimension, scale.variable);
+                        //vis.draw.axis.update(mode, scale.dimension, scale.variable);
 
                     }
                     });
@@ -711,7 +749,7 @@ const vis = {
 
             // para garantir as transições de eixo, quando passa de uma variável numérica para uma categórica, só vamos usar eixos x e y. Por isso vão aparecer argumentos "dimension" e "dimension_axis": o dimension para acessar a escala correta ("y_cat", por exemplo), e o dimension_axis para acessar o eixo correto ("y", nesse caso do exemplo, e não um "y_cat" que seria uma novo eixo y, o que não é desejável)
 
-            update_axis_scale : function(dimension) {
+            update_axis_scale : function(mode, dimension) {
 
                 let dimension_axis = vis.params.dims_vs_visual_dims[dimension];
                     
@@ -721,7 +759,7 @@ const vis = {
                 console.log("Updating o axis_scale da dimensao", dimension, dimension_axis);
 
                 vis.draw.axis[dimension_axis].scale(
-                    vis.draw.scales[dimension]
+                    vis.draw.scales[mode][dimension]
                 )
 
             },
@@ -745,7 +783,7 @@ const vis = {
                 ; 
             },
 
-            update : function(dimension, variable) {
+            update : function(mode, dimension, variable) {
 
                 let dimension_axis = vis.params.dims_vs_visual_dims[dimension];
                     
@@ -756,7 +794,7 @@ const vis = {
 
                 vis.draw.axis.tick_format(dimension_axis, variable);
 
-                vis.draw.axis.update_axis_scale(dimension);
+                vis.draw.axis.update_axis_scale(mode, dimension);
 
                 vis.sels.axis[dimension_axis]
                   .transition()
@@ -770,11 +808,14 @@ const vis = {
 
                 //fazer um forEach aqui... armazenar essas variáveis
 
-                vis.draw.axis.update_axis_scale("x");
-                vis.draw.axis.update_axis_scale("x_log");
-                vis.draw.axis.update_axis_scale("y");
-                vis.draw.axis.update_axis_scale("y_cat");
-                vis.draw.axis.update_axis_scale("y_var");
+                vis.params.modes.forEach(mode => {
+                    vis.draw.axis.update_axis_scale(mode, "x");
+                    vis.draw.axis.update_axis_scale(mode, "y");
+                //vis.draw.axis.update_axis_scale("x_log");
+                });
+                
+                //vis.draw.axis.update_axis_scale("y_cat");
+                vis.draw.axis.update_axis_scale("detalhado", "y_var");
 
                 // aqui tb... evitar superposição de eixos tb.
     
@@ -849,10 +890,10 @@ const vis = {
                 .attr("x", vis.dims.margins.left)
                 .attr("width", 0)
                 .attr("height", vis.dims.bar_height)
-                .attr("y", d => vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top)
+                .attr("y", d => vis.draw.scales["agregado"].y(d[variable]) + vis.dims.margins.top)
                 .transition()
                 .duration(vis.params.transitions_duration)
-                .attr("width", d => vis.draw.scales.w(d[vis.params.main_variable]))
+                .attr("width", d => vis.draw.scales["agregado"].w(d[vis.params.main_variable]))
                 .attr("fill", vis.params.colors.barra_normal);
 
                 // a main_variable é o PLOA
@@ -866,14 +907,14 @@ const vis = {
                 .join("p")
                 .classed("labels-valores-barras", true)
                 .classed("rotulos", true)
-                .style("top", d => (vis.draw.scales.y_cat(d[variable]) + vis.dims.margins.top) + "px")
+                .style("top", d => (vis.draw.scales["agregado"].y(d[variable]) + vis.dims.margins.top) + "px")
                 .style("left", vis.dims.margins.left + "px")
                 .style("font-size", vis.dims.bar_height + "px")
                 .style("line-height", vis.dims.bar_height + "px")
                 .text(d => utils.valor_formatado(d[vis.params.main_variable]))
                 .transition()
                 .duration(vis.params.transitions_duration)
-                .style("left", d => (vis.dims.margins.left + vis.draw.scales.w(d[vis.params.main_variable])) + "px")
+                .style("left", d => (vis.dims.margins.left + vis.draw.scales["agregado"].w(d[vis.params.main_variable])) + "px")
 
 
             },
@@ -888,12 +929,12 @@ const vis = {
                       .attr("x1", vis.dims.margins.left)
                       .attr("x2", vis.dims.margins.left))
                 .classed("ref", true)
-                .attr("y1", d => vis.draw.scales.y_cat(d[cat_variable]) + vis.dims.margins.top - vis.dims.bar_height/2)
-                .attr("y2", d => vis.draw.scales.y_cat(d[cat_variable]) + vis.dims.margins.top + vis.dims.bar_height*1.5)
+                .attr("y1", d => vis.draw.scales["agregado"].y(d[cat_variable]) + vis.dims.margins.top - vis.dims.bar_height/2)
+                .attr("y2", d => vis.draw.scales["agregado"].y(d[cat_variable]) + vis.dims.margins.top + vis.dims.bar_height*1.5)
                 .transition()
                 .duration(vis.params.transitions_duration)
-                .attr("x1", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
-                .attr("x2", d => vis.dims.margins.left + vis.draw.scales.w(d[num_variable]))
+                .attr("x1", d => vis.dims.margins.left + vis.draw.scales["agregado"].w(d[num_variable]))
+                .attr("x2", d => vis.dims.margins.left + vis.draw.scales["agregado"].w(d[num_variable]))
                 .attr("stroke", "red");
 
                 vis.sels.linhas_referencia = d3.selectAll(vis.refs.linhas_referencia);
@@ -968,7 +1009,7 @@ const vis = {
                     const magnitudeForca = this.magnitudeForca;
 
                     const carga = function(d) {
-                        return -Math.pow(vis.draw.scales.r(+d.PLOA), 2.0) * magnitudeForca;
+                        return -Math.pow(vis.draw.scales["detalhado"].r(+d.PLOA), 2.0) * magnitudeForca;
                     };
 
                     return d3.forceManyBody().strength(carga);
@@ -1051,7 +1092,7 @@ const vis = {
                                 },
     
                                 { 
-                                    dimension : "y_cat" ,  
+                                    dimension : "y" ,  
                                     variable  : "orgao_decreto",
                                     axis      : true 
                                 },
@@ -1082,7 +1123,7 @@ const vis = {
                                     variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
                                     axis     : true },
     
-                                { dimension : "y_cat" ,  
+                                { dimension : "y" ,  
                                     variable  : "anexo",
                                     axis      : true },
     
@@ -1111,7 +1152,7 @@ const vis = {
                                     variable : "agregado", //"pos_ini_agregador", pq o que importa aqui é a escala 
                                     axis     : true },
     
-                                { dimension : "y_cat" ,  
+                                { dimension : "y" ,  
                                     variable  : "agregador",
                                     axis      : true },
     
@@ -1143,7 +1184,7 @@ const vis = {
     
                             set_scales : [
     
-                                { dimension: "x_log" , 
+                                { dimension: "x" , 
                                   variable : "var_pct_mod",
                                   axis     : true },
     
@@ -1165,10 +1206,10 @@ const vis = {
 
                                 vis.draw.bubbles.simulation
                                   .nodes(vis.data.processed.detalhado.filter(d => !d.acao_nova))
-                                  .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales.x_log(+d.var_pct_mod)))
-                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales.y_var(d.var_tipo)))
+                                  .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales["detalhado"].x(+d.var_pct_mod)))
+                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales["detalhado"].y_var(d.var_tipo)))
                                   .force("charge", null)
-                                  .force('colisao', d3.forceCollide().radius(d => vis.draw.scales.r(+d.PLOA)));
+                                  .force('colisao', d3.forceCollide().radius(d => vis.draw.scales["detalhado"].r(+d.PLOA)));
 
                                 // atualizei os nodes para tirar as ações novas, mas os círculos que correspondem a esses nodes continuam existindo. vou fazê-los sumir aqui: (depois tenho que retorná-los se voltar ao estado inicial)
 
@@ -1197,7 +1238,7 @@ const vis = {
     
                             set_scales : [
     
-                                { dimension: "x_log" , 
+                                { dimension: "x" , 
                                   variable : "var_abs_mod",
                                   axis     : true },
     
@@ -1219,10 +1260,10 @@ const vis = {
 
                                 vis.draw.bubbles.simulation
                                   .nodes(vis.data.processed.detalhado.filter(d => !d.acao_nova))
-                                  .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales.x(+d.var_abs_mod)))
-                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales.y_var(d.var_tipo)))
+                                  .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales["detalhado"].x(+d.var_abs_mod)))
+                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales["detalhado"].y_var(d.var_tipo)))
                                   .force("charge", null)
-                                  .force('colisao', d3.forceCollide().radius(d => vis.draw.scales.r(+d.PLOA)));
+                                  .force('colisao', d3.forceCollide().radius(d => vis.draw.scales["detalhado"].r(+d.PLOA)));
 
                                 vis.sels.circles_acoes
                                   .classed("silent", d => d.acao_nova)
@@ -1257,7 +1298,7 @@ const vis = {
                                     vis.sels.circles_acoes
                                       .transition()
                                       .duration(vis.params.transitions_duration)
-                                      .attr("r", d => vis.draw.scales.r(+d.PLOA))
+                                      .attr("r", d => vis.draw.scales["detalhado"].r(+d.PLOA))
                                       .attr("fill", d => d.acao_nova ? "#4B008250" : "#fada5e50")
     
                                     vis.draw.bubbles.config_simulation();
@@ -1299,12 +1340,15 @@ const vis = {
     
         },
 
-        begin : function(data) {
+        begin : function(files) {
 
-            console.log(data.columns);
+            console.log(files[0].columns);
+            console.log(files[1].columns);
 
             // saves data as a property to make it easier to access it elsewhere
-            vis.data.raw = data;
+            vis.data.raw.agregado = files[0];
+            vis.data.raw.detalhado = files[1];
+
 
             // // summarise data for categorical variables
             // vis.f.summarise_categorical(
@@ -1330,7 +1374,7 @@ const vis = {
             vis.draw.scales.initialize();
 
             // add x, y axis
-            vis.draw.axis.initialize();
+            //vis.draw.axis.initialize();
 
             // add rects/bubbles
             //vis.draw.bubbles.add();
