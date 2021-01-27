@@ -120,7 +120,7 @@ const vis = {
             categorical : {
             
                 agregado : ["orgao_decreto", "anexo", "agregador"],
-                detalhado : ["var_aumento"]
+                detalhado : ["var_tipo"]
     
             }
 
@@ -144,6 +144,8 @@ const vis = {
 
         // this will serve to determine axis
 
+        // ainda não está muito bom. talvez fazer um super objeto, com os tipos já embutidos.
+
         variables_type : {
 
             PLOA              : "numerical",
@@ -152,7 +154,9 @@ const vis = {
             dot_atu           : "numerical",
             agregado          : "numerical",
             agregador         : "categorical",
-            var_tipo          : "categorical"
+            var_tipo          : "categorical",
+            orgao_decreto     : "categorical",
+            anexo             : "categorical"
 
         },
 
@@ -514,6 +518,8 @@ const vis = {
 
                 function generate(data, variable, categorical = false) {
 
+                    // por enquanto só categorical do agregado
+
                     console.log(variable);
 
                     if (!categorical) {
@@ -536,12 +542,14 @@ const vis = {
 
                 vis.params.variables.categorical.agregado
                   .forEach(variable => {
-                    vis.draw.domains[variable] = generate(vis.data.raw.agregado, variable, categorical = true);
+                    vis.draw.domains.categorical.agregado[variable] = generate(vis.data.raw.agregado, variable, categorical = true);
                 });
 
             },
 
             evaluate_domain_categorical : function() {
+
+                // por enquanto só as categoricals do agregado
 
                 let current_variable = vis.control.current_state.variavel_detalhamento;
 
@@ -552,9 +560,9 @@ const vis = {
                     ordena_decrescente = true
                 );
 
-                console.log(subtotais);
+                //console.log(subtotais);
 
-                vis.draw.domains[current_variable] = utils.unique(
+                vis.draw.domains.categorical.agregado[current_variable] = utils.unique(
                     obj = subtotais,
                     col = "categoria"
                 ).reverse();
@@ -563,13 +571,15 @@ const vis = {
 
             evaluate_domain_agregado : function(){
 
+                // trocar esse nome que está causando confusão com o "agregado" do modo.
+
                 // maximos dos dados selecionados atuais
 
                 const maxs = vis.params.variables.numerical.agregado.map(
                     variable => d3.max(vis.data.processed.agregado, d => d[variable])
                 );
 
-                vis.draw.domains.agregado = [
+                vis.draw.domains.numerical.agregado.agregado = [
                     0,
                     Math.max(...maxs)
                 ];
@@ -581,7 +591,7 @@ const vis = {
                 vis.params.variables.numerical.detalhado.forEach(
                     variavel => {
                         console.log(variavel, "DOMINIOS")
-                        vis.draw.domains[variavel] = [
+                        vis.draw.domains.numerical.detalhado[variavel] = [
                             vis.params.variables_type[variavel] == "log" ? 1 : 0,
                             d3.max(vis.data.processed.detalhado, d => +d[variavel])
                         ]
@@ -595,12 +605,31 @@ const vis = {
 
             },
 
-            agregado : null, // trocar esse nome
+            numerical : {
+
+                agregado : {
+                    agregado : null // horrivel
+                },
+                detalhado : {}
+
+            },
+
+            categorical: {
+
+                agregado : {},
+                detalhado : {
+
+                    var_tipo : ["aumento", "redução"]
+                    // automatizar isso. vai ter que inicializar só quando clicar no modo agregado.
+
+                }
+
+            }
 
             // categorical variables will be properties
             // numerical também
 
-            var_tipo : ["aumento", "redução"]
+            
 
         },
 
@@ -686,8 +715,15 @@ const vis = {
 
             set_domain : function(mode, dimension, variable) {
 
+                let var_type = vis.params.variables_type[variable];
+
+                var_type = var_type == "log" ? "numerical" : var_type;
+
+
+                console.log("VAR TYPE", variable, var_type);
+
                 vis.draw.scales[mode][dimension]
-                  .domain(vis.draw.domains[variable]);
+                  .domain(vis.draw.domains[var_type][mode][variable]);
     
             },
 
