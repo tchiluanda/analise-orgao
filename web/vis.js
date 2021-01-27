@@ -108,9 +108,23 @@ const vis = {
 
         modes : ["agregado", "detalhado"],
 
-        variables : ["PLOA", "dot_atu", "desp_paga"], // mudar esse nome aqui depois
+        variables : {
 
-        variables_detalhado : ["PLOA", "var_pct_mod", "var_abs_mod"],
+            numerical : {
+
+                agregado : ["PLOA", "dot_atu", "desp_paga"],
+                detalhado : ["PLOA", "var_pct_mod", "var_abs_mod"]
+
+            },
+
+            categorical : {
+            
+                agregado : ["orgao_decreto", "anexo", "agregador"],
+                detalhado : ["var_aumento"]
+    
+            }
+
+        },
 
         variables_names : {
 
@@ -122,7 +136,7 @@ const vis = {
 
         main_variable : "PLOA",
 
-        categorical_vars : ["orgao_decreto", "anexo", "agregador"],
+
         // also, those are the variables used for evaluating summaries in the "agregado" mode.
         // não inclui o var_tipo aqui, pq a função atual vai procurar a variável em vis.data.raw... e o var_tipo só aparece quando é calculado o dataset detalhado.
 
@@ -238,22 +252,6 @@ const vis = {
 
         },
 
-        summarise_categorical : function(numerical_variable) {
-
-            vis.params.categorical_vars.forEach(categorical_variable => {
-
-                vis.data.processed.agregado[categorical_variable] =
-                utils.group_by_sum(
-                    objeto = vis.data.raw.agregado, 
-                    coluna_categoria = categorical_variable, 
-                    coluna_valor = numerical_variable, 
-                    ordena_decrescente = true
-                )
-                
-            });
-
-        },
-
         evaluate_dataset : function(modo, selecao_orgao, selecao_anexo, exclui_divida, exclui_rgps, var_detalhamento) {
 
             let dados = vis.data.raw.agregado;
@@ -297,13 +295,11 @@ const vis = {
 
             // agregado
 
-            console.log("Estou aqui", var_detalhamento);
-
             vis.data.processed.agregado = utils.group_by_sum_cols(
 
                 objeto = vis.data.processed.filtered,
                 coluna_categoria = var_detalhamento,
-                colunas_valor = vis.params.variables,
+                colunas_valor = vis.params.variables.numerical.agregado,
                 ordena_decrescente = true,
                 coluna_ordem = vis.params.main_variable
 
@@ -323,7 +319,7 @@ const vis = {
                     [var_detalhamento] : vis.params.nomes_demais[var_detalhamento]
                 };
 
-                vis.params.variables.forEach(
+                vis.params.variables.numerical.agregado.forEach(
                     variable => elemento_demais[variable] = 
                     bottom_dataset
                     .map(d => +d[variable])
@@ -344,19 +340,9 @@ const vis = {
         summarise_dataset_detalhado : function() {
 
             vis.data.processed.detalhado = vis.data.raw.detalhado;
-            
-            // utils.group_by_sum_cols(
-
-            //     objeto = vis.data.processed.filtered.filter(d => d[vis.params.main_variable] > 0),
-            //     coluna_categoria = "acao",
-            //     colunas_valor = vis.params.variables,
-            //     ordena_decrescente = false,
-            //     coluna_ordem = null
-
-            // );
 
             vis.data.processed.detalhado.forEach(el => {
-                const acao_nova = (+el.dot_atu == 0 & +el.desp_paga == 0);
+                const acao_nova = (+el.dot_atu == 0); //& +el.desp_paga == 0);
 
                 el["acao_nova"] = acao_nova;
 
@@ -397,9 +383,11 @@ const vis = {
 
         populates_comparison_selector : function() {
 
+            // só no modo agregado
+
             const selector = document.querySelector(vis.refs.comparison_selector);
 
-            const comparison_variables = [...vis.params.variables];
+            const comparison_variables = [...vis.params.variables.numerical.agregado];
 
             
             // vou tirar a main_variable, PLOA, dessa lista.
@@ -546,26 +534,10 @@ const vis = {
                 //         categorical = false);
                 // });
 
-                vis.params.categorical_vars.forEach(variable => {
+                vis.params.variables.categorical.agregado
+                  .forEach(variable => {
                     vis.draw.domains[variable] = generate(vis.data.raw.agregado, variable, categorical = true);
                 });
-
-                // function initialize_domain_agregado() {
-
-                //     const maxs = vis.params.categorical_vars.map(
-                //         cat => d3.max(vis.data.processed.agregado[cat],
-                //             d => +d.subtotal)
-                //     )
-    
-                //     vis.draw.domains["agregado"] = [
-                //         0, 
-                //         d3.max(maxs, d => d)
-                //     ];
-                //     // Math.max(...maxs)
-                //     // ES6
-                // }
-
-                // initialize_domain_agregado();
 
             },
 
@@ -593,7 +565,7 @@ const vis = {
 
                 // maximos dos dados selecionados atuais
 
-                const maxs = vis.params.variables.map(
+                const maxs = vis.params.variables.numerical.agregado.map(
                     variable => d3.max(vis.data.processed.agregado, d => d[variable])
                 );
 
@@ -606,8 +578,9 @@ const vis = {
 
             evaluate_domain_detalhado : function(){
 
-                vis.params.variables_detalhado.forEach(
+                vis.params.variables.numerical.detalhado.forEach(
                     variavel => {
+                        console.log(variavel, "DOMINIOS")
                         vis.draw.domains[variavel] = [
                             vis.params.variables_type[variavel] == "log" ? 1 : 0,
                             d3.max(vis.data.processed.detalhado, d => +d[variavel])
