@@ -536,6 +536,73 @@ principais_orgaos <- base_anexos_sumarizada %>%
   spread(ranking, uo_valor)
     
 
+# prep final da base ------------------------------------------------------
+
+titulo_acao <- ploa %>%
+  select(acao, tituloacao) %>%
+  distinct()
+
+base_pre <- base_anexos_sumarizada %>% #base_variacoes %>%
+  mutate(
+    orgao_decreto_cod = orgao_decreto,
+    orgao_decreto = paste(orgao_decreto_cod, orgao_decreto_nome, sep = " - "),
+    uo = paste(uo, nomeuo, sep = " - "),
+    marcador = case_when(
+      uo == "75101" ~ "divida",
+      uo == "25917" ~ "rgps",
+      TRUE ~ "demais")) %>%
+  group_by(orgao_decreto, anexo, agregador, fonte, marcador, acao, uo, gnd, mod, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup()
+
+
+# PAra ter ideia do maximo de marcadores (divida, RGPS) por acao
+base_pre %>% select(acao, marcador) %>% distinct() %>% count(acao)
+
+acrescenta_todos <- function(variavel) {
+  base_pre %>%
+    mutate(!!sym(variavel) = "Todos") %>%
+    #mutate({{variavel}} = "Todos") %>%
+    group_by(orgao_decreto, anexo, agregador, fonte, marcador, acao, uo, gnd, mod, variavel) %>%
+    summarise(valor = sum(valor)) %>%
+    ungroup()
+}
+
+# tira uo, gnd e mod, que serao (re)acrescentados depois
+# computa os "Todos" para cada variavel de interesse
+base_pre_todos_orgaos <- base_pre %>%
+  group_by(anexo, agregador, fonte, marcador, acao, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  mutate(orgao_decreto = "Todos", .before = anexo)
+
+base_pre_todos_anexos <- base_pre %>%
+  group_by(orgao_decreto, agregador, fonte, marcador, acao, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  mutate(anexo = "Todos", .before = agregador)
+
+base_pre_todos_agregadores <- base_pre %>%
+  group_by(orgao_decreto, anexo, fonte, marcador, acao, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  mutate(agregador = "Todos", .before = fonte)
+
+base_pre_todas_fontes <- base_pre %>%
+  group_by(orgao_decreto, anexo, agregador, marcador, acao, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  mutate(fonte = "Todos", .before = marcador)
+
+base_pre_todos_marcadores <- base_pre %>%
+  group_by(orgao_decreto, anexo, agregador, fonte, acao, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup() %>%
+  mutate(marcador = "Todos", .before = acao)
+
+# arrumar um jeito eficiente
+
+# computa todos para cada combinação de duas variáveis de interesse
 
 # calcula variacoes -------------------------------------------------------
 
@@ -599,13 +666,13 @@ titulo_acao <- ploa %>%
 base_export <- base_anexos_sumarizada %>% #base_variacoes %>%
   mutate(
     orgao_decreto_cod = orgao_decreto,
-    orgao_decreto = paste(orgao_decreto_cod, orgao_decreto_nome, sep = " - "),  
+    orgao_decreto = paste(orgao_decreto, orgao_decreto_nome, sep = " - "),  
     marcador = case_when(
     uo == "75101" ~ "divida",
     uo == "25917" ~ "rgps",
     TRUE ~ "demais")) %>%
-  group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo, marcador,
-           acao, fonte, variavel) %>%
+  group_by(orgao_decreto, orgao_decreto_nome, agregador, anexo, marcador,#acao
+           fonte, variavel) %>%
   summarise(valor = sum(valor)) %>%
   ungroup() %>%
   spread(variavel, valor) %>%
@@ -613,14 +680,92 @@ base_export <- base_anexos_sumarizada %>% #base_variacoes %>%
   # left_join(perfil_gnd) %>%
   # left_join(perfil_mod) %>%
   # left_join(principais_orgaos) %>%
-  left_join(titulo_acao) %>%
+  #left_join(titulo_acao) %>%
   mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
-         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga))
+         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga))#,
+         #acao = paste(acao, tituloacao, sep = " - "))
+  #select(-tituloacao)
 
   # (1) tira ações que não estão no PLOA
   
 write.csv(base_export, file = "./dados/dados.csv", fileEncoding = "utf-8")
 
+
+
+#  base acoes preliminar --------------------------------------------------
+
+
+base_acoes <- base_anexos_sumarizada %>%
+  mutate(uo = paste(uo, nomeuo, sep = " - "),
+         orgao_decreto = paste(orgao_decreto, orgao_decreto_nome, sep = " - ")) %>%
+  group_by(acao, orgao_decreto, uo, fonte, gnd, mod, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  ungroup()
+
+perfil_gnd <- base_acoes %>%
+  filter(variavel == variavel_principal) %>%
+  group_by(acao) %>%
+  mutate(total_acao = sum(valor)) %>%
+  group_by(acao, gnd) %>%
+  mutate(total_gnd = sum(valor)) %>%
+  group_by(acao, gnd) %>%
+  summarise(percent_gnd = first(total_gnd / total_acao)) %>%
+  ungroup() %>%
+  #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
+  spread(gnd, percent_gnd)
+
+perfil_mod <- base_acoes %>%
+  filter(variavel == variavel_principal) %>%
+  group_by(acao) %>%
+  mutate(total_acao = sum(valor)) %>%
+  group_by(acao, mod) %>%
+  mutate(total_mod = sum(valor)) %>%
+  group_by(acao, mod) %>%
+  summarise(percent_mod = first(total_mod / total_acao)) %>%
+  ungroup() %>%
+  #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
+  spread(mod, percent_mod)
+
+principais_orgaos <- base_acoes %>%
+  filter(variavel == variavel_principal) %>%
+  group_by(acao, orgao_decreto) %>%
+  summarise(valor = sum(valor)) %>%
+  arrange(desc(valor)) %>%
+  mutate(ranking = paste0("orgao_valor_", ifelse(row_number()>5, 6, row_number())),
+         orgao_decreto = ifelse(row_number()>5, "Demais", orgao_decreto)) %>%
+  group_by(acao, orgao_decreto, ranking) %>%
+  summarize(valor = sum(valor)) %>%
+  ungroup() %>%
+  arrange(acao, ranking) %>%
+  unite("orgao_valor", c(orgao_decreto, valor), sep = "__", remove = TRUE) %>%
+  spread(ranking, orgao_valor)
+
+perfil_fonte <- base_acoes %>%
+  filter(variavel == variavel_principal) %>%
+  group_by(acao) %>%
+  mutate(total_acao = sum(valor)) %>%
+  group_by(acao, fonte) %>%
+  mutate(total_fonte = sum(valor)) %>%
+  group_by(acao, fonte) %>%
+  summarise(percent_fonte = first(total_fonte / total_acao)) %>%
+  ungroup() %>%
+  #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
+  spread(fonte, percent_fonte)
+  
+# junta tudo numa super tabela de acoes
+
+base_acoes_export <- base_acoes %>%
+  group_by(acao, variavel) %>%
+  summarise(valor = sum(valor)) %>%
+  spread(variavel, valor) %>%
+  filter(!is.na(PLOA)) %>%
+  ungroup() %>%
+  left_join(perfil_gnd) %>%
+  left_join(perfil_mod) %>%
+  left_join(perfil_fonte) %>%
+  left_join(principais_orgaos)
+
+write.csv(base_acoes_export, file = "./dados/dados_acoes.csv", fileEncoding = "utf-8")
 
 # tab_fonte <- ploa %>%
 #   select(fonte, descricaofonte) %>%
@@ -649,6 +794,7 @@ sum(base_export_longa$dot_atu)
 sum(base_export_longa$desp_paga)
 
 base_export_longa %>% ungroup() %>% select(acao, funcao_tipica) %>% distinct() %>% count(acao) %>% filter(n > 1)
+org <- base_export_longa %>% ungroup() %>% select(orgao_decreto, orgao_decreto_nome) %>% distinct()
 
 write.csv(base_export_longa, file = "./dados/dados.csv", fileEncoding = "utf-8")
 
