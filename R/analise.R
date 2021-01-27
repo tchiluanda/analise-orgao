@@ -763,7 +763,9 @@ base_acoes_export <- base_acoes %>%
   left_join(perfil_gnd) %>%
   left_join(perfil_mod) %>%
   left_join(perfil_fonte) %>%
-  left_join(principais_orgaos)
+  left_join(principais_orgaos) %>%
+  mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
+         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga)) 
 
 write.csv(base_acoes_export, file = "./dados/dados_acoes.csv", fileEncoding = "utf-8")
 
