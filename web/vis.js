@@ -160,11 +160,12 @@ const vis = {
 
         },
 
-        dimensions : ["x", 
-        //"x_log", 
-        "y", 
-        //"y_cat", 
-        "y_var", "w", "r"],
+        dimensions : {
+
+            agregado : ["x", "y", "w"],
+            detalhado : ["x", "y", "r"]
+
+        },
 
         dims_vs_visual_dims : {
 
@@ -176,7 +177,7 @@ const vis = {
 
             //"x_log" : "x",
             //"y_cat" : "y",
-            "y_var" : "y"
+            //"y_var" : "y"
 
         },
 
@@ -352,10 +353,19 @@ const vis = {
 
                 if (!acao_nova) {
                     const var_pct = (el.PLOA / el.dot_atu);
-                    const var_abs = (el.PLOA - el.dot_atu);
-                    const aumento = var_pct > 1;
+                    let var_abs = (el.PLOA - el.dot_atu);
+                    let aumento;
+                    if (var_pct == 1) {
+                        aumento = "mesmo valor"; 
+                        var_abs = 1;            
+                    } else if (var_pct > 1) {
+                        aumento = "aumento"
+                    } else {
+                        aumento = "redução"
+                    }
+                     
 
-                    el["var_tipo"] = aumento ? "aumento" : "redução";
+                    el["var_tipo"] = aumento;
 
                     el["var_pct_mod"] = aumento ? var_pct : (1/var_pct);
                     el["var_abs_mod"] = Math.abs(var_abs);
@@ -590,11 +600,13 @@ const vis = {
 
                 vis.params.variables.numerical.detalhado.forEach(
                     variavel => {
-                        console.log(variavel, "DOMINIOS")
                         vis.draw.domains.numerical.detalhado[variavel] = [
                             vis.params.variables_type[variavel] == "log" ? 1 : 0,
                             d3.max(vis.data.processed.detalhado, d => +d[variavel])
                         ]
+
+                        console.log("detalhado", variavel, "DOMINIO", vis.draw.domains.numerical.detalhado[variavel]);
+
                         
                         //d3.extent(vis.data.processed.detalhado, d => d[variavel]);
                     }
@@ -619,7 +631,7 @@ const vis = {
                 agregado : {},
                 detalhado : {
 
-                    var_tipo : ["aumento", "redução"]
+                    var_tipo : ["aumento", "mesmo valor", "redução"]
                     // automatizar isso. vai ter que inicializar só quando clicar no modo agregado.
 
                 }
@@ -635,40 +647,56 @@ const vis = {
 
         ranges : {
 
-            x : null,
-            //x_log : null,
-            y : null,
-            //y_cat : null,
-            //y_anexos : null,
-            //y_agregadores : null,
-            w : null,
-            r : [2,40],
-            y_var : null,
-            // o do modo detalhado, opcao variação
+            agregado : {
+
+                x : null,
+                y : null,
+                w : null
+
+            },
+
+            detalhado : {
+
+                x : null, 
+                y : null,
+                r : [2,40]
+
+            },
+
+            // x : null,
+            // //x_log : null,
+            // y : null,
+            // //y_cat : null,
+            // //y_anexos : null,
+            // //y_agregadores : null,
+            // w : null,
+            // r : [2,40],
+            // y_var : null,
+            // // o do modo detalhado, opcao variação
 
             update : function() {
 
-                vis.draw.ranges.x = [ vis.dims.margins.left, vis.dims.w - vis.dims.margins.right ];
+                vis.draw.ranges.agregado.x = [ vis.dims.margins.left, vis.dims.w - vis.dims.margins.right ];
 
-                //vis.draw.ranges.x_log = [ vis.dims.margins.left/2, vis.dims.w - vis.dims.margins.right ];
+                vis.draw.ranges.detalhado.x = [ vis.dims.margins.left/2, vis.dims.w - vis.dims.margins.right ];
     
-                vis.draw.ranges.y = [ vis.dims.h - vis.dims.margins.bottom, vis.dims.margins.top ];
+                vis.draw.ranges.agregado.y = [ vis.dims.h - vis.dims.margins.bottom, vis.dims.margins.top ];
 
-                vis.draw.ranges.y_var = [vis.dims.h/4, vis.dims.h*3/4];
+                vis.draw.ranges.detalhado.y = [vis.dims.h/4, vis.dims.h*3/4];
 
-                vis.draw.ranges.w = [ 0, vis.dims.w - vis.dims.margins.left - vis.dims.margins.right];
+                vis.draw.ranges.agregado.w = [ 0, vis.dims.w - vis.dims.margins.left - vis.dims.margins.right];
     
             },
 
-            calcula_range_var_categorica : function(categorical_var) {
+            // calcula_range_var_categorica : function(categorical_var) {
 
-                let qde_categorias = vis.draw.domains[categorical_var].length;
+            //     let qde_categorias = vis.draw.domains[categorical_var].length;
 
-                let comprimento_necessario = vis.dims.bar_height * qde_categorias;
+            //     let comprimento_necessario = vis.dims.bar_height * qde_categorias;
 
-                return([vis.dims.margins.top, vis.dims.margins.top + comprimento_necessario]);
+            //     return([vis.dims.margins.top, vis.dims.margins.top + comprimento_necessario]);
 
-            }
+            // }
 
         },
 
@@ -685,32 +713,32 @@ const vis = {
             detalhado : {
 
                 x : d3.scaleLog(),
-                y: d3.scaleLinear().clamp(true),
-                y_var: d3.scaleOrdinal(),
+                y: d3.scaleOrdinal(),
                 r: d3.scaleSqrt()
 
             },
 
             initialize : function() {
-                
-                vis.params.dimensions.forEach(dimension => {
 
-                    let dimension_range = vis.params.dims_vs_visual_dims[dimension];
-                    
-                    if (!dimension_range) dimension_range = dimension;
-                    // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
+                vis.params.modes.forEach(mode => {
 
-                    vis.params.modes.forEach(mode => {
+                    vis.params.dimensions[mode].forEach(dimension => {
+
+                        // let dimension_range = vis.params.dims_vs_visual_dims[dimension];
+                        
+                        // if (!dimension_range) dimension_range = dimension;
+                        // // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
+    
+
                         if (vis.draw.scales[mode][dimension]) {
                             vis.draw.scales[mode][dimension]
-                              .range(vis.draw.ranges[dimension_range])
+                                .range(vis.draw.ranges[mode][dimension])
                         }
-                        console.log("Inicializando scales", dimension, vis.draw.scales[mode][dimension]);
+                            console.log("Inicializando scales", mode, dimension, vis.draw.scales[mode][dimension].range());
                     });
-
-
-                });
     
+                });
+                
             },
 
             set_domain : function(mode, dimension, variable) {
@@ -1197,7 +1225,7 @@ const vis = {
                                   variable : "var_pct_mod",
                                   axis     : true },
     
-                                { dimension : "y_var" ,  
+                                { dimension : "y" ,  
                                   variable  : "var_tipo",
                                   axis      : true },
     
@@ -1216,7 +1244,7 @@ const vis = {
                                 vis.draw.bubbles.simulation
                                   .nodes(vis.data.processed.detalhado.filter(d => !d.acao_nova))
                                   .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales["detalhado"].x(+d.var_pct_mod)))
-                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales["detalhado"].y_var(d.var_tipo)))
+                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales["detalhado"].y(d.var_tipo)))
                                   .force("charge", null)
                                   .force('colisao', d3.forceCollide().radius(d => vis.draw.scales["detalhado"].r(+d.PLOA)));
 
@@ -1251,7 +1279,7 @@ const vis = {
                                   variable : "var_abs_mod",
                                   axis     : true },
     
-                                { dimension : "y_var" ,  
+                                { dimension : "y" ,  
                                   variable  : "var_tipo",
                                   axis      : true },
     
@@ -1270,7 +1298,7 @@ const vis = {
                                 vis.draw.bubbles.simulation
                                   .nodes(vis.data.processed.detalhado.filter(d => !d.acao_nova))
                                   .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales["detalhado"].x(+d.var_abs_mod)))
-                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales["detalhado"].y_var(d.var_tipo)))
+                                  .force('y', d3.forceY().strength(magnitudeForca).y(d => vis.draw.scales["detalhado"].y(d.var_tipo)))
                                   .force("charge", null)
                                   .force('colisao', d3.forceCollide().radius(d => vis.draw.scales["detalhado"].r(+d.PLOA)));
 
