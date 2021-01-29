@@ -11,8 +11,15 @@
     --main-font: "Inter";
 
     /*vis*/
+        /*barras*/
     --cor-barra-normal: goldenrod;
     --cor-barra-destaque: rebeccapurple;
+
+        /*bubbles*/
+    --cor-aumento: #BF2C62;
+    --cor-reducao: #1E5693;
+    --cor-mesmo-valor: #F6E2DF;
+    --cor-novas-acoes: #F2A007;
 
 }
 

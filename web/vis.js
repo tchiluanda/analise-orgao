@@ -27,7 +27,14 @@ const vis = {
         colors : {
             destaque_barra : "--cor-barra-destaque",
 
-            barra_normal : "--cor-barra-normal"
+            barra_normal : "--cor-barra-normal",
+
+            "aumento" : "--cor-aumento",
+            "redução" : "--cor-reducao",
+            "mesmo valor" : "--cor-mesmo-valor",
+            "nova" : "--cor-novas-acoes",
+            "cor fundo": "--light"
+
         }
 
     },
@@ -120,11 +127,13 @@ const vis = {
             categorical : {
             
                 agregado : ["orgao_decreto", "anexo", "agregador"],
-                detalhado : ["var_tipo"]
+                detalhado : null //["var_tipo"]
     
             }
 
         },
+
+
 
         variables_names : {
 
@@ -371,7 +380,7 @@ const vis = {
                     el["var_abs_mod"] = Math.abs(var_abs);
 
                     // essas variáveis criadas aqui devem ser informadas lá em vis.params.variables_detalhado
-                }
+                } else el["var_tipo"] = "nova";
                 
             });
 
@@ -659,7 +668,7 @@ const vis = {
 
                 x : null, 
                 y : null,
-                r : [2,40]
+                r : [3,40]
 
             },
 
@@ -678,11 +687,11 @@ const vis = {
 
                 vis.draw.ranges.agregado.x = [ vis.dims.margins.left, vis.dims.w - vis.dims.margins.right ];
 
-                vis.draw.ranges.detalhado.x = [ vis.dims.margins.left/2, vis.dims.w - vis.dims.margins.right ];
+                vis.draw.ranges.detalhado.x = [ vis.dims.margins.left, vis.dims.w - vis.dims.margins.right*1.5 ];
     
                 vis.draw.ranges.agregado.y = [ vis.dims.h - vis.dims.margins.bottom, vis.dims.margins.top ];
 
-                vis.draw.ranges.detalhado.y = [vis.dims.h/4, vis.dims.h*3/4];
+                vis.draw.ranges.detalhado.y = [vis.dims.h/5, vis.dims.h*4.5/5];
 
                 vis.draw.ranges.agregado.w = [ 0, vis.dims.w - vis.dims.margins.left - vis.dims.margins.right];
     
@@ -713,7 +722,7 @@ const vis = {
             detalhado : {
 
                 x : d3.scaleLog(),
-                y: d3.scaleOrdinal(),
+                y: d3.scaleBand(),
                 r: d3.scaleSqrt()
 
             },
@@ -1032,7 +1041,7 @@ const vis = {
                       return random;
                     })
                   .attr("r", 1)
-                  .attr("stroke", d => d.acao_nova ? "#4B0082" : "#fada5e")
+                  .attr("stroke", vis.params.colors["cor fundo"])
                   .attr("opacity", 1)
                   .text(d => d.acao)
                 ;
@@ -1262,7 +1271,7 @@ const vis = {
                                   .transition()
                                   .duration(vis.params.transitions_duration)
                                   .attr("opacity", d => d.acao_nova ? 0 : 1)
-                                  .attr("fill", d => d.var_tipo == "aumento" ? "dodgerblue" : "tomato");
+                                  .attr("fill", d => vis.params.colors[d.var_tipo]);
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
@@ -1307,7 +1316,7 @@ const vis = {
                                   .transition()
                                   .duration(vis.params.transitions_duration)
                                   .attr("opacity", d => d.acao_nova ? 0 : 1)
-                                  .attr("fill", d => d.var_tipo == "aumento" ? "dodgerblue" : "tomato");
+                                  .attr("fill", d => vis.params.colors[d.var_tipo]);
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
@@ -1336,7 +1345,7 @@ const vis = {
                                       .transition()
                                       .duration(vis.params.transitions_duration)
                                       .attr("r", d => vis.draw.scales["detalhado"].r(+d.PLOA))
-                                      .attr("fill", d => d.acao_nova ? "#4B008250" : "#fada5e50")
+                                      .attr("fill", d => vis.params.colors[d.var_tipo])
     
                                     vis.draw.bubbles.config_simulation();
 
