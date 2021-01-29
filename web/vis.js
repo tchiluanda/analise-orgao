@@ -23,6 +23,8 @@ const vis = {
         objetos_atuais : "svg *", // para limpar o canvas
         rotulos_atuais : "div.vis-container .rotulos",
 
+        tooltip : "div#card",
+
 
         colors : {
             destaque_barra : "--cor-barra-destaque",
@@ -363,20 +365,20 @@ const vis = {
                 if (!acao_nova) {
                     const var_pct = (el.PLOA / el.dot_atu);
                     let var_abs = (el.PLOA - el.dot_atu);
-                    let aumento;
+                    let var_tipo;
                     if (var_pct == 1) {
-                        aumento = "mesmo valor"; 
+                        var_tipo = "mesmo valor"; 
                         var_abs = 1;            
                     } else if (var_pct > 1) {
-                        aumento = "aumento"
+                        var_tipo = "aumento"
                     } else {
-                        aumento = "redução"
+                        var_tipo = "redução"
                     }
                      
 
-                    el["var_tipo"] = aumento;
+                    el["var_tipo"] = var_tipo;
 
-                    el["var_pct_mod"] = aumento ? var_pct : (1/var_pct);
+                    el["var_pct_mod"] = var_tipo == "redução" ? 1/var_pct : var_pct;
                     el["var_abs_mod"] = Math.abs(var_abs);
 
                     // essas variáveis criadas aqui devem ser informadas lá em vis.params.variables_detalhado
@@ -469,19 +471,24 @@ const vis = {
             let x_bubble = +d3.select(this).attr('cx');
             let y_bubble = +d3.select(this).attr('cy');
 
-            console.log(x_bubble, y_bubble);
+            //console.log(x_bubble, y_bubble);
         
-            const $tooltip = d3.select("div#card");
+            const $tooltip = d3.select(vis.refs.tooltip);
+            const $tt = document.querySelector(vis.refs.tooltip);
+
+            $tt.dataset.variacao = dados["var_tipo"];
             
             let largura_tooltip_css = +$tooltip.style("width").substring(0, $tooltip.style("width").length-2);
             
-            $tooltip.classed("hidden", false);
+            $tooltip
+              .classed("hidden", false)
+              .style("background-color", "var(" + vis.refs.colors[dados["var_tipo"]] + ")");
         
             // popula informacao
 
             // parametrizar isso em vis.params
       
-            const infos_tooltip = ["acao", "tituloacao", "PLOA", "dot_atu", "aumento"];
+            const infos_tooltip = ["acao", "tituloacao", "PLOA", "dot_atu", "var_tipo", "var_pct_mod", "var_abs_mod"];
         
             infos_tooltip.forEach(function(info) {
                 let text = "";
@@ -522,7 +529,7 @@ const vis = {
 
         escondeTooltip : function(d) {
 
-            d3.select("div#card").classed("hidden", true);
+            d3.select(vis.refs.tooltip).classed("hidden", true);
 
         }
 

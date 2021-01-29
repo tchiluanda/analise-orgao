@@ -209,7 +209,7 @@ div#card {
 }
 
 div#card * + * {
-    margin-top: .5em;
+    margin-top: .25em;
 }
 
 .hidden {
