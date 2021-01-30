@@ -69,7 +69,7 @@ const vis = {
         margins: {
 
             top: 10,
-            left: 200,
+            left: 250,
             right: 50,
             bottom: 20
 
@@ -720,17 +720,17 @@ const vis = {
 
             agregado : {
 
-                x: d3.scaleLinear().clamp(true),
-                y: d3.scaleBand(),
-                w: d3.scaleLinear().clamp(true),
+                x : d3.scaleLinear().clamp(true),
+                y : d3.scaleBand(),
+                w : d3.scaleLinear().clamp(true),
 
             },
 
             detalhado : {
 
                 x : d3.scaleLog(),
-                y: d3.scaleBand(),
-                r: d3.scaleSqrt()
+                y : d3.scaleBand(),
+                r : d3.scaleSqrt()
 
             },
 
@@ -857,36 +857,30 @@ const vis = {
 
             },
 
-            initialize : function() {
+            initialize : function(mode) {
 
-                //fazer um forEach aqui... armazenar essas variáveis
+                vis.draw.axis.update_axis_scale(mode, "x");
+                vis.draw.axis.update_axis_scale(mode, "y");
 
-                vis.params.modes.forEach(mode => {
-                    vis.draw.axis.update_axis_scale(mode, "x");
-                    vis.draw.axis.update_axis_scale(mode, "y");
-                //vis.draw.axis.update_axis_scale("x_log");
-                });
-                
                 //vis.draw.axis.update_axis_scale("y_cat");
-                vis.draw.axis.update_axis_scale("detalhado", "y_var");
+                //vis.draw.axis.update_axis_scale("detalhado", "y_var");
 
                 // aqui tb... evitar superposição de eixos tb.
-    
-                vis.draw.axis.create(
-                    desloc_x = 0,
-                    desloc_y = vis.draw.scales.y(0),//vis.dims.h - vis.dims.margins,
-                    "x");
-    
-                vis.draw.axis.create(
-                    desloc_x = vis.dims.margins.left,
-                    desloc_y = 0,
-                    "y");
 
-                vis.draw.axis.create(
-                    desloc_x = vis.dims.margins.left/2,
-                    desloc_y = 0,
-                    "y_var");
-                
+                if (!vis.sels.axis.x) {
+
+                    vis.draw.axis.create(
+                        desloc_x = 0,
+                        desloc_y = vis.draw.scales[mode].y(mode == "agregado" ? 0 : "mesmo valor"),//vis.dims.h - vis.dims.margins,
+                        "x");
+        
+                    vis.draw.axis.create(
+                        desloc_x = vis.dims.margins.left,
+                        desloc_y = 0,
+                        "y");
+
+                }
+    
             },
 
             reset : function(dimension) {
@@ -925,9 +919,7 @@ const vis = {
 
             x :  d3.axisBottom(),
 
-            y :  d3.axisLeft(),
-
-            y_var : d3.axisLeft()
+            y :  d3.axisLeft()
 
         },
 
@@ -954,6 +946,8 @@ const vis = {
 
                 vis.sels.barras = d3.selectAll(vis.refs.barras);
 
+                // rotulos valores
+
                 vis.sels.cont
                 .selectAll("p.labels-valores-barras")
                 .data(vis.data.processed.agregado, d => d[variable])
@@ -968,6 +962,22 @@ const vis = {
                 .transition()
                 .duration(vis.params.transitions_duration)
                 .style("left", d => (vis.dims.margins.left + vis.draw.scales["agregado"].w(d[vis.params.main_variable])) + "px")
+
+
+                // rotulos categorias
+
+                vis.sels.cont
+                .selectAll("p.labels-categorias")
+                .data(vis.data.processed.agregado, d => d[variable])
+                .join("p")
+                .classed("labels-categorias", true)
+                .classed("rotulos", true)
+                .style("top", d => (vis.draw.scales["agregado"].y(d[variable]) + vis.dims.margins.top) + "px")
+                .style("left", vis.dims.margins.left + "px")
+                .style("font-size", vis.dims.bar_height + "px")
+                .style("line-height", vis.dims.bar_height + "px")
+                .style("max-width", vis.dims.margins.left + "px")
+                .text(d => d[variable]);
 
 
             },
@@ -1114,6 +1124,8 @@ const vis = {
         current_state : {
 
             mode : null,
+            primeira_vez_agregado : true,
+            primeira_vez_detalhado : true,
             option : null,
             variavel_detalhamento : null,
             variavel_comparacao : null,
@@ -1427,7 +1439,7 @@ const vis = {
             vis.draw.scales.initialize();
 
             // add x, y axis
-            //vis.draw.axis.initialize();
+            //// vis.draw.axis.initialize();
 
             // add rects/bubbles
             //vis.draw.bubbles.add();
@@ -1449,6 +1461,8 @@ const vis = {
             // option é a variável de detalhamento (no caso do agregado)
 
             console.log(vis.control.current_state);
+
+            if (vis.control.current_state.primeira_vez_agregado)
 
             if (mode == "detalhado" & !vis.control.current_state.precisa_atualizar_dataset_detalhado) {
 
@@ -1491,6 +1505,13 @@ const vis = {
 
         },
 
+        clear_canvas : function() {
+
+            d3.selectAll(vis.refs.objetos_atuais).remove();
+            d3.selectAll(vis.refs.rotulos_atuais).remove();
+
+        },
+
         monitor_mode_button : function() {
 
             let buttons = document.querySelector(vis.refs.mode_button);
@@ -1520,8 +1541,9 @@ const vis = {
 
                         vis.control.show_mode_dependent_controls(mode);
 
-                        d3.selectAll(vis.refs.objetos_atuais).remove();
-                        d3.selectAll(vis.refs.rotulos_atuais).remove();
+                        vis.control.clear_canvas();
+
+
 
                         /*
 
