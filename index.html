@@ -89,15 +89,59 @@
 
     <main>
 
-        <div class="controle-comparacao hidden"
-          data-visible-on-mode="agregado"
-          >
-          <p>
-          Valores do PLOA. Comparar com 
-          <select name="seletor-comparacao" id="">
-              <option value="nada">nada</option>
-          </select>
-          </p>
+        <div class="controle-comparacao hidden" data-visible-on-mode="agregado">
+            <p>
+            Valores do PLOA. Comparar com 
+            <select name="seletor-comparacao" id="">
+                <option value="nada">nada</option>
+            </select>
+            </p>
+        </div>
+
+        <div class="controle-cores hidden" data-visible-on-mode="detalhado">
+
+            <p>
+            Colorir bolhas por 
+            <select name="seletor-cores" id="">
+                <option value="padrao">Padrão</option>
+                <option value="fonte">Fonte de recursos</option>
+                <option value="gnd">Grupo de despesas</option>
+                <option value="mod">Modalidade de aplicação</option>
+                <option value="obrig-discr">Obrigatórias / Discricionárias</option>
+            </select>
+            </p>
+
+            <div class="selecao-adicional-cores seletor-radio" data-selecao-adicional-para="fonte">
+
+                <input type="radio" name="cores-fontes" id="cores-fontes-tesouro" value="tesouro" checked> 
+                <label for="cores-fontes-tesouro">Fontes Tesouro</label>
+
+                <input type="radio" name="cores-fontes" id="cores-fontes-proprias" value="proprias">
+                <label for="cores-fontes-proprias">Fontes Próprias</label>
+
+                <input type="radio" name="cores-fontes" id="cores-fontes-emissao" value="emissao">
+                <label for="cores-fontes-emissao">Fontes de Emissão</label>
+
+            </div>
+
+            <div class="selecao-adicional-cores seletor-radio" data-selecao-adicional-para="gnd">
+
+                <input type="radio" name="cores-gnd" id="cores-gnd-pessoal" value="pessoal" checked> 
+                <label for="cores-gnd-pessoal">Pessoal</label>
+
+                <input type="radio" name="cores-gnd" id="cores-gnd-custeio" value="custeio">
+                <label for="cores-gnd-custeio">Custeio</label>
+
+                <input type="radio" name="cores-gnd" id="cores-gnd-investimento" value="investimento">
+                <label for="cores-gnd-investimento">Investimento</label>
+
+                <input type="radio" name="cores-gnd" id="cores-gnd-divida" value="divida">
+                <label for="cores-gnd-divida">Dívida</label>
+
+            </div>
+
+            <div id="legenda-cores"></div>
+
         </div>
         <div class="vis-container">
             <svg class="vis">
