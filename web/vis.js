@@ -7,6 +7,10 @@ const vis = {
         mode_button: "nav.mode-control",
         option_button: "div.option-control",
         mode_dependent_controls: "[data-visible-on-mode]",
+
+        seletor_cores : "[name='seletor-cores']",
+        controles_adicionais_cores : "[data-selecao-adicional-para]",
+
         comparison_selector: "[name='seletor-comparacao']",
         selectors_wrapper: ".selecoes-wrapper",
         selector_orgao_decreto : "#selecao-orgao",
@@ -1137,7 +1141,8 @@ const vis = {
             exclui_divida : false,
             exclui_rgps : false,
             precisa_atualizar_dataset_detalhado : true,
-            simulation_started : false
+            simulation_started : false,
+            criterio_adicional_cores : null
 
         },
 
@@ -1454,6 +1459,7 @@ const vis = {
             vis.control.monitora_seletor_comparacao();
             vis.control.monitora_seletores_filtros();
             vis.control.monitora_exclusoes();
+            vis.control.monitora_seletor_cores();
 
             //vis.control.draw_state("agregado", "orgao_decreto");
 
@@ -1743,6 +1749,32 @@ const vis = {
 
         },
 
+        monitora_seletor_cores : function() {
+
+            const selector = document.querySelector(vis.refs.seletor_cores);
+
+            vis.elems.seletor_cores = selector;
+
+            selector.addEventListener("change", function(e) {
+
+                const opcao_selecionada = e.target.value;
+
+                vis.control.current_state.criterio_adicional_cores = opcao_selecionada;
+
+                if (opcao_selecionada == "padrao") {
+
+                    // definir
+
+                } else {
+
+                    vis.control.show_controles_adicionais_cores(opcao_selecionada);
+                    
+                }
+
+            })
+
+        },
+
         activates_button : function(all_buttons, clicked) {
 
             let all_buttons_arr = Array.from(all_buttons);
@@ -1770,6 +1802,23 @@ const vis = {
             // mudei para querySelectorAll para selecionar o seletor de comparação também
 
             active_controls.forEach(control => control.classList.remove("hidden"));
+
+        },
+
+        show_controles_adicionais_cores : function(opcao) {
+
+            let controles_adicionais = document.querySelectorAll(vis.refs.controles_adicionais_cores);
+
+            controles_adicionais.forEach(controle_adicional => controle_adicional.classList.add("hidden"));
+
+            let active_controls = document.querySelectorAll(
+                '[data-selecao-adicional-para="' +
+                opcao +
+                '"]' );
+            
+            // mudei para querySelectorAll para selecionar o seletor de comparação também
+
+            active_controls.forEach(controle_adicional => controle_adicional.classList.remove("hidden"));
 
         },
 
