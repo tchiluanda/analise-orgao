@@ -20,12 +20,27 @@ const vis = {
         exclui_rgps: "#exclui-rgps",
         barras: "rect.barras",
         linhas_referencia: "line.ref",
+
         data: {
+
             agregado : "./dados/dados.csv",
             detalhado : "./dados/dados_acoes.csv"
+
         },
-        objetos_atuais : "svg *", // para limpar o canvas
-        rotulos_atuais : "div.vis-container .rotulos",
+
+        objetos_atuais : {
+
+            agregado : "svg .geoms-agregado", // para limpar o canvas
+            detalhado : "svg .geoms-detalhado"
+
+        },
+
+        rotulos_atuais : {
+            
+            agregado : "div.vis-container .rotulos-agregado",
+            detalhado : "div.vis-container .rotulos-detalhado"
+
+        },
 
         tooltip : "div#card",
 
@@ -139,7 +154,12 @@ const vis = {
 
         },
 
+        standard_option : {
 
+            agregado : "orgao_decreto",
+            detalhado : "inicial"
+
+        },
 
         variables_names : {
 
@@ -938,6 +958,7 @@ const vis = {
                 .data(vis.data.processed.agregado, d => d[variable])
                 .join("rect")
                 .classed("barras", true)
+                .classed("geoms-agregado", true)
                 .attr("x", vis.dims.margins.left)
                 .attr("width", 0)
                 .attr("height", vis.dims.bar_height)
@@ -959,7 +980,7 @@ const vis = {
                 .data(vis.data.processed.agregado, d => d[variable])
                 .join("p")
                 .classed("labels-valores-barras", true)
-                .classed("rotulos", true)
+                .classed("rotulos-agregado", true)
                 .style("top", d => (vis.draw.scales["agregado"].y(d[variable]) + vis.dims.margins.top) + "px")
                 .style("left", vis.dims.margins.left + "px")
                 //.style("font-size", vis.dims.bar_height + "px")
@@ -977,7 +998,7 @@ const vis = {
                 .data(vis.data.processed.agregado, d => d[variable])
                 .join("p")
                 .classed("labels-categorias", true)
-                .classed("rotulos", true)
+                .classed("rotulos-agregado", true)
                 .style("top", d => (vis.draw.scales["agregado"].y(d[variable]) + vis.dims.margins.top) + "px")
                 .style("left", vis.dims.margins.left + "px")
                 //.style("font-size", vis.dims.bar_height + "px")
@@ -998,6 +1019,7 @@ const vis = {
                       .attr("x1", vis.dims.margins.left)
                       .attr("x2", vis.dims.margins.left))
                 .classed("ref", true)
+                .classed("geoms-agregado", true)
                 .attr("y1", d => vis.draw.scales["agregado"].y(d[cat_variable]) + vis.dims.margins.top - vis.dims.bar_height/2)
                 .attr("y2", d => vis.draw.scales["agregado"].y(d[cat_variable]) + vis.dims.margins.top + vis.dims.bar_height*1.5)
                 .transition()
@@ -1053,6 +1075,7 @@ const vis = {
                   .data(vis.data.processed.detalhado)
                   .join("circle")
                   .classed("acoes", true)
+                  .classed("geoms-detalhado", true)
                   .attr("cx", function(d) {
                       let random = vis.dims.w * Math.random();
                       d.x = random; // para inicializar a posição na simulação
@@ -1481,7 +1504,23 @@ const vis = {
 
             } 
 
-            if (vis.control.current_state.primeira_vez_agregado)
+            // // ajusta flags quando for a primeira vez num novo modo
+
+            // if (vis.control.current_state.primeira_vez_agregado) {
+
+            //     vis.control.current_state.primeira_vez_agregado = false;
+            //     vis.control.current_state.primeira_vez_detalhado = true;
+
+            // }
+
+            // if (vis.control.current_state.primeira_vez_detalhado) {
+
+            //     vis.control.current_state.primeira_vez_agregado = true;
+            //     vis.control.current_state.primeira_vez_detalhado = false;
+
+            // }
+
+
 
             if (mode == "detalhado" & !vis.control.current_state.precisa_atualizar_dataset_detalhado) {
 
@@ -1524,10 +1563,41 @@ const vis = {
 
         },
 
-        clear_canvas : function() {
+        clear_canvas : function(mode) {
 
-            d3.selectAll(vis.refs.objetos_atuais).remove();
-            d3.selectAll(vis.refs.rotulos_atuais).remove();
+            // salvo o opacity atual para recuperar depois (para evitar que uma bolha que estivesse escondida na visão atual apareça quando o usuário voltar para essa visão)
+
+            d3.selectAll(vis.refs.objetos_atuais[mode]).each(function(d) {
+                let obj = d3.select(this);
+                let current_opacity = obj.attr("opacity");
+                console.log(current_opacity);
+
+                obj
+                  .attr("data-opacity", current_opacity)
+                  .attr("opacity", 0)
+            });
+
+            d3.selectAll(vis.refs.rotulos_atuais[mode]).style("opacity", 0);
+
+        },
+
+        recover_canvas : function(mode) {
+
+            // agora recupero o valor da opacity dele antes de tê-lo feito desaparecer por uma mudança de modo
+
+            let objs = d3.selectAll(vis.refs.objetos_atuais[mode]);
+            if (objs) {
+                objs.each(function(d) {
+                    let obj = d3.select(this);
+                    let previous_opacity = obj.attr("data-opacity");
+                    
+                    obj
+                      .attr("opacity", previous_opacity); 
+                })
+            }
+
+            let rotulos = d3.selectAll(vis.refs.rotulos_atuais[mode]);
+            if (rotulos) rotulos.style("opacity", null);
 
         },
 
@@ -1553,37 +1623,50 @@ const vis = {
 
                     let mode = e.target.id;
 
-                    if (this.dataset.mode != mode) {
+                    if (vis.control.current_state.mode != mode) {
 
-                        this.dataset.mode = mode;
+                        // esconde objetos do modo atual
+                        vis.control.clear_canvas(vis.control.current_state.mode);
+
+                        // recupera, se existirem, objetos do novo modo
+                        vis.control.recover_canvas(mode);
+
+                        // atualiza modo
                         vis.control.current_state.mode = mode;
 
                         vis.control.show_mode_dependent_controls(mode);
 
-                        vis.control.clear_canvas();
-
-
-
-                        /*
-
-                        if (mode == "detalhado") {
-
-                            vis.control.draw_state(
-                                mode = "detalhado", 
-                                option = "variacao"
-                                );
-                        }
-    
-                        if (mode == "agregado") {
-    
-                            vis.control.draw_state(
-                                mode = "agregado", 
-                                option = "agregador"
-                                );
-    
-                        }
                         
-                        */
+
+                        // define uma opção padrão na primeira vez que se escolhe um modo
+
+                        // if (vis.control.current_state.primeira_vez_agregado || vis.control.current_state.primeira_vez_detalhado) {
+
+                        //     let option = vis.params.standard_option[mode];
+
+                        //     // aciona o botao da opcao
+
+                        //     option_button = document.querySelector("#" + option);
+                        //     other_options = option_button.parentElement;
+
+                        //     vis.control.activates_button(
+                        //         all_buttons = other_options,
+                        //         clicked = option_button
+                        //     );
+
+                        //     //
+
+
+                        //     // fazer esse controle nos data-attributes?
+                        //     vis.control.current_state.mode = mode;
+                        //     vis.control.current_state.variavel_detalhamento = option;
+
+                        //     vis.f.reinicia_seletor_comparacao();
+
+                        //     vis.control.draw_state(mode, option);
+
+                        // }
+
     
                         console.log(mode);
 
@@ -1624,10 +1707,10 @@ const vis = {
 
                     let option = e.target.id;
 
-                    if (button_container.dataset.option != option) {
+                    if (vis.control.current_state.option != option) {
 
                         // depois tem que ajeitar isso aqui
-                        button_container.dataset.option = option;
+                        // button_container.dataset.option = option;
 
                         vis.control.current_state.option = option;
 
@@ -1636,7 +1719,7 @@ const vis = {
                         console.log("hi", mode, option);
 
                         // fazer esse controle nos data-attributes?
-                        vis.control.current_state.mode = mode;
+                        //vis.control.current_state.mode = mode;
                         vis.control.current_state.variavel_detalhamento = option;
 
                         vis.f.reinicia_seletor_comparacao();
