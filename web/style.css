@@ -134,6 +134,10 @@ div.controle-comparacao {
     text-align: center;
 }
 
+div.controle-cores p {
+    margin-bottom: 0.5rem;
+}
+
 .mission-control button.disabled {
     cursor: not-allowed;
     pointer-events: none;
@@ -152,6 +156,7 @@ div.controle-comparacao {
 
 .selecao-adicional-cores {
     font-size: .8rem;
+    margin-bottom: 1rem;
 }
 
 /* vis */
