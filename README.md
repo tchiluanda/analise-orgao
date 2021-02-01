@@ -223,6 +223,9 @@ para cada nova combinação modo / opcao, basta definir o mapeamento de escalas 
 
 Fazer um dashboard pode ser me
 
+Explicar o que precisa fazer para incluir nova variável, novo filtro etc.
+
+
 ### dúvidas
 
 como dar um "clean" no tickFormat do eixo? por ora estou dando um reset e recriando o objeto eixo. 

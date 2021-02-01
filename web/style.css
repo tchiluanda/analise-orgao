@@ -11,8 +11,15 @@
     --main-font: "Inter";
 
     /*vis*/
+        /*barras*/
     --cor-barra-normal: goldenrod;
     --cor-barra-destaque: rebeccapurple;
+
+        /*bubbles*/
+    --cor-aumento: #BF2C62;
+    --cor-reducao: #1E5693;
+    --cor-mesmo-valor: #F6E2DF;
+    --cor-novas-acoes: #F2A007;
 
 }
 
@@ -177,6 +184,17 @@ p.labels-valores-barras {
     margin-left: .5rem;
 }
 
+/* labels categorias (eixo) */
+
+p.labels-categorias {
+    position: absolute;
+    font-family: var(--main-font);
+    margin: 0;
+    padding-right: .5rem;
+    transform: translateX(-100%);
+    text-align: right;
+}
+
 /* linhas de referência */
 line.ref {
     stroke-width: 2px;
@@ -202,7 +220,7 @@ div#card {
 }
 
 div#card * + * {
-    margin-top: .5em;
+    margin-top: .25em;
 }
 
 .hidden {
