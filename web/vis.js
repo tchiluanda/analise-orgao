@@ -1905,6 +1905,16 @@ const vis = {
 
         },
 
+        monitora_controles_adicionais_cores : function() {
+
+            let controles_adicionais = document.querySelectorAll(".selecao-adicional-cores")
+
+            controles_adicionais.forEach(radio => radio.addEventListener("change", function(e) {console.log(e, e.target.id, e.target.name)}))
+
+            // continuar aqui. definir escala de cores.
+
+        },
+
         monitora_tooltips : function() {
 
             // usando listener de D3
