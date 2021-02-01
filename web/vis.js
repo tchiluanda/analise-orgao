@@ -68,7 +68,7 @@ const vis = {
         bar_height: 10,
         margins: {
 
-            top: 10,
+            top: 20,
             left: 250,
             right: 50,
             bottom: 20
@@ -787,10 +787,10 @@ const vis = {
 
                     if (scale.axis == true) {
 
-                        //vis.draw.axis.update(mode, scale.dimension, scale.variable);
+                        vis.draw.axis.update(mode, scale.dimension, scale.variable);
 
                     }
-                    });
+                  });
 
                     // ISSUE : testar em algum momento se o domínio permanece igual? vale a pena em termos de performance? poderia ter um "current" em vis.control.states
 
@@ -809,7 +809,7 @@ const vis = {
                 if (!dimension_axis) dimension_axis = dimension;
                 // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
 
-                console.log("Updating o axis_scale da dimensao", dimension, dimension_axis);
+                console.log("Updating o axis_scale da dimensao", dimension, dimension_axis, ", no modo ", mode);
 
                 vis.draw.axis[dimension_axis].scale(
                     vis.draw.scales[mode][dimension]
@@ -820,6 +820,8 @@ const vis = {
             create : function(desloc_x, desloc_y, dimension) {
                 
                 let svg = vis.sels.svg;
+
+                console.log("Dimensão ", dimension);
 
                 vis.sels.axis[dimension] = svg
                   .append("g") 
@@ -860,7 +862,7 @@ const vis = {
             initialize : function(mode) {
 
                 vis.draw.axis.update_axis_scale(mode, "x");
-                vis.draw.axis.update_axis_scale(mode, "y");
+                //vis.draw.axis.update_axis_scale(mode, "y");
 
                 //vis.draw.axis.update_axis_scale("y_cat");
                 //vis.draw.axis.update_axis_scale("detalhado", "y_var");
@@ -871,13 +873,13 @@ const vis = {
 
                     vis.draw.axis.create(
                         desloc_x = 0,
-                        desloc_y = vis.draw.scales[mode].y(mode == "agregado" ? 0 : "mesmo valor"),//vis.dims.h - vis.dims.margins,
+                        desloc_y = vis.dims.margins.top,//vis.draw.scales[mode].y(mode == "agregado" ? 0 : "mesmo valor"),//vis.dims.h - vis.dims.margins,
                         "x");
         
-                    vis.draw.axis.create(
-                        desloc_x = vis.dims.margins.left,
-                        desloc_y = 0,
-                        "y");
+                    // vis.draw.axis.create(
+                    //     desloc_x = vis.dims.margins.left,
+                    //     desloc_y = 0,
+                    //     "y");
 
                 }
     
@@ -917,7 +919,7 @@ const vis = {
 
             },
 
-            x :  d3.axisBottom(),
+            x :  d3.axisTop(),
 
             y :  d3.axisLeft()
 
@@ -1124,6 +1126,7 @@ const vis = {
         current_state : {
 
             mode : null,
+            primeira_vez : true,
             primeira_vez_agregado : true,
             primeira_vez_detalhado : true,
             option : null,
@@ -1159,7 +1162,7 @@ const vis = {
                                 { 
                                     dimension : "y" ,  
                                     variable  : "orgao_decreto",
-                                    axis      : true 
+                                    axis      : false 
                                 },
     
                                 { 
@@ -1190,7 +1193,7 @@ const vis = {
     
                                 { dimension : "y" ,  
                                     variable  : "anexo",
-                                    axis      : true },
+                                    axis      : false },
     
                                 { dimension : "w" ,
                                     variable  : "agregado", //"atu_total",
@@ -1219,7 +1222,7 @@ const vis = {
     
                                 { dimension : "y" ,  
                                     variable  : "agregador",
-                                    axis      : true },
+                                    axis      : false },
     
                                 { dimension : "w" ,
                                     variable  : "agregado", //"atu_total",
@@ -1255,7 +1258,7 @@ const vis = {
     
                                 { dimension : "y" ,  
                                   variable  : "var_tipo",
-                                  axis      : true },
+                                  axis      : false },
     
                                 { dimension : "r" , 
                                   variable  : "PLOA",
@@ -1309,7 +1312,7 @@ const vis = {
     
                                 { dimension : "y" ,  
                                   variable  : "var_tipo",
-                                  axis      : true },
+                                  axis      : false },
     
                                 { dimension : "r" , 
                                   variable  : "PLOA",
@@ -1439,7 +1442,8 @@ const vis = {
             vis.draw.scales.initialize();
 
             // add x, y axis
-            //// vis.draw.axis.initialize();
+            // isso vai para o draw state
+            //vis.draw.axis.initialize();
 
             // add rects/bubbles
             //vis.draw.bubbles.add();
@@ -1461,6 +1465,15 @@ const vis = {
             // option é a variável de detalhamento (no caso do agregado)
 
             console.log(vis.control.current_state);
+
+            // se começou agora, inicializa o eixo
+
+            if (vis.control.current_state.primeira_vez) {
+
+                vis.draw.axis.initialize(mode);
+                vis.control.current_state.primeira_vez = false;
+
+            } 
 
             if (vis.control.current_state.primeira_vez_agregado)
 
