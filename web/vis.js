@@ -69,7 +69,7 @@ const vis = {
 
         h: null,
         w: null,
-        bar_height: 10,
+        bar_height: 16,
         margins: {
 
             top: 20,
@@ -962,7 +962,7 @@ const vis = {
                 .classed("rotulos", true)
                 .style("top", d => (vis.draw.scales["agregado"].y(d[variable]) + vis.dims.margins.top) + "px")
                 .style("left", vis.dims.margins.left + "px")
-                .style("font-size", vis.dims.bar_height + "px")
+                //.style("font-size", vis.dims.bar_height + "px")
                 .style("line-height", vis.dims.bar_height + "px")
                 .text(d => utils.valor_formatado(d[vis.params.main_variable]))
                 .transition()
@@ -980,7 +980,7 @@ const vis = {
                 .classed("rotulos", true)
                 .style("top", d => (vis.draw.scales["agregado"].y(d[variable]) + vis.dims.margins.top) + "px")
                 .style("left", vis.dims.margins.left + "px")
-                .style("font-size", vis.dims.bar_height + "px")
+                //.style("font-size", vis.dims.bar_height + "px")
                 .style("line-height", vis.dims.bar_height + "px")
                 .style("max-width", vis.dims.margins.left + "px")
                 .text(d => d[variable]);

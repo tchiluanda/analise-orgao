@@ -148,6 +148,12 @@ div.controle-comparacao {
 } 
 */
 
+/* seletores de cores */
+
+.selecao-adicional-cores {
+    font-size: .8rem;
+}
+
 /* vis */
 
 svg {
@@ -173,6 +179,12 @@ svg {
 rect.acoes {
     stroke : coral;
     fill : var(--pink);
+}
+
+/* labels em geral */
+
+p.rotulos {
+    font-size: .7rem;
 }
 
 /* labels valor barras */
