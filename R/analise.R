@@ -724,7 +724,7 @@ perfil_mod <- base_acoes %>%
   summarise(percent_mod = first(total_mod / total_acao)) %>%
   ungroup() %>%
   #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
-  spread(mod, percent_mod)
+  spread(mod, percent_mod, fill = 0)
 
 principais_orgaos <- base_acoes %>%
   filter(variavel == variavel_principal) %>%
@@ -765,7 +765,14 @@ base_acoes_export <- base_acoes %>%
   left_join(perfil_fonte) %>%
   left_join(principais_orgaos) %>%
   mutate(dot_atu = ifelse(is.na(dot_atu), 0, dot_atu),
-         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga)) 
+         desp_paga = ifelse(is.na(desp_paga), 0, desp_paga)) %>%
+  mutate(gnd_predominante = case_when(
+    `Dívida` > .5 ~ "Dívida",
+    Pessoal > .5 ~ "Pessoal",
+    Investimento > .5 ~ "Investimento",
+    Custeio > .5 ~ "Custeio",
+    TRUE ~ "Nenhum"
+  ))
 
 write.csv(base_acoes_export, file = "./dados/dados_acoes.csv", fileEncoding = "utf-8")
 
