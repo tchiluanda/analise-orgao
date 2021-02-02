@@ -148,7 +148,7 @@ const vis = {
             categorical : {
             
                 agregado : ["orgao_decreto", "anexo", "agregador"],
-                detalhado : null //["var_tipo"]
+                detalhado : ["gnd_predominante"] //null 
     
             }
 
@@ -191,14 +191,15 @@ const vis = {
             agregador         : "categorical",
             var_tipo          : "categorical",
             orgao_decreto     : "categorical",
-            anexo             : "categorical"
+            anexo             : "categorical",
+            gnd_predominante  : "categorical"
 
         },
 
         dimensions : {
 
             agregado : ["x", "y", "w"],
-            detalhado : ["x", "y", "r"]
+            detalhado : ["x", "y", "r", "x_gnd"]
 
         },
 
@@ -213,6 +214,7 @@ const vis = {
             //"x_log" : "x",
             //"y_cat" : "y",
             //"y_var" : "y"
+            "x_gnd" : "x"
 
         },
 
@@ -742,7 +744,8 @@ const vis = {
                 agregado : {},
                 detalhado : {
 
-                    var_tipo : ["aumento", "mesmo valor", "redução"]
+                    var_tipo : ["aumento", "mesmo valor", "redução"],
+                    gnd_predominante : ["Pessoal", "Dívida", "Custeio", "Investimento", "Nenhum"]
                     // automatizar isso. vai ter que inicializar só quando clicar no modo agregado.
 
                 }
@@ -834,10 +837,12 @@ const vis = {
                 x : d3.scaleLog(),
                 y : d3.scaleBand(),
                 r : d3.scaleSqrt(),
+                x_gnd : d3.scaleBand()
 
             },
 
             cores_bolhas : d3.scaleQuantile().domain([0,1]),
+
 
             update_cores_bolhas : function(tipo) { // fonte, gnd etc.
 
@@ -851,17 +856,18 @@ const vis = {
 
                     vis.params.dimensions[mode].forEach(dimension => {
 
-                        // let dimension_range = vis.params.dims_vs_visual_dims[dimension];
+                        let dimension_range = vis.params.dims_vs_visual_dims[dimension];
                         
-                        // if (!dimension_range) dimension_range = dimension;
+                        if (!dimension_range) dimension_range = dimension;
                         // // dimension_range vai ser undefined se não estiver na lista de correspondência, caso contrário assume a própria dimensão.
-    
+
+                        console.log("Inicializando scales", mode, dimension, vis.draw.scales[mode][dimension].range());
 
                         if (vis.draw.scales[mode][dimension]) {
                             vis.draw.scales[mode][dimension]
-                                .range(vis.draw.ranges[mode][dimension])
+                                .range(vis.draw.ranges[mode][dimension_range])
                         }
-                            console.log("Inicializando scales", mode, dimension, vis.draw.scales[mode][dimension].range());
+
                     });
     
                 });
@@ -1454,6 +1460,47 @@ const vis = {
                                   .duration(vis.params.transitions_duration)
                                   .attr("opacity", d => d.acao_nova ? 0 : 1);
                                   //.attr("fill", d => vis.params.colors[d.var_tipo]);
+
+                                vis.draw.bubbles.simulation.alpha(1).restart();
+
+                            }
+    
+                        },
+
+                        "gnd" : {
+    
+                            set_scales : [
+    
+                                { dimension: "x_gnd" , 
+                                  variable : "gnd_predominante",
+                                  axis     : false },
+    
+                                { dimension : "r" , 
+                                  variable  : "PLOA",
+                                  axis      : false }
+    
+                            ],
+        
+                            render : function() {
+
+                                console.log("let's go!")
+
+                                const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
+
+                                vis.draw.bubbles.simulation
+                                .nodes(vis.data.processed.detalhado)
+                                .force('colisao', null)
+                                .force('charge', vis.draw.bubbles.parametros_simulation.force_charge())
+                                .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales.detalhado.x_gnd(d.gnd_predominante)))
+                                .force('y', d3.forceY().strength(magnitudeForca).y(vis.dims.h/2));
+
+                              // fazer todo mundo reaparecer.
+
+                              vis.sels.circles_acoes
+                                .classed("silent", false)
+                                .transition()
+                                .duration(vis.params.transitions_duration)
+                                .attr("opacity", 1);
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
