@@ -486,7 +486,7 @@ const vis = {
 
         reinicia_seletor_comparacao : function() {
 
-            vis.elems.seletor_cores.value = "padrao";
+            vis.elems.seletor_comparacao.value = "nada";
             vis.draw.agregado.remove_linhas_referencia();
         },
 
@@ -496,7 +496,7 @@ const vis = {
 
         reinicia_seletor_cores : function() {
 
-            vis.elems.seletor_comparacao.value = "padrao";
+            vis.elems.seletor_cores.value = "padrao";
             vis.control.show_controles_adicionais_cores("padrao");
             //vis.f.colore_bolhas("padrao");
 
@@ -1378,8 +1378,8 @@ const vis = {
                                   .classed("silent", d => d.acao_nova)
                                   .transition()
                                   .duration(vis.params.transitions_duration)
-                                  .attr("opacity", d => d.acao_nova ? 0 : 1)
-                                  .attr("fill", d => vis.params.colors[d.var_tipo]);
+                                  .attr("opacity", d => d.acao_nova ? 0 : 1);
+                                  //.attr("fill", d => vis.params.colors[d.var_tipo]);
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
@@ -1423,8 +1423,8 @@ const vis = {
                                   .classed("silent", d => d.acao_nova)
                                   .transition()
                                   .duration(vis.params.transitions_duration)
-                                  .attr("opacity", d => d.acao_nova ? 0 : 1)
-                                  .attr("fill", d => vis.params.colors[d.var_tipo]);
+                                  .attr("opacity", d => d.acao_nova ? 0 : 1);
+                                  //.attr("fill", d => vis.params.colors[d.var_tipo]);
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
@@ -1782,7 +1782,7 @@ const vis = {
                         vis.control.current_state.variavel_detalhamento = option;
 
                         vis.f.reinicia_seletor_comparacao();
-                        vis.f.reinicia_seletor_cores();
+                        //vis.f.reinicia_seletor_cores();
 
                         vis.control.draw_state(mode, option);
 
