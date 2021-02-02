@@ -750,7 +750,7 @@ perfil_fonte <- base_acoes %>%
   summarise(percent_fonte = first(total_fonte / total_acao)) %>%
   ungroup() %>%
   #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
-  spread(fonte, percent_fonte)
+  spread(fonte, percent_fonte, fill = 0)
   
 # junta tudo numa super tabela de acoes
 
