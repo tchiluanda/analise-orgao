@@ -1568,6 +1568,41 @@ const vis = {
 
                             }
     
+                        },
+
+                        "acao_nova" : {
+    
+                            set_scales : [
+    
+                                { dimension : "r" , 
+                                  variable  : "PLOA",
+                                  axis      : false }
+    
+                            ],
+        
+                            render : function() {
+
+                                const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
+
+                                vis.draw.bubbles.simulation
+                                    .nodes(vis.data.processed.detalhado)
+                                    .force('colisao', null)
+                                    .force('charge', vis.draw.bubbles.parametros_simulation.force_charge())
+                                    .force('x', d3.forceX().strength(magnitudeForca).x(vis.dims.w/2))
+                                    .force('y', d3.forceY().strength(magnitudeForca).y(vis.dims.h/2));
+
+                                vis.sels.circles_acoes
+                                  .transition()
+                                  .duration(vis.params.transitions_duration)
+                                  .attr("opacity", d => d.acao_nova ? 1 : 0);
+
+                                vis.draw.bubbles.simulation.alpha(1).restart();
+
+                                // melhorar, parametrizar
+                                vis.sels.axis.x.style("opacity", 0);
+
+                            }
+    
                         }
     
                     }
