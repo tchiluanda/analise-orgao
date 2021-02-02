@@ -224,6 +224,18 @@ const vis = {
             agregador: "Demais agregadores",
             orgao_decreto: "Demais órgãos"
 
+        },
+
+        variaveis_cores : {
+            // correspondencia entre os valores no html e os nomes das variaveis;
+
+            "cores-fontes" : {
+
+                tesouro : "Fontes Tesouro",
+                proprias : "Fontes próprias",
+                emissao : "Fontes de Emissão"
+
+            }
         }
 
     },
@@ -464,13 +476,27 @@ const vis = {
 
         reinicia_seletor_comparacao : function() {
 
-            vis.elems.seletor_comparacao.value = "nada";
+            vis.elems.seletor_cores.value = "padrao";
             vis.draw.agregado.remove_linhas_referencia();
         },
 
         update_positions : {
             // para quando for disparado um resize
         },
+
+        reinicia_seletor_cores : function() {
+
+            vis.elems.seletor_comparacao.value = "padrao";
+            vis.control.show_controles_adicionais_cores("padrao");
+            //vis.f.colore_bolhas("padrao");
+
+        },
+
+        update_positions : {
+            // para quando for disparado um resize
+        },
+
+
 
         update_colors : function() {
 
@@ -554,6 +580,27 @@ const vis = {
         escondeTooltip : function(d) {
 
             d3.select(vis.refs.tooltip).classed("hidden", true);
+
+        },
+
+        colore_bolhas : function(tipo, valor_selecionado) {
+
+            const bubbles =
+            vis.sels.circles_acoes
+                .transition()
+                .duration(vis.params.transitions_duration);
+
+
+            if (tipo == "padrao") {
+                bubbles.attr("fill", d => vis.params.colors[d.var_tipo]);
+            }
+
+            else {
+                const variavel_criterio_cor = vis.params.variaveis_cores[tipo][valor_selecionado];
+
+                bubbles.attr("fill", d => vis.draw.scales.detalhado.cores_pct(d[variavel_criterio_cor]));
+            }
+
 
         }
 
@@ -754,7 +801,8 @@ const vis = {
 
                 x : d3.scaleLog(),
                 y : d3.scaleBand(),
-                r : d3.scaleSqrt()
+                r : d3.scaleSqrt(),
+                cores_pct : d3.scaleQuantile().range(d3.schemePurples[4]).domain([0,1])
 
             },
 
@@ -1483,6 +1531,7 @@ const vis = {
             vis.control.monitora_seletores_filtros();
             vis.control.monitora_exclusoes();
             vis.control.monitora_seletor_cores();
+            vis.control.monitora_controles_adicionais_cores();
 
             //vis.control.draw_state("agregado", "orgao_decreto");
 
@@ -1723,6 +1772,7 @@ const vis = {
                         vis.control.current_state.variavel_detalhamento = option;
 
                         vis.f.reinicia_seletor_comparacao();
+                        vis.f.reinicia_seletor_cores();
 
                         vis.control.draw_state(mode, option);
 
@@ -1846,13 +1896,19 @@ const vis = {
 
                 if (opcao_selecionada == "padrao") {
 
-                    // definir
+                    vis.f.colore_bolhas(opcao_selecionada);
+                    // nos demais casos colore_bolhas só vai ser chamada no evento de mudança do radio selector
 
-                } else {
+                } //else {
 
-                    vis.control.show_controles_adicionais_cores(opcao_selecionada);
+                // tirei o else pq ele tem que chamar essa função sempre. se a opcao for "padrao", a funcao show vai fazer com que todos os controles adicionais sejam ocultados.
+
+                console.log("seletor de cores, opcao: ", opcao_selecionada);
+
+                vis.control.show_controles_adicionais_cores(opcao_selecionada);
+                
                     
-                }
+                //}
 
             })
 
@@ -1901,6 +1957,10 @@ const vis = {
             
             // mudei para querySelectorAll para selecionar o seletor de comparação também
 
+            console.log('[data-selecao-adicional-para="' +
+            opcao +
+            '"]', active_controls);
+
             active_controls.forEach(controle_adicional => controle_adicional.classList.remove("hidden"));
 
         },
@@ -1909,7 +1969,19 @@ const vis = {
 
             let controles_adicionais = document.querySelectorAll(".selecao-adicional-cores")
 
-            controles_adicionais.forEach(radio => radio.addEventListener("change", function(e) {console.log(e, e.target.id, e.target.name)}))
+            controles_adicionais.forEach(radio => radio.addEventListener("change", function(e) {
+
+                const tipo = e.target.name;
+                const valor_selecionado = e.target.value;
+
+                console.log(tipo, valor_selecionado);
+
+                //const variavel_criterio_cor = vis.params.variaveis_cores[opcao][valor_selecionado];
+
+                vis.f.colore_bolhas(tipo, valor_selecionado);
+                
+
+            }))
 
             // continuar aqui. definir escala de cores.
 
