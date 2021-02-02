@@ -235,6 +235,16 @@ const vis = {
                 proprias : "Fontes próprias",
                 emissao : "Fontes de Emissão"
 
+            },
+
+            "cores-gnd" : {
+
+                pessoal : "Pessoal",
+                custeio : "Custeio",
+                investimento : "Investimento",
+                divida : "Dívida" 
+
+
             }
         }
 
