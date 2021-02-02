@@ -1418,6 +1418,9 @@ const vis = {
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
+                                // melhorar, parametrizar
+                                vis.sels.axis.x.style("opacity", 1);
+
                             }
     
     
@@ -1463,6 +1466,9 @@ const vis = {
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
+                                // melhorar, parametrizar
+                                vis.sels.axis.x.style("opacity", 1);
+
                             }
     
                         },
@@ -1503,6 +1509,9 @@ const vis = {
                                 .attr("opacity", 1);
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
+
+                                // melhorar, parametrizar
+                                vis.sels.axis.x.style("opacity", 0);
 
                             }
     
@@ -1552,12 +1561,12 @@ const vis = {
 
                                 }
 
-
-
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 
+                                // melhorar, parametrizar
+                                vis.sels.axis.x.style("opacity", 0);
+
                             }
-    
     
                         }
     
