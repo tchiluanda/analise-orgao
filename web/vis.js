@@ -608,7 +608,11 @@ const vis = {
             else {
                 const variavel_criterio_cor = vis.params.variaveis_cores[tipo][valor_selecionado];
 
-                bubbles.attr("fill", d => vis.draw.scales.detalhado.cores_pct(d[variavel_criterio_cor]));
+                console.log(tipo, variavel_criterio_cor)
+
+                vis.draw.scales.update_cores_bolhas(tipo);
+
+                bubbles.attr("fill", d => vis.draw.scales.cores_bolhas(d[variavel_criterio_cor]));
             }
 
 
@@ -760,6 +764,13 @@ const vis = {
 
             },
 
+            cores_bolhas : {
+
+                "cores-fontes" : d3.schemePurples[4],
+                "cores-gnd" : d3.schemeOranges[4]
+
+            },
+
             // x : null,
             // //x_log : null,
             // y : null,
@@ -812,7 +823,14 @@ const vis = {
                 x : d3.scaleLog(),
                 y : d3.scaleBand(),
                 r : d3.scaleSqrt(),
-                cores_pct : d3.scaleQuantile().range(d3.schemePurples[4]).domain([0,1])
+
+            },
+
+            cores_bolhas : d3.scaleQuantile().domain([0,1]),
+
+            update_cores_bolhas : function(tipo) { // fonte, gnd etc.
+
+                vis.draw.scales.cores_bolhas.range(vis.draw.ranges.cores_bolhas[tipo]);
 
             },
 
