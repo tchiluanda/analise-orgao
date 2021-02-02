@@ -712,7 +712,7 @@ perfil_gnd <- base_acoes %>%
   summarise(percent_gnd = first(total_gnd / total_acao)) %>%
   ungroup() %>%
   #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
-  spread(gnd, percent_gnd)
+  spread(gnd, percent_gnd, fill = 0)
 
 perfil_mod <- base_acoes %>%
   filter(variavel == variavel_principal) %>%
