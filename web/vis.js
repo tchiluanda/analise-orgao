@@ -606,13 +606,23 @@ const vis = {
             }
 
             else {
-                const variavel_criterio_cor = vis.params.variaveis_cores[tipo][valor_selecionado];
-
-                console.log(tipo, variavel_criterio_cor)
 
                 vis.draw.scales.update_cores_bolhas(tipo);
 
-                bubbles.attr("fill", d => vis.draw.scales.cores_bolhas(d[variavel_criterio_cor]));
+                if (tipo == "mod") {
+
+                    bubbles.attr("fill", d => vis.draw.scales.cores_bolhas(d["Direta"]))
+
+                } else {
+
+                    const variavel_criterio_cor = vis.params.variaveis_cores[tipo][valor_selecionado];
+
+                    console.log(tipo, variavel_criterio_cor)
+    
+                    bubbles.attr("fill", d => vis.draw.scales.cores_bolhas(d[variavel_criterio_cor]));
+
+                }
+
             }
 
 
@@ -767,7 +777,8 @@ const vis = {
             cores_bolhas : {
 
                 "cores-fontes" : d3.schemePurples[4],
-                "cores-gnd" : d3.schemeOranges[4]
+                "cores-gnd" : d3.schemeOranges[4],
+                "mod" : d3.schemePiYG[3]
 
             },
 
@@ -1922,10 +1933,10 @@ const vis = {
 
                 vis.control.current_state.criterio_adicional_cores = opcao_selecionada;
 
-                if (opcao_selecionada == "padrao") {
+                if (["padrao", "mod"].includes(opcao_selecionada)) {
 
                     vis.f.colore_bolhas(opcao_selecionada);
-                    // nos demais casos colore_bolhas só vai ser chamada no evento de mudança do radio selector
+                    // nos demais casos, vai ser aberto um controle adicional com radio buttons, e o colore_bolhas só vai ser chamada no evento de mudança do radio
 
                 } //else {
 
