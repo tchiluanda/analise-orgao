@@ -1494,7 +1494,7 @@ const vis = {
                                 const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
 
                                 vis.draw.bubbles.simulation
-                                .nodes(vis.data.processed.detalhado)
+                                .nodes(vis.data.processed.detalhado) // para garantir que todas estarao aqui, se vier do var_pct ou var_abs
                                 .force('colisao', null)
                                 .force('charge', vis.draw.bubbles.parametros_simulation.force_charge())
                                 .force('x', d3.forceX().strength(magnitudeForca).x(d => vis.draw.scales.detalhado.x_gnd(d.gnd_predominante)))
@@ -1585,11 +1585,11 @@ const vis = {
                                 const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
 
                                 vis.draw.bubbles.simulation
-                                    .nodes(vis.data.processed.detalhado)
-                                    .force('colisao', null)
-                                    .force('charge', vis.draw.bubbles.parametros_simulation.force_charge())
-                                    .force('x', d3.forceX().strength(magnitudeForca).x(vis.dims.w/2))
-                                    .force('y', d3.forceY().strength(magnitudeForca).y(vis.dims.h/2));
+                                  .nodes(vis.data.processed.detalhado.filter(d => d.acao_nova))
+                                  .force('colisao', null)
+                                  .force('charge', vis.draw.bubbles.parametros_simulation.force_charge())
+                                  .force('x', d3.forceX().strength(magnitudeForca).x(vis.dims.w/2))
+                                  .force('y', d3.forceY().strength(magnitudeForca).y(vis.dims.h/2));
 
                                 vis.sels.circles_acoes
                                   .transition()
