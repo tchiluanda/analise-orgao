@@ -143,6 +143,15 @@ const utils = {
     return result;
   },
 
+  invertColor : function(color) {
+
+    const rgb_color = d3.color(color);
+
+    const opposite_components = ["r", "g", "b"].map(component => 255 - d3.color(rgb_color)[component]);
+
+    return d3.rgb(...opposite_components).toString();
+
+  },
 
   // para gerar arco para anotações
 
