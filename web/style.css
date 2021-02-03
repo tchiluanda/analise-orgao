@@ -252,8 +252,8 @@ div.vis-container {
 
 div#tooltip {
     position: absolute;
-    background-color: var(--highlight);
-    color: var(--dark);
+    /*background-color: var(--highlight);
+    color: var(--dark);*/
     font-family: 'Inter', sans-serif;
     font-size: 10px;
     width: 180px;
@@ -269,4 +269,77 @@ div#tooltip * + * {
 
 .hidden {
     display: none;
+}
+
+
+/* ***********************
+   CARD
+   *********************** */
+
+div#card {
+    position : absolute;
+    top: 0;
+    font-size: .7rem;
+    max-width: 400px;
+}
+
+div#card .card-content {
+    display: grid;
+    grid-template-columns: (1fr, 1fr);
+    grid-template-rows: auto;
+    grid-template:
+    "header header"
+    "geral geral"
+    "historico fontes"
+    "gnd mod"
+    "orgaos orgaos";
+}
+
+.card-content div {
+    outline: 1px solid tomato;
+}
+
+.card-content svg {
+    background: goldenrod;
+    width: 100%;
+    height: 200px;
+}
+
+
+div#card .card-fechar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1rem;
+    font-weight: bolder;
+}
+
+/* grid */
+
+.card-header {
+    grid-area: header;
+}
+
+.card-vis-geral {
+    grid-area: geral;
+}
+
+.card-vis-historico {
+    grid-area: historico;
+}
+
+.card-vis-fontes {
+    grid-area: fontes;
+}
+
+.card-vis-gnd {
+    grid-area: gnd;
+}
+
+.card-vis-mod {
+    grid-area: mod;
+}
+
+.card-vis-orgaos {
+    grid-area: orgaos;
 }
