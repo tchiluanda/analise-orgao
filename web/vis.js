@@ -42,7 +42,7 @@ const vis = {
 
         },
 
-        tooltip : "div#card",
+        tooltip : "div#tooltip",
 
 
         colors : {
@@ -67,7 +67,9 @@ const vis = {
         circles_acoes : null,
         axis : {},
         barras : null,
-        linhas_referencia : null
+        linhas_referencia : null,
+        rotulos_detalhados : null,
+        rotulos_detalhados_lateral : null
 
     },
 
@@ -112,6 +114,19 @@ const vis = {
             agregado : null,
 
             detalhado : null 
+        },
+
+        auxiliar : {
+
+            total_acoes : null,
+
+            qde_acoes : null,
+
+            total_gnd : null,
+
+            qde_acoes_novas : null,
+
+            total_acoes_novas : null
         }
         
         //{
@@ -434,6 +449,36 @@ const vis = {
                 
             });
 
+            vis.f.computa_dados_auxiliares();
+
+        },
+
+        computa_dados_auxiliares : function() {
+
+            vis.data.auxiliar.total_acoes = utils.valor_formatado(
+                vis.data.processed.detalhado
+                  .map(d => +d[vis.params.main_variable])
+                  .reduce((acum, atual) => acum + atual)
+            );
+
+            vis.data.auxiliar.qde_acoes = vis.data.processed.detalhado.length;
+
+            const acoes_novas = vis.data.processed.detalhado.filter(d => d.acao_nova);
+
+            vis.data.auxiliar.qde_acoes_novas = acoes_novas.length;
+
+            vis.data.auxiliar.total_acoes_novas = utils.valor_formatado(
+                acoes_novas
+                  .map(d => +d[vis.params.main_variable])
+                  .reduce((acum, atual) => acum + atual)
+            )
+
+            vis.data.auxiliar.total_gnd = utils.group_by_sum(
+                objeto = vis.data.processed.detalhado,
+                coluna_categoria = "gnd_predominante",
+                coluna_valor = vis.params.main_variable
+            );
+
         },
 
         populates_filter_selector : function(seletor) { // orgao_decreto ou anexo
@@ -526,9 +571,48 @@ const vis = {
 
         },
 
+        remove_rotulos_detalhados : function() {
+
+            if (vis.sels.rotulos_detalhados) {
+
+                vis.sels.rotulos_detalhados
+                  .transition()
+                  .duration(vis.params.transitions_duration/2)
+                  .style("opacity", 0)
+                  .remove();
+
+            }
+
+        },
+
+        remove_rotulos_detalhados_lateral : function() {
+
+            if (vis.sels.rotulos_detalhados_lateral) {
+
+                vis.sels.rotulos_detalhados_lateral
+                  .transition()
+                  .duration(vis.params.transitions_duration/2)
+                  .style("opacity", 0)
+                  .remove();
+
+            }
+
+        },
+
         mostraTooltip : function(d) {
 
             let dados = d3.select(this).datum();
+            let bubble = d3.select(this);
+
+            const current_color = bubble.attr("fill");
+
+            function invertHex(hex) {
+                return (Number(`0x1${hex}`) ^ 0xFFFFFF).toString(16).substr(1).toUpperCase()
+            }
+
+            const opposite_color = utils.invertColor(current_color);
+
+            //console.log(current_color, opposite_color);
 
             let x_bubble = +d3.select(this).attr('cx');
             let y_bubble = +d3.select(this).attr('cy');
@@ -544,17 +628,20 @@ const vis = {
             
             $tooltip
               .classed("hidden", false)
-              .style("background-color", "var(" + vis.refs.colors[dados["var_tipo"]] + ")");
+              .style("background-color", current_color)
+              .style("color", opposite_color);
         
             // popula informacao
 
             // parametrizar isso em vis.params
       
             const infos_tooltip = ["acao", "tituloacao", "PLOA", "dot_atu", "var_tipo", "var_pct_mod", "var_abs_mod"];
+
+            console.log(dados);
         
             infos_tooltip.forEach(function(info) {
                 let text = "";
-                if (vis.params.variables_type[info] == "numerical") text = utils.valor_formatado(dados[info])
+                if (vis.params.variables_type[info] == "numerical") text = "R$ " + utils.valor_formatado(dados[info])
                 else text = dados[info];
                 $tooltip.select("#tt-"+info).text(text);
             })
@@ -1153,7 +1240,7 @@ const vis = {
                         .attr("fill", (d[variavel_comparacao] < d[vis.params.main_variable]) ? vis.params.colors.destaque_barra : vis.params.colors.barra_normal);
                 });
 
-            }
+            },
 
         },
 
@@ -1389,8 +1476,6 @@ const vis = {
         
                             render : function() {
 
-                                console.log("let's go!")
-
                                 const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
 
                                 vis.draw.bubbles.simulation
@@ -1421,6 +1506,27 @@ const vis = {
                                 // melhorar, parametrizar
                                 vis.sels.axis.x.style("opacity", 1);
 
+                                // acrescenta rótulos
+
+                                vis.f.remove_rotulos_detalhados();
+
+                                if (document.querySelectorAll("div.rotulos-detalhado-lateral").length == 0) {
+
+                                    console.log("supostamente ainda não há rótulos");
+
+                                    vis.sels.rotulos_detalhados_lateral = vis.sels.cont
+                                    .selectAll("div.rotulos-detalhado-lateral")
+                                    .data(vis.draw.domains.categorical.detalhado.var_tipo)
+                                    .join("div")
+                                    .classed("rotulos-detalhado", true)
+                                    .classed("rotulos-detalhado-lateral", true)
+                                    .style("top", d => vis.draw.scales["detalhado"].y(d) + "px")
+                                    .style("left", (vis.dims.margins.left*2/3) + "px")
+
+                                    vis.sels.rotulos_detalhados_lateral.append("h2").text(d => d);
+
+                                }
+
                             }
     
     
@@ -1446,8 +1552,6 @@ const vis = {
         
                             render : function() {
 
-                                console.log("let's go!")
-
                                 const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
 
                                 vis.draw.bubbles.simulation
@@ -1469,6 +1573,24 @@ const vis = {
                                 // melhorar, parametrizar
                                 vis.sels.axis.x.style("opacity", 1);
 
+                                vis.f.remove_rotulos_detalhados();
+
+                                if (document.querySelectorAll("div.rotulos-detalhado-lateral").length == 0) {
+
+                                    vis.sels.rotulos_detalhados_lateral = vis.sels.cont
+                                    .selectAll("div.rotulos-detalhado-lateral")
+                                    .data(vis.draw.domains.categorical.detalhado.var_tipo)
+                                    .join("div")
+                                    .classed("rotulos-detalhado", true)
+                                    .classed("rotulos-detalhado-lateral", true)
+                                    .style("top", d => vis.draw.scales["detalhado"].y(d) + "px")
+                                    .style("left", (vis.dims.margins.left*2/3) + "px");
+
+                                    vis.sels.rotulos_detalhados_lateral.append("h2").text(d => d);
+
+
+                                }
+
                             }
     
                         },
@@ -1489,7 +1611,9 @@ const vis = {
         
                             render : function() {
 
-                                console.log("let's go!")
+                                // primeiro remove rotulos pre-existentes
+                                vis.f.remove_rotulos_detalhados();
+                                vis.f.remove_rotulos_detalhados_lateral();
 
                                 const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
 
@@ -1513,6 +1637,31 @@ const vis = {
                                 // melhorar, parametrizar
                                 vis.sels.axis.x.style("opacity", 0);
 
+                                // rotulos
+
+                                // na marra
+                                const posicoes = {
+                                    "Pessoal" : 186,
+                                    "Dívida" : 300,
+                                    "Custeio" : 460,
+                                    "Investimento" : 643,
+                                    "Nenhum" : 760
+                                }
+
+
+                                vis.sels.rotulos_detalhados = vis.sels.cont
+                                  .selectAll("p.rotulos-detalhado-gnd")
+                                  .data(vis.data.auxiliar.total_gnd)
+                                  .join("div")
+                                  .classed("rotulos-detalhado", true)
+                                  .classed("rotulos-detalhado-gnd", true)
+                                  .style("bottom", (vis.dims.margins.bottom * 2) + "px")
+                                  .style("left", d => posicoes[d.categoria] + "px");
+
+                                vis.sels.rotulos_detalhados.append("h2").text(d => d.categoria);
+                                vis.sels.rotulos_detalhados.append("p").text(d => utils.valor_formatado(d.subtotal));
+
+
                             }
     
                         },
@@ -1528,6 +1677,10 @@ const vis = {
                             ],
         
                             render : function() {
+
+                                // primeiro remove rotulos pre-existentes
+                                vis.f.remove_rotulos_detalhados();
+                                vis.f.remove_rotulos_detalhados_lateral();
 
                                 const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
 
@@ -1566,6 +1719,17 @@ const vis = {
                                 // melhorar, parametrizar
                                 vis.sels.axis.x.style("opacity", 0);
 
+                                // acrescenta rótulos
+                                vis.sels.rotulos_detalhados = vis.sels.cont
+                                  .append("div")
+                                  .classed("rotulos-detalhado", true)
+                                  .classed("rotulos-detalhado-gnd", true)
+                                  .style("top", (vis.dims.margins.top * 1.5) + "px")
+                                  .style("left", vis.dims.w/2 + "px");
+
+                                vis.sels.rotulos_detalhados.append("h2").text(vis.data.auxiliar.qde_acoes + " ações no PLOA 2021.");
+                                vis.sels.rotulos_detalhados.append("p").text("R$ " + vis.data.auxiliar.total_acoes);
+
                             }
     
                         },
@@ -1581,6 +1745,10 @@ const vis = {
                             ],
         
                             render : function() {
+
+                                // primeiro remove rotulos pre-existentes
+                                vis.f.remove_rotulos_detalhados();
+                                vis.f.remove_rotulos_detalhados_lateral();
 
                                 const magnitudeForca = vis.draw.bubbles.parametros_simulation.magnitudeForca;
 
@@ -1600,6 +1768,18 @@ const vis = {
 
                                 // melhorar, parametrizar
                                 vis.sels.axis.x.style("opacity", 0);
+
+                                // acrescenta rótulos
+                                vis.sels.rotulos_detalhados = vis.sels.cont
+                                  .append("div")
+                                  .classed("rotulos-detalhado", true)
+                                  .classed("rotulos-detalhado-gnd", true)
+                                  .style("top", (vis.dims.margins.top * 2) + "px")
+                                  .style("left", vis.dims.w/2 + "px");
+
+                                vis.sels.rotulos_detalhados.append("h2").text(vis.data.auxiliar.qde_acoes_novas + " novas ações");
+                                vis.sels.rotulos_detalhados.append("p").text("R$ " + vis.data.auxiliar.total_acoes_novas);
+                                
 
                             }
     
@@ -1749,7 +1929,7 @@ const vis = {
             d3.selectAll(vis.refs.objetos_atuais[mode]).each(function(d) {
                 let obj = d3.select(this);
                 let current_opacity = obj.attr("opacity");
-                console.log(current_opacity);
+                //console.log(current_opacity);
 
                 obj
                   .attr("data-opacity", current_opacity)

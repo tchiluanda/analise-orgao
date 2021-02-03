@@ -212,18 +212,45 @@ p.labels-categorias {
     text-align: right;
 }
 
+/* rotulos do modo detalhado */
+
+div.rotulos-detalhado {
+    position: absolute;
+    font-family: var(--main-font);
+    margin: 0;
+    text-align: center;
+    transform: translateX(-50%);
+
+}
+
+div.rotulos-detalhado.rotulos-detalhado-lateral {
+    text-align: right;
+    transform: translate(-100%, -50%);
+
+}
+
+div.rotulos-detalhado * {
+    margin: 0;
+    font-size : .8rem;
+}
+
+div.rotulos-detalhado h2 {
+    margin-bottom: .25rem;
+    font-size: 1.2rem;
+}
+
 /* linhas de referência */
 line.ref {
     stroke-width: 2px;
 }
 
-/* card */
+/* tooltip */
 
 div.vis-container {
     position: relative;
 }
 
-div#card {
+div#tooltip {
     position: absolute;
     background-color: var(--highlight);
     color: var(--dark);
@@ -236,7 +263,7 @@ div#card {
     z-index: 1; 
 }
 
-div#card * + * {
+div#tooltip * + * {
     margin-top: .25em;
 }
 
