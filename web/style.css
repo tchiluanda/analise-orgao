@@ -280,11 +280,14 @@ div#card {
     --largura: 460px;
     position : absolute;
     top: 0;
+    left: 50%;
+    transform: translateX(-50%);
     font-size: .8rem;
     font-family: "Open Sans Condensed";
     max-width: var(--largura);
     background: white;
     border-radius: 1rem;
+    z-index: 2;
 }
 
 div#card .card-content {
@@ -302,6 +305,10 @@ div#card .card-content {
     "historico fontes"
     "gnd mod"
     "orgaos orgaos";
+}
+
+div#card.hidden {
+    pointer-events: none;
 }
 
 .card-content div {
@@ -324,9 +331,10 @@ div#card .card-content {
 
 div#card .card-fechar {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    font-size: 1rem;
+    top: 1.5rem;
+    right: 1.5rem;
+    font-size: 1.5rem;
+    font-family: sans-serif;
     font-weight: bolder;
 }
 

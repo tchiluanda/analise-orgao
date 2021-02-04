@@ -20,6 +20,8 @@ const vis = {
         exclui_rgps: "#exclui-rgps",
         barras: "rect.barras",
         linhas_referencia: "line.ref",
+        card: "div#card",
+        card_fechar : "div.card-fechar",
 
         data: {
 
@@ -1319,12 +1321,41 @@ const vis = {
 
         },
 
-        card : {
+    },
 
-            // outro script, talvez?
+    card : {
 
+        params : {
+
+            
+
+        },
+
+        montaCard : function() {
+
+            let bubble = d3.select(this);
+            let dados = d3.select(this).datum();
+
+            const $card = d3.select(vis.refs.card);
+            vis.sels.card = $card;
+
+            $card.classed("hidden", false);
+            vis.card.monitora_fechar_card();
+
+            console.log(dados);
+
+        },
+
+        monitora_fechar_card : function() {
+
+            const $botao_fechar = d3.select(vis.refs.card_fechar);
+            $botao_fechar.on("click", function() {
+
+                vis.sels.card.classed("hidden", true);
+                
+            });
+            
         }
-
 
     },
 
@@ -1918,7 +1949,12 @@ const vis = {
               .render(option)
             ;
 
-            if (mode == "detalhado") {vis.control.monitora_tooltips()}
+            if (mode == "detalhado") {
+
+                vis.control.monitora_tooltips();
+                vis.control.monitora_card();
+
+            }
 
         },
 
@@ -2304,6 +2340,13 @@ const vis = {
             vis.sels.circles_acoes
               .on('mouseover', vis.f.mostraTooltip)
               .on('mouseout',  vis.f.escondeTooltip);
+
+        },
+
+        monitora_card : function() {
+
+            vis.sels.circles_acoes
+              .on('click', vis.card.montaCard);
 
         }
 
