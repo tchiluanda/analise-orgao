@@ -1629,20 +1629,24 @@ const vis = {
             svg
               .select("path.sh")
               .datum(mini_dados)
-              .attr("d", line)
               .attr("stroke", "lightcoral")
               .attr("stroke-width", "3px")
-              .attr("fill", "none");
+              .attr("fill", "none")
+              .transition()
+              .duration(vis.params.transitions_duration)
+              .attr("d", line);
 
             svg
               .selectAll("circle.sh")
               .data(mini_dados)
               .join("circle")
               .classed("sh", true)
+              .attr("r", "4")
+              .attr("fill", "lightcoral")
+              .transition()
+              .duration(vis.params.transitions_duration)
               .attr("cx", d => x(d.rotulo))
               .attr("cy", d => y(d.valor))
-              .attr("r", "4")
-              .attr("fill", "lightcoral");
 
             cont
               .selectAll("p.rotulos-valores-line-card")
