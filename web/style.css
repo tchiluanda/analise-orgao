@@ -277,7 +277,7 @@ div#tooltip * + * {
    *********************** */
 
 div#card {
-    --largura: 460px;
+    --largura: 520px;
     position : absolute;
     top: 0;
     left: 50%;

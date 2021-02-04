@@ -1362,6 +1362,8 @@ const vis = {
 
             },
 
+            range_geral : null,
+
             "geral" : null,
             "fontes" : null,
             "gnd" : null,
@@ -1451,6 +1453,10 @@ const vis = {
             // // geral
 
             vis.card.montaBarChart("geral", false);
+            vis.card.montaBarChart("fontes", true);
+            vis.card.montaBarChart("gnd", true);
+            vis.card.montaBarChart("mod", false);
+            vis.card.montaBarChart("orgaos", false);
 
             
 
@@ -1464,7 +1470,7 @@ const vis = {
             let qde_categorias = vis.card.mini_datasets.nomes_colunas[nome_mini_dataset].length;
             let espaco_necessario = vis.card.params.bar_height * 1.5 * qde_categorias;
             const largura_svg = vis.card.pegaLarguraSVG_dimensionaAltura(
-                "geral", 
+                nome_mini_dataset, 
                 espaco_necessario
             );
 
@@ -1496,6 +1502,8 @@ const vis = {
             const range_categorias = [0, espaco_necessario];
 
             const y = d3.scaleBand().range(range_categorias).domain(domain_categorias);
+
+            console.log(nome_mini_dataset, range_barras)
 
             // barras
 
@@ -1539,7 +1547,20 @@ const vis = {
                 .style("top", d => y(d.rotulo) + "px")
                 .style("width", vis.card.params.margin_right + "px")
                 .style("line-height", vis.card.params.bar_height + "px")
-                .text(d => utils.valor_formatado(d.valor));
+                .text(d => {
+                    if (d.valor === 0) return "" 
+                    else return (
+                        utils.valor_formatado(
+                            valores_relativos ? 
+                            utils.formataPct(d.valor) :
+                            //(d.valor * vis.card.dados_card[vis.params.main_variable]) :
+                            d.valor)
+
+                    )
+                });
+
+                    // se for relativo (valores em percentuais), tem que multiplicar pelo PLOA.
+                    // não, mostrar em 100%.
 
 
         },
