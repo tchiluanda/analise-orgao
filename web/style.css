@@ -406,3 +406,9 @@ div#card .container-vis-card {
     text-align: left;
     padding-left: 5px;
 }
+
+.container-vis-card p.rotulos-valores-line-card {
+    text-align: center;
+    padding-bottom: 20px;
+    transform: translateX(-50%);
+}

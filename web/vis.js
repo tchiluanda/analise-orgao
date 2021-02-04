@@ -1366,7 +1366,8 @@ const vis = {
                 "fontes" : ["Fontes Tesouro", "Fontes de Emissão", "Fontes próprias"],
                 "gnd" : ["Pessoal", "Custeio", "Investimento", "Dívida"],
                 "mod" : ["Direta", "Transferência"],
-                "orgaos" : ["orgao_valor_1", "orgao_valor_2", "orgao_valor_3", "orgao_valor_4", "orgao_valor_5", "orgao_valor_6"]
+                "orgaos" : ["orgao_valor_1", "orgao_valor_2", "orgao_valor_3", "orgao_valor_4", "orgao_valor_5", "orgao_valor_6"],
+                "historico" : ["2016", "2017", "2018", "2019", "2020", "2021"]
 
             },
 
@@ -1469,6 +1470,7 @@ const vis = {
             vis.card.montaBarChart("gnd", true);
             vis.card.montaBarChart("mod", true);
             vis.card.montaBarChart("orgaos", false);
+            vis.card.montaLineChart("historico");
 
             
 
@@ -1585,6 +1587,75 @@ const vis = {
 
                     // se for relativo (valores em percentuais), tem que multiplicar pelo PLOA.
                     // não, mostrar em 100%.
+
+
+        },
+
+        montaLineChart : function(nome_mini_dataset) {
+
+            const svg = d3.select("#card-vis-" + nome_mini_dataset);
+            const cont = d3.select("div.card-vis-" + nome_mini_dataset + " .container-vis-card");
+
+            let w = +cont.style("width").slice(0,-2);
+            let h = +cont.style("height").slice(0,-2);
+
+            const domain_categorias = vis.card.mini_datasets.nomes_colunas[nome_mini_dataset];
+
+            const mini_dados = vis.card.mini_datasets[nome_mini_dataset];
+            const valores = mini_dados.map(d => +d.valor);
+            
+            const domain_valores = [
+                0, Math.max(...valores)
+            ];
+
+            const range_x = [20, w-20];
+            const range_y = [h-40, 40];
+
+            const y = d3.scaleLinear().range(range_y).domain(domain_valores);
+            const x = d3.scaleBand().range(range_x).domain(domain_categorias);
+
+            const line = d3.line()
+              .x(d => x(d.rotulo))
+              .y(d => y(d.valor));
+
+            svg
+              .select("path.sh")
+              .datum(mini_dados)
+              .attr("d", line)
+              .attr("stroke", "lightcoral")
+              .attr("stroke-width", "3px")
+              .attr("fill", "none");
+
+            svg
+              .selectAll("circle.sh")
+              .data(mini_dados)
+              .join("circle")
+              .classed("sh", true)
+              .attr("cx", d => x(d.rotulo))
+              .attr("cy", d => y(d.valor))
+              .attr("r", "4")
+              .attr("fill", "lightcoral");
+
+            cont
+              .selectAll("p.rotulos-valores-line-card")
+              .data(mini_dados, d => d.rotulo)
+              .join("p")
+              .classed("rotulos-valores-line-card", true)
+              .classed("rotulos-card", true)
+              .style("bottom", d => (h - y(d.valor)) + "px")
+              .style("left", d => x(d.rotulo) + "px")
+              .text(function(d) {
+
+                console.log(d, d.valor);
+
+                if (d.valor === 0) {
+                    return "";
+                } else {
+                    return utils.valor_formatado(d.valor);
+                }
+
+            });
+
 
 
         },
