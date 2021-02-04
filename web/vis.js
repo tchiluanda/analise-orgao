@@ -1382,16 +1382,20 @@ const vis = {
 
                     const orgao_valor = dados[coluna].split("__");
 
-                    mini_dataset.push({
-                        "rotulo" : orgao_valor[0],
-                        "valor" : +orgao_valor[1]
-                    })
+                    if (orgao_valor[0] != "NA") {
+
+                        mini_dataset.push({
+                            "rotulo" : orgao_valor[0],
+                            "valor" : orgao_valor[1]
+                        })
+
+                    }
 
                 } else {
 
                     mini_dataset.push({
                         "rotulo" : coluna,
-                        "valor" : +dados[coluna]
+                        "valor" : isNaN(+dados[coluna]) ? 0 : +dados[coluna]
                     })
 
 
@@ -1455,7 +1459,7 @@ const vis = {
             vis.card.montaBarChart("geral", false);
             vis.card.montaBarChart("fontes", true);
             vis.card.montaBarChart("gnd", true);
-            vis.card.montaBarChart("mod", false);
+            vis.card.montaBarChart("mod", true);
             vis.card.montaBarChart("orgaos", false);
 
             
@@ -1497,8 +1501,18 @@ const vis = {
 
             // escala y
 
-            const domain_categorias = vis.card.mini_datasets.nomes_colunas[nome_mini_dataset];
-            //mini_dados.map(mini_dados, d => d.rotulo);
+            let domain_categorias;
+
+            if (nome_mini_dataset == "orgaos") {
+
+                domain_categorias = mini_dados.map(d => d.rotulo);
+
+            } else {
+
+                domain_categorias = vis.card.mini_datasets.nomes_colunas[nome_mini_dataset];
+
+            }
+
             const range_categorias = [0, espaco_necessario];
 
             const y = d3.scaleBand().range(range_categorias).domain(domain_categorias);
@@ -1513,10 +1527,9 @@ const vis = {
               .join("rect")
               .attr("x", vis.card.params.margin_left)
               .attr("y", d => y(d.rotulo))
-              .attr("w", 0)
               .attr("height", vis.card.params.bar_height)
-              .transition()
-              .duration(vis.params.transitions_duration/2)
+              //.transition()
+              //.duration(vis.params.transitions_duration/2)
               .attr("width", d => w(d.valor));
 
             // categorias
@@ -1547,16 +1560,18 @@ const vis = {
                 .style("top", d => y(d.rotulo) + "px")
                 .style("width", vis.card.params.margin_right + "px")
                 .style("line-height", vis.card.params.bar_height + "px")
-                .text(d => {
-                    if (d.valor === 0) return "" 
-                    else return (
-                        utils.valor_formatado(
-                            valores_relativos ? 
-                            utils.formataPct(d.valor) :
-                            //(d.valor * vis.card.dados_card[vis.params.main_variable]) :
-                            d.valor)
+                .text(function(d) {
 
-                    )
+                    console.log(d, d.valor);
+
+                    if (d.valor === 0) {
+                        return "";
+                    } else if (valores_relativos) {
+                        return utils.formataPct(d.valor);
+                    } else {
+                        return utils.valor_formatado(d.valor);
+                    }
+
                 });
 
                     // se for relativo (valores em percentuais), tem que multiplicar pelo PLOA.
