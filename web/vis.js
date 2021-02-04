@@ -1339,7 +1339,10 @@ const vis = {
 
                 // nome : colunas
                 "geral" : ["PLOA", "dot_atu", "desp_paga"],
-                "fontes" : ["Fontes Tesouro", "Fontes de Emissão", "Fontes próprias"]
+                "fontes" : ["Fontes Tesouro", "Fontes de Emissão", "Fontes próprias"],
+                "gnd" : ["Pessoal", "Custeio", "Investimento", "Dívida"],
+                "mod" : ["Direta", "Transferência"],
+                "orgaos" : ["orgao_valor_1", "orgao_valor_2", "orgao_valor_3", "orgao_valor_4", "orgao_valor_5", "orgao_valor_6"]
 
             },
 
@@ -1356,10 +1359,26 @@ const vis = {
             let mini_dataset = [];
 
             vis.card.mini_datasets.nomes_colunas[nome_mini_dataset].forEach(coluna => {
-                mini_dataset.push({
-                    "rotulo" : coluna,
-                    "valor" : +dados[coluna]
-                })
+
+                if (nome_mini_dataset == "orgaos") {
+
+                    const orgao_valor = dados[coluna].split("__");
+
+                    mini_dataset.push({
+                        "rotulo" : orgao_valor[0],
+                        "valor" : +orgao_valor[1]
+                    })
+
+                } else {
+
+                    mini_dataset.push({
+                        "rotulo" : coluna,
+                        "valor" : +dados[coluna]
+                    })
+
+
+                }
+
             })
             
             vis.card.mini_datasets[nome_mini_dataset] = mini_dataset;
