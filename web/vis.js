@@ -263,8 +263,8 @@ const vis = {
                 investimento : "Investimento",
                 divida : "Dívida" 
 
-
             }
+
         }
 
     },
@@ -448,6 +448,17 @@ const vis = {
 
                     // essas variáveis criadas aqui devem ser informadas lá em vis.params.variables_detalhado
                 } else el["var_tipo"] = "nova";
+
+                // tipo de ação
+
+                const primeiro_digito_acao = +el["acao"].slice(0,1);
+
+                if (primeiro_digito_acao == 0) el["tipo"] = "Operação Especial";
+                else {
+                    if (primeiro_digito_acao % 2 == 0) el["tipo"] = "Atividade"
+                    else el["tipo"] = "Projeto"
+                }
+
                 
             });
 
@@ -637,7 +648,8 @@ const vis = {
 
             // parametrizar isso em vis.params
       
-            const infos_tooltip = ["acao", "tituloacao", "PLOA", "dot_atu", "var_tipo", "var_pct_mod", "var_abs_mod"];
+            const infos_tooltip = ["acao", "tituloacao", "PLOA", "dot_atu"];
+            //, "var_tipo", "var_pct_mod", "var_abs_mod"];
 
             //console.log(dados);
         
@@ -702,15 +714,23 @@ const vis = {
 
                 if (tipo == "mod") {
 
-                    bubbles.attr("fill", d => vis.draw.scales.cores_bolhas(d["Direta"]))
+                    bubbles.attr("fill", d => vis.draw.scales.cores_bolhas(d["Direta"]));
 
                 } else {
 
-                    const variavel_criterio_cor = vis.params.variaveis_cores[tipo][valor_selecionado];
+                    if (tipo == "tipo") {
 
-                    console.log(tipo, variavel_criterio_cor)
-    
-                    bubbles.attr("fill", d => vis.draw.scales.cores_bolhas(d[variavel_criterio_cor]));
+                        bubbles.attr("fill", d => vis.draw.scales.cores_bolhas_tipo(d["tipo"]));
+
+                    } else {
+
+                        const variavel_criterio_cor = vis.params.variaveis_cores[tipo][valor_selecionado];
+
+                        console.log(tipo, variavel_criterio_cor)
+        
+                        bubbles.attr("fill", d => vis.draw.scales.cores_bolhas(d[variavel_criterio_cor]));
+
+                    }
 
                 }
 
@@ -870,7 +890,8 @@ const vis = {
 
                 "cores-fontes" : d3.schemePurples[4],
                 "cores-gnd" : d3.schemeOranges[4],
-                "mod" : d3.schemePiYG[3]
+                "mod" : d3.schemePiYG[3],
+                "tipo" : d3.schemeCategory10.slice(-3)
 
             },
 
@@ -931,11 +952,22 @@ const vis = {
             },
 
             cores_bolhas : d3.scaleQuantile().domain([0,1]),
-
+            cores_bolhas_tipo : d3.scaleOrdinal().domain(["Atividade", "Operação Especial", "Projeto"]),
 
             update_cores_bolhas : function(tipo) { // fonte, gnd etc.
 
-                vis.draw.scales.cores_bolhas.range(vis.draw.ranges.cores_bolhas[tipo]);
+                // melhorar
+
+                if (tipo == "tipo") {
+
+                    vis.draw.scales.cores_bolhas_tipo.range(vis.draw.ranges.cores_bolhas[tipo]);
+
+                } else {
+
+                    vis.draw.scales.cores_bolhas.range(vis.draw.ranges.cores_bolhas[tipo]);
+                }
+
+
 
             },
 
@@ -2596,7 +2628,8 @@ const vis = {
 
                 vis.control.current_state.criterio_adicional_cores = opcao_selecionada;
 
-                if (["padrao", "mod"].includes(opcao_selecionada)) {
+                if (["padrao", "mod", "tipo"].includes(opcao_selecionada)) {
+                    // parametrizar, melhorar
 
                     vis.f.colore_bolhas(opcao_selecionada);
                     // nos demais casos, vai ser aberto um controle adicional com radio buttons, e o colore_bolhas só vai ser chamada no evento de mudança do radio

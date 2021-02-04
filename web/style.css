@@ -135,7 +135,7 @@ div.controle-comparacao {
 }
 
 div.controle-cores p {
-    margin-bottom: 0.5rem;
+    margin: 0;
 }
 
 .mission-control button.disabled {
@@ -161,7 +161,7 @@ div.controle-cores p {
 
 .selecao-adicional-cores {
     font-size: .8rem;
-    margin-bottom: 0;
+    margin: 0;
 }
 
 /* vis */
