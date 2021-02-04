@@ -2,8 +2,8 @@
     --light: #f7f3eb;
     --dark: #383735;
     --main-highlight-color: firebrick;
-    --ligther: #787672;
-    --ligther2: #DEDAD3;
+    --lighter: #787672;
+    --lighter2: #DEDAD3;
     --pink: #F7DFED;
     --cream: #F7EBD2;
     --highlight: #F9DCA2;
@@ -277,15 +277,24 @@ div#tooltip * + * {
    *********************** */
 
 div#card {
+    --largura: 460px;
     position : absolute;
     top: 0;
-    font-size: .7rem;
-    max-width: 400px;
+    font-size: .8rem;
+    font-family: "Open Sans Condensed";
+    max-width: var(--largura);
+    background: white;
+    border-radius: 1rem;
 }
 
 div#card .card-content {
+    border: 5px solid var(--dark);
+    border-radius: 1rem;
+    margin: 0;
+    padding: 1rem;
     display: grid;
-    grid-template-columns: (1fr, 1fr);
+    grid-gap: .5rem;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: auto;
     grid-template:
     "header header"
@@ -297,6 +306,13 @@ div#card .card-content {
 
 .card-content div {
     outline: 1px solid tomato;
+}
+
+.card-content h2,
+.card-content h4,
+.card-content p {
+    margin-bottom: .5rem;
+    margin-top: .5rem;
 }
 
 .card-content svg {
