@@ -1619,6 +1619,14 @@ const vis = {
               .y(d => y(d.valor));
 
             svg
+              .select("line.sh")
+              .attr("x1", x("2016"))
+              .attr("x2", x("2021"))
+              .attr("y1", y(0))
+              .attr("y2", y(0))
+              .attr("stroke", "grey");
+
+            svg
               .select("path.sh")
               .datum(mini_dados)
               .attr("d", line)
@@ -1655,6 +1663,16 @@ const vis = {
                 }
 
             });
+
+            cont
+            .selectAll("p.rotulos-categorias-line-card")
+            .data(mini_dados, d => d.rotulo)
+            .join("p")
+            .classed("rotulos-categorias-line-card", true)
+            .classed("rotulos-card", true)
+            .style("top", y(0) + "px")
+            .style("left", d => x(d.rotulo) + "px")
+            .text(d => d.rotulo);
 
 
 
