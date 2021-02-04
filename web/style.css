@@ -276,6 +276,16 @@ div#tooltip * + * {
     display: none;
 }
 
+/* legendas */
+
+p.legenda-rotulo {
+    position: absolute;
+    margin: 0;
+    font-size : .8rem;
+    font-family: "Open Sans Condensed";
+    transform: translateY(-50%);
+}
+
 
 /* ***********************
    CARD

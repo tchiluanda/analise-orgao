@@ -1163,6 +1163,57 @@ const vis = {
 
         },
 
+        legenda : {
+
+            inicializaLegendaCor: function() {
+
+                vis.sels.legenda_cor = vis.sels.svg.append("g")
+                  .classed("legenda-cor", true)
+                  .classed("hidden", true)
+                  .classed("silent", true);
+
+            },
+
+            montaLegendaCor : function(rotulos, cores) {
+
+                const mini_dados_legenda = [];
+
+                rotulos.forEach((d,i) => {
+                    mini_dados_legenda.push(
+                        { 
+                            rotulo : d,
+                            cor : cores[i]
+                        }
+                    )
+                });
+
+                console.log("mini_dados_legenda");
+
+                vis.sels.legenda_cor.classed("hidden", false);
+
+                vis.sels.legenda_cor
+                  .selectAll("circle.legenda-key")
+                  .data(mini_dados_legenda)
+                  .join("circle")
+                  .classed("legenda-key", true)
+                  .attr("cx", 20)
+                  .attr("cy", (d,i) => i * 20 + 20)
+                  .attr("r", 5)
+                  .attr("fill", d => d.cor);
+
+                vis.sels.cont
+                  .selectAll("p.legenda-rotulo")
+                  .data(mini_dados_legenda)
+                  .join("p")
+                  .classed("legenda-rotulo", true)
+                  .style("top", (d,i) => (i * 20 + 20) + "px")
+                  .style("left", "35px")
+                  .text(d => d.rotulo);
+
+            }
+
+        },
+
         agregado : {
 
             desenha_barras : function(variable) {
@@ -2245,6 +2296,9 @@ const vis = {
 
             // sets scales
             vis.draw.scales.initialize();
+
+            // legenda cor         
+            vis.draw.legenda.inicializaLegendaCor();
 
             // add x, y axis
             // isso vai para o draw state
