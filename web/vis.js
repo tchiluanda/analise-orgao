@@ -1334,7 +1334,7 @@ const vis = {
         params : {
 
             bar_height : 16,
-            margin_left : 60,
+            margin_left : 80,
             margin_right : 40,
 
             rotulos_geral : {
@@ -1343,6 +1343,14 @@ const vis = {
                 "dot_atu" : "Dotação 2020",
                 "desp_paga" : "Pago 2020"
 
+            },
+
+            cores : {
+                "geral" : "var(--cor-barra-normal)",
+                "fontes" : d3.schemePurples[4][3],
+                "gnd" : d3.schemeOranges[4][3],
+                "mod" : d3.schemePiYG[3][2],
+                "orgaos" : "dodgerblue"
             }
 
         },
@@ -1530,7 +1538,8 @@ const vis = {
               .attr("height", vis.card.params.bar_height)
               //.transition()
               //.duration(vis.params.transitions_duration/2)
-              .attr("width", d => w(d.valor));
+              .attr("width", d => w(d.valor))
+              .attr("fill", vis.card.params.cores[nome_mini_dataset]);
 
             // categorias
 
@@ -1543,7 +1552,7 @@ const vis = {
               .style("left", vis.card.params.margin_left + "px")
               .style("top", d => y(d.rotulo) + "px")
               .style("width", vis.card.params.margin_left + "px")
-              .style("line-height", vis.card.params.bar_height + "px")
+              //.style("line-height", vis.card.params.bar_height + "px")
               .text(d => nome_mini_dataset == "geral" ?
                          vis.card.params.rotulos_geral[d.rotulo] :
                          d.rotulo);
