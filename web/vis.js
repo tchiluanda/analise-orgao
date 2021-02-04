@@ -1331,9 +1331,47 @@ const vis = {
 
         },
 
-        montaDadosCard : function(raw_data) {
+        dados_card : null,
 
+        mini_datasets : {
 
+            nomes_colunas : {
+
+                // nome : colunas
+                "geral" : ["PLOA", "dot_atu", "desp_paga"],
+                "fontes" : ["Fontes Tesouro", "Fontes de Emissão", "Fontes próprias"]
+
+            },
+
+            "geral" : null,
+            "fontes" : null,
+            "gnd" : null,
+            "mod" : null,
+            "orgaos" : null
+
+        },
+
+        montaMiniDataset : function(nome_mini_dataset, dados) {
+
+            let mini_dataset = [];
+
+            vis.card.mini_datasets.nomes_colunas[nome_mini_dataset].forEach(coluna => {
+                mini_dataset.push({
+                    "rotulo" : coluna,
+                    "valor" : +dados[coluna]
+                })
+            })
+            
+            vis.card.mini_datasets[nome_mini_dataset] = mini_dataset;
+
+        },
+
+        montaDadosCard : function(dados) {
+
+            // mini_datasets desejados
+            const lista_minis = Object.keys(vis.card.mini_datasets.nomes_colunas);
+
+            lista_minis.forEach(mini_dataset => {vis.card.montaMiniDataset(mini_dataset, dados)})
 
         },
 
@@ -1341,6 +1379,9 @@ const vis = {
 
             let bubble = d3.select(this);
             let dados = d3.select(this).datum();
+
+            //vis.card.montaMiniDataset("geral", dados);
+            vis.card.montaDadosCard(dados);
 
             const $card = d3.select(vis.refs.card);
             vis.sels.card = $card;
