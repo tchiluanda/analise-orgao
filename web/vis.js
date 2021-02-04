@@ -639,7 +639,7 @@ const vis = {
       
             const infos_tooltip = ["acao", "tituloacao", "PLOA", "dot_atu", "var_tipo", "var_pct_mod", "var_abs_mod"];
 
-            console.log(dados);
+            //console.log(dados);
         
             infos_tooltip.forEach(function(info) {
                 let text = "";
@@ -1355,8 +1355,18 @@ const vis = {
 
             $card.style("top", (y_bubble + r_bubble + 20) + "px" );
 
+
+            // popula
+
             //acao nova
             d3.select(vis.card.refs_componentes.acao_nova).classed("hidden", !dados.acao_nova);
+
+            const infos_basicas = ["acao", "tituloacao"];
+        
+            infos_basicas.forEach(function(info) {
+                let text = dados[info];
+                $card.select("#card-"+info).text(text);
+            })
 
 
         },

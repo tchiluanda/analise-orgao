@@ -325,6 +325,7 @@ div#card.hidden {
 }
 
 .card-content h2,
+.card-content h3,
 .card-content h4,
 .card-content p {
     margin-bottom: .5rem;
