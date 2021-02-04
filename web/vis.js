@@ -1325,9 +1325,15 @@ const vis = {
 
     card : {
 
-        params : {
+        refs_componentes : {
 
-            
+            acao_nova : "#card-acao_nova"
+
+        },
+
+        montaDadosCard : function(raw_data) {
+
+
 
         },
 
@@ -1343,6 +1349,15 @@ const vis = {
             vis.card.monitora_fechar_card();
 
             console.log(dados);
+
+            let y_bubble = +bubble.attr('cy');
+            let r_bubble = +bubble.attr('r');
+
+            $card.style("top", (y_bubble + r_bubble + 20) + "px" );
+
+            //acao nova
+            d3.select(vis.card.refs_componentes.acao_nova).classed("hidden", !dados.acao_nova);
+
 
         },
 
