@@ -1397,7 +1397,7 @@ const vis = {
                 "geral" : ["PLOA", "dot_atu", "desp_paga"],
                 "fontes" : ["Fontes Tesouro", "Fontes de Emissão", "Fontes próprias"],
                 "gnd" : ["Pessoal", "Custeio", "Investimento", "Dívida"],
-                "mod" : ["Direta", "Transferência"],
+                "mod" : ["Direta", "Transferencia"],
                 "orgaos" : ["orgao_valor_1", "orgao_valor_2", "orgao_valor_3", "orgao_valor_4", "orgao_valor_5", "orgao_valor_6"],
                 "historico" : ["2016", "2017", "2018", "2019", "2020", "2021"]
 
@@ -1526,7 +1526,7 @@ const vis = {
 
             // escala largura
 
-            console.log(mini_dados)
+            console.log(nome_mini_dataset, mini_dados)
 
             const valores = mini_dados.map(d => +d.valor);
             
