@@ -284,7 +284,7 @@ div#card {
     transform: translateX(-50%);
     font-size: .8rem;
     font-family: "Open Sans Condensed";
-    max-width: var(--largura);
+    width: var(--largura);
     background: white;
     border-radius: 1rem;
     z-index: 2;
@@ -319,6 +319,7 @@ div#card .card-content {
 div#card.hidden {
     pointer-events: none;
 }
+
 
 .card-content div {
     outline: 1px solid tomato;
@@ -376,4 +377,28 @@ div#card .card-fechar {
 
 .card-vis-orgaos {
     grid-area: orgaos;
+}
+
+
+
+div#card .container-vis-card {
+    position: relative;
+}
+
+.container-vis-card p.rotulos-card {
+    position: absolute;
+    margin: 0;
+    font-size: 0.6rem;
+}
+
+.container-vis-card p.rotulos-categorias-card {
+    transform: translateX(-100%);
+    text-align: right;
+    padding-right: 5px;
+
+}
+
+.container-vis-card p.rotulos-valores-card {
+    text-align: left;
+    padding-left: 5px;
 }

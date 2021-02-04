@@ -1331,6 +1331,22 @@ const vis = {
 
         },
 
+        params : {
+
+            bar_height : 16,
+            margin_left : 60,
+            margin_right : 40,
+
+            rotulos_geral : {
+
+                "PLOA" : "PLOA 2021",
+                "dot_atu" : "Dotação 2020",
+                "desp_paga" : "Pago 2020"
+
+            }
+
+        },
+
         dados_card : null,
 
         mini_datasets : {
@@ -1399,7 +1415,9 @@ const vis = {
             let bubble = d3.select(this);
             let dados = d3.select(this).datum();
 
-            //vis.card.montaMiniDataset("geral", dados);
+            vis.card.dados_card = dados;
+
+            //prepara os datasets para a visualização
             vis.card.montaDadosCard(dados);
 
             const $card = d3.select(vis.refs.card);
@@ -1428,6 +1446,119 @@ const vis = {
                 $card.select("#card-"+info).text(text);
             })
 
+            // gráficos
+
+            // // geral
+
+            vis.card.montaBarChart("geral", false);
+
+            
+
+
+        },
+
+        montaBarChart : function(nome_mini_dataset, valores_relativos = true) {
+
+            const svg = d3.select("#card-vis-" + nome_mini_dataset);
+            const cont = d3.select("div.card-vis-" + nome_mini_dataset + " .container-vis-card");
+            let qde_categorias = vis.card.mini_datasets.nomes_colunas[nome_mini_dataset].length;
+            let espaco_necessario = vis.card.params.bar_height * 1.5 * qde_categorias;
+            const largura_svg = vis.card.pegaLarguraSVG_dimensionaAltura(
+                "geral", 
+                espaco_necessario
+            );
+
+            // dados
+
+            const mini_dados = vis.card.mini_datasets[nome_mini_dataset];
+
+            // escala largura
+
+            console.log(mini_dados)
+
+            const valores = mini_dados.map(d => +d.valor);
+            
+            const domain_valores = [
+                0, 
+                valores_relativos ? 1 : Math.max(...valores)
+            ];
+
+            const range_barras = [0, largura_svg - vis.card.params.margin_left - vis.card.params.margin_right];
+
+            console.log(range_barras, largura_svg);
+
+            const w = d3.scaleLinear().range(range_barras).domain(domain_valores)
+
+            // escala y
+
+            const domain_categorias = vis.card.mini_datasets.nomes_colunas[nome_mini_dataset];
+            //mini_dados.map(mini_dados, d => d.rotulo);
+            const range_categorias = [0, espaco_necessario];
+
+            const y = d3.scaleBand().range(range_categorias).domain(domain_categorias);
+
+            // barras
+
+            svg
+              .selectAll("rect")
+              .data(mini_dados, d => d.rotulo)
+              .join("rect")
+              .attr("x", vis.card.params.margin_left)
+              .attr("y", d => y(d.rotulo))
+              .attr("w", 0)
+              .attr("height", vis.card.params.bar_height)
+              .transition()
+              .duration(vis.params.transitions_duration/2)
+              .attr("width", d => w(d.valor));
+
+            // categorias
+
+            cont
+              .selectAll("p.rotulos-categorias-card")
+              .data(mini_dados, d => d.rotulo)
+              .join("p")
+              .classed("rotulos-categorias-card", true)
+              .classed("rotulos-card", true)
+              .style("left", vis.card.params.margin_left + "px")
+              .style("top", d => y(d.rotulo) + "px")
+              .style("width", vis.card.params.margin_left + "px")
+              .style("line-height", vis.card.params.bar_height + "px")
+              .text(d => nome_mini_dataset == "geral" ?
+                         vis.card.params.rotulos_geral[d.rotulo] :
+                         d.rotulo);
+
+            // valores
+
+            cont
+                .selectAll("p.rotulos-valores-card")
+                .data(mini_dados, d => d.rotulo)
+                .join("p")
+                .classed("rotulos-valores-card", true)
+                .classed("rotulos-card", true)
+                .style("left", d => vis.card.params.margin_left + w(d.valor) + "px")
+                .style("top", d => y(d.rotulo) + "px")
+                .style("width", vis.card.params.margin_right + "px")
+                .style("line-height", vis.card.params.bar_height + "px")
+                .text(d => utils.valor_formatado(d.valor));
+
+
+        },
+
+        pegaLarguraSVG_dimensionaAltura : function(nome_mini_dataset, espaco_necessario) {
+
+            const svg = d3.select("#card-vis-" + nome_mini_dataset);
+            const cont = d3.select("div.card-vis-" + nome_mini_dataset + " .container-vis-card");
+
+            //let qde_categorias = vis.card.mini_datasets.nomes_colunas[nome_mini_dataset].length;
+
+            //let espaco_necessario = vis.card.params.bar_height * 1.5 * qde_categorias;
+
+            let w = +cont.style("width").slice(0,-2);
+
+            svg.style("height", espaco_necessario + "px");
+            svg.style("width", w + "px");
+
+            return(w)
 
         },
 
