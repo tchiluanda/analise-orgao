@@ -154,9 +154,14 @@ div.controle-cores p {
 
 /* seletores de cores */
 
+.controle-cores {
+    display: flex;
+    align-items: center;
+}
+
 .selecao-adicional-cores {
     font-size: .8rem;
-    margin-bottom: 1rem;
+    margin-bottom: 0;
 }
 
 /* vis */
