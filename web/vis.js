@@ -1453,7 +1453,7 @@ const vis = {
             //acao nova
             d3.select(vis.card.refs_componentes.acao_nova).classed("hidden", !dados.acao_nova);
 
-            const infos_basicas = ["acao", "tituloacao"];
+            const infos_basicas = ["acao", "tituloacao", "textoacao"];
         
             infos_basicas.forEach(function(info) {
                 let text = dados[info];
@@ -1536,10 +1536,10 @@ const vis = {
               .attr("x", vis.card.params.margin_left)
               .attr("y", d => y(d.rotulo))
               .attr("height", vis.card.params.bar_height)
-              //.transition()
-              //.duration(vis.params.transitions_duration/2)
-              .attr("width", d => w(d.valor))
-              .attr("fill", vis.card.params.cores[nome_mini_dataset]);
+              .attr("fill", vis.card.params.cores[nome_mini_dataset])
+              .transition()
+              .duration(vis.params.transitions_duration)
+              .attr("width", d => w(d.valor));
 
             // categorias
 
@@ -2052,9 +2052,11 @@ const vis = {
                                   .force('y', d3.forceY().strength(magnitudeForca).y(vis.dims.h/2));
 
                                 vis.sels.circles_acoes
+                                  .classed("silent", d => d.acao_nova ? false : true)
                                   .transition()
                                   .duration(vis.params.transitions_duration)
-                                  .attr("opacity", d => d.acao_nova ? 1 : 0);
+                                  .attr("opacity", d => d.acao_nova ? 1 : 0)
+
 
                                 vis.draw.bubbles.simulation.alpha(1).restart();
 

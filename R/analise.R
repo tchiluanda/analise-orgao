@@ -752,6 +752,18 @@ perfil_fonte <- base_acoes %>%
   #unite("classificador", c(id_info,grupo), remove = TRUE) %>%
   spread(fonte, percent_fonte, fill = 0)
   
+
+sh_acoes <- readxl::read_excel("./dados/dados_originais/acoes_ploas_2016_2021.xlsx", skip = 9) %>%
+  rename(acao = 1,
+         nomeacao = 2,
+         textoacao = 3) %>%
+  select(-nomeacao)
+
+
+
+
+
+
 # junta tudo numa super tabela de acoes
 
 base_acoes_export <- base_acoes %>%
@@ -773,7 +785,8 @@ base_acoes_export <- base_acoes %>%
     Investimento > .5 ~ "Investimento",
     Custeio > .5 ~ "Custeio",
     TRUE ~ "Nenhum"
-  ))
+  )) %>% 
+  left_join(sh_acoes)
 
 write.csv(base_acoes_export, file = "./dados/dados_acoes.csv", fileEncoding = "utf-8")
 
