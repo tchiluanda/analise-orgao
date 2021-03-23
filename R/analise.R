@@ -14,20 +14,21 @@ library(readxl)
 ploa_raw <- readxl::read_excel("./dados/dados_originais/SOF_PLOA_2021_STN_ajustada_gepla.xlsx", sheet = "ajustada")
 
 arquivos <- c(
-  # "./dados/dados_originais/dot_2020_ate26000.xlsx",
-  # "./dados/dados_originais/dot_2020_so26000.xlsx",
-  # "./dados/dados_originais/dot_2020_maior26000.xlsx",
+  "./dados/dados_originais/dot_2020_ate26000.xlsx",
+  "./dados/dados_originais/dot_2020_so26000.xlsx",
+  "./dados/dados_originais/dot_2020_maior26000.xlsx",
   "./dados/dados_originais/pago_2020_menor_igual26000.xlsx",
   "./dados/dados_originais/pago_2020_26001_36000.xlsx",
   "./dados/dados_originais/pago_2020_36001_53000.xlsx",
-  "./dados/dados_originais/pago_2020_maior53000.xlsx"
+  "./dados/dados_originais/pago_2020_maior53000.xlsx",
+  "./dados/dados_originais/ploa_2020.xlsx"
+  
 )
 
 dados_adicionais_raw <- 
   purrr::map(.x = arquivos, .f = readxl::read_excel, skip = 8) %>%
-  bind_rows()
-
-dados_adicionais_raw %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum()
+  bind_rows() %>%
+  distinct() # tem linhas repetidas, por algum motivo.
 
 colnames(dados_adicionais_raw) <- c(
   "exercicio", 
@@ -51,12 +52,19 @@ colnames(dados_adicionais_raw) <- c(
   "tipo_valor_cod", "tipo_valor",
   "valor")
 
+# uma verificação básica
+dados_adicionais_raw %>% filter(tipo_valor == "DOTACAO ATUALIZADA", exercicio == "2020") %>% distinct() %>% select(valor) %>% sum()
+
+dados_adicionais_raw %>% filter(tipo_valor == "PROJETO INICIAL DA LOA - FIXACAO DESPESA", exercicio == "2020") %>% select(valor) %>% sum()
+
+#incorpora tabela de função
 tab_funcao <- readxl::read_excel("./dados/dados_originais/tabela_funcao.xlsx") %>%
   select(subfuncao = cod_subfuncao,
          funcao_tipica = Funcao) %>%
   distinct()
 
-orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin_2021.xlsx", skip = 5) %>%
+#incorpora tabela de orgaos
+orgaos <- readxl::read_excel("./dados/dados_originais/tabela_orgao_cofin_2021_.xlsx", skip = 14) %>%
   select(uo = `uo Código`,
          orgao = `orgao Código`,
          orgao_decreto = `Órgãos Poder Executivo 2021`) %>%
@@ -96,7 +104,9 @@ ploa <- ploa_raw %>%
          fonte = str_sub(fonte, 2, 3))
 
 dados_adicionais <- dados_adicionais_raw %>%
-  mutate(fonte = str_sub(fonte, 3, 4))
+  mutate(fonte = str_sub(fonte, 3, 4),
+         tipo_valor = ifelse(tipo_valor == "PROJETO INICIAL DA LOA - FIXACAO DESPESA", "PLOA", tipo_valor))
+  
 
 dados_combinados_raw <-
   bind_rows(
@@ -142,8 +152,8 @@ base <- dados_combinados %>%
   ) #%>%
   #filter(orgao_decreto == "25000")
 
-dados_combinados %>% filter(tipo_valor == "PLOA") %>% select(valor) %>% sum(.)
-base %>% filter(tipo_valor == "PLOA") %>% select(valor) %>% sum(.)
+dados_combinados %>% filter(tipo_valor == "PLOA", exercicio == "2021") %>% select(valor) %>% sum(.)
+base %>% filter(tipo_valor == "PLOA", exercicio == "2021") %>% select(valor) %>% sum(.)
 
 dados_combinados %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum(.)
 base %>% filter(tipo_valor == "DOTACAO ATUALIZADA") %>% select(valor) %>% sum(.)
@@ -420,9 +430,12 @@ base_anexos_verifica %>%
 
 # sumariza a base ---------------------------------------------------------
 
+#base_anexos_verifica %>% select(tipo_valor) %>% unique() %>% unlist(),
+
 tipos_de_valor <- data.frame(
-  tipo_valor = base_anexos_verifica %>% select(tipo_valor) %>% unique() %>% unlist(),
-  variavel = c("desp_paga", "dot_atu", "PLOA") #c("desp_emp", "desp_liq", "desp_paga", "dot_atu", "RAP_inscritos", "RAP_pagos", "PLOA")
+  tipo_valor = c("DESPESAS PAGAS", "DOTACAO ATUALIZADA", "PLOA", "PLOA"),
+  exercicio = c("2020", "2020", "2020", "2021"),
+  variavel = c("desp_paga", "dot_atu", "PLOA_anterior", "PLOA")
 )
 
 base_anexos_sumarizada <- base_anexos_verifica %>%
@@ -436,10 +449,11 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
     gnd, 
     mod, 
     funcao_tipica,
+    exercicio,
     tipo_valor) %>%
   summarise(valor = sum(valor)) %>%
   ungroup() %>%
-  left_join(tipos_de_valor) %>%
+  left_join(tipos_de_valor, by = c("tipo_valor", "exercicio")) %>%
   select(-tipo_valor) %>%
   mutate(gnd = case_when(
     gnd == "1" ~ "Pessoal",
@@ -455,6 +469,8 @@ base_anexos_sumarizada <- base_anexos_verifica %>%
     TRUE ~ "Fontes Tesouro"
   ))
 
+base_anexos_verifica %>% filter(tipo_valor == "PLOA") %>% group_by(exercicio) %>% summarise(sum(valor))
+
 base_anexos_sumarizada %>% filter(variavel == "PLOA") %>% group_by(fonte) %>% summarise(sum(valor))
 base_anexos_sumarizada %>% group_by(variavel) %>% summarise(sum(valor))
 
@@ -467,6 +483,8 @@ base_anexos_sumarizada %>% group_by(variavel) %>% summarise(sum(valor))
 #   base_anexos_sumarizada,
 #   base_anexos_todos_orgaos
 # )
+
+base_completa <- base_anexos_sumarizada
 
 # testes vis
 
