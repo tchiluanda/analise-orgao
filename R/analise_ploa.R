@@ -148,3 +148,10 @@ ggplot(demais %>% group_by(funcao, ano) %>% summarise(valor = sum(valor)), aes(y
 
 ggsave("./other/analise/demais_funcao.png", plot = last_plot(), width = 7, height = 4)
 
+
+# Planilhona --------------------------------------------------------------
+
+planilha <- ploa %>%
+  group_by(orgao, funcao, classificador, acao_longa) %>%
+  summarise_if(is.numeric, .funs = ~sum(.)) %>%
+  filter(abs(variacao) > corte)
