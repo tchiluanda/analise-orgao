@@ -23,7 +23,7 @@ tema<- function(){
       panel.grid.minor = element_blank(),
       legend.text = element_text(size = 8),
       legend.title = element_text(size = 8),
-      legend.position = 'bottom')
+      legend.position = 'none')
 }
 
 readxl::excel_sheets("./other/analise/ploa_analise.xlsx")
@@ -49,21 +49,102 @@ ploa <- ploa_raw %>%
 
 ploa %>% filter(is.na(acao_longa))
 
+
+# helpers -----------------------------------------------------------------
+
+gera_dataset <- function(data) {
+  
+  {{data}} %>%
+    group_by(funcao, acao_longa) %>%
+    summarise_if(is.numeric, .funs = ~sum(.)) %>%
+    filter(abs(variacao) > corte) %>%
+    arrange(desc(variacao)) %>%
+    gather(ploa2021, ploa2020, key = "ano", value = "valor")
+  
+}
+
+plota <- function(data) {
+  
+  ggplot({{data}}, aes(y = acao_longa, x = valor)) +
+    geom_col(aes(fill = ano), position = position_dodge(width = .6), width = .5) +
+    geom_text(aes(label = format(round(valor/1e9,0), big.mark = ".", decimal.mark=",", scientific = FALSE), color = ano, x = valor + 1e9), family = "Source Sans Pro", size = 3, fontface = "bold", position = position_dodge(width = .6), vjust = "center", hjust = "left") +
+    scale_y_discrete(labels = function(x) str_wrap(x, width = 40)) +
+    scale_x_continuous(labels = function(x) {format(x/1e9, big.mark = ".", decimal.mark=",", scientific = FALSE)}) +
+    scale_fill_manual(values = vetor_cor) +
+    scale_color_manual(values = vetor_cor) +
+    labs(x = NULL, y = NULL, fill = NULL) +
+    tema()
+  
+}
+
 # Inversões ---------------------------------------------------------------
 
-inversoes <- ploa %>%
+inv <- ploa %>%
   filter(str_sub(gnd, 1, 1) == "5") %>%
-  group_by(funcao, acao_longa) %>%
-  summarise_if(is.numeric, .funs = ~sum(.)) %>%
-  filter(abs(variacao) > corte) %>%
-  arrange(desc(variacao)) %>%
-  gather(ploa2021, ploa2020, key = "ano", value = "valor")
+  gera_dataset()
 
-ggplot(inversoes, aes(y = acao_longa)) +
-  geom_col(aes(x = valor, fill = ano), position = position_dodge(width = .6), width = .5) +
+plota(inv)
+ggsave("./other/analise/inv.png", plot = last_plot(), width = 7, height = 4)
+
+# Pessoal -----------------------------------------------------------------
+
+pes <- ploa %>%
+  filter(str_sub(gnd, 1, 1) == "1") %>%
+  gera_dataset()
+
+plota(pes) #+ facet_wrap(~funcao)
+ggsave("./other/analise/pes.png", plot = last_plot(), width = 7, height = 4)
+
+
+
+# Investimentos -----------------------------------------------------------
+
+invest <- ploa %>%
+  filter(str_sub(gnd, 1, 1) == "4") %>%
+  gera_dataset()
+
+plota(invest) #+ facet_wrap(~funcao)
+ggsave("./other/analise/invest.png", plot = last_plot(), width = 7, height = 4)
+
+
+
+# transferencias ----------------------------------------------------------
+
+transf <- ploa %>%
+  filter(classificador == "Transferências Constituicionais") %>%
+  gera_dataset()
+
+plota(transf)
+ggsave("./other/analise/transf.png", plot = last_plot(), width = 9, height = 6)
+
+
+# Demais ------------------------------------------------------------------
+
+demais <- ploa %>%
+  filter(classificador == "Demais custeio") %>%
+  gera_dataset()
+
+plota(demais) + theme(axis.text = element_text(size = 8)) + facet_wrap(~funcao, scales = 'free')
+ggsave("./other/analise/demais.png", plot = last_plot(), width = 10, height = 6)
+
+
+# inversoes <- ploa %>%
+#   filter(str_sub(gnd, 1, 1) == "5") %>%
+#   group_by(funcao, acao_longa) %>%
+#   summarise_if(is.numeric, .funs = ~sum(.)) %>%
+#   filter(abs(variacao) > corte) %>%
+#   arrange(desc(variacao)) %>%
+#   gather(ploa2021, ploa2020, key = "ano", value = "valor")
+# 
+ggplot(demais %>% group_by(funcao, ano) %>% summarise(valor = sum(valor)), aes(y = funcao, x = valor)) +
+  geom_col(aes(fill = ano), position = position_dodge(width = .6), width = .5) +
+  geom_text(aes(label = format(round(valor/1e9,0), big.mark = ".", decimal.mark=",", scientific = FALSE), color = ano, x = valor + 1e9), family = "Source Sans Pro", size = 3, fontface = "bold", position = position_dodge(width = .6), vjust = "center", hjust = "left") +
   scale_y_discrete(labels = function(x) str_wrap(x, width = 40)) +
   scale_x_continuous(labels = function(x) {format(x/1e9, big.mark = ".", decimal.mark=",", scientific = FALSE)}) +
   scale_fill_manual(values = vetor_cor) +
+  scale_color_manual(values = vetor_cor) +
   labs(x = NULL, y = NULL, fill = NULL) +
   tema()
+
+ggsave("./other/analise/demais_funcao.png", plot = last_plot(), width = 7, height = 4)
 
