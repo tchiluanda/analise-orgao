@@ -1,141 +1,141 @@
-"";"acao_longa";"orgao";"ploa2021";"ploa2020";"variacao"
-"1";"00NK - Contribuição à Aliança Global para Vacinas e Imunização - GAVI";"36000 - Ministério da Saúde";4300000;0;4300000
-"2";"00QM - Assunção de Riscos das Operações de Recuperação da Lavoura Cacaueira Baiana (Leis nº 9.126, de 1995 e nº 10.186, de 2001)";"25000 - Ministério da Economia";2,15e+08;0;2,15e+08
-"3";"00RA - Assunção de Riscos das Operações do Programa Nacional de Fortalecimento da Agricultura – PRONAF Grupo A (Lei nº 10.186, de 2001)";"25000 - Ministério da Economia";1e+08;0;1e+08
-"4";"00RW - Subvenção Econômica em Operações de Investimento Rural e Agroindustrial destinadas a Empresas Cerealistas (Medida Provisória nº 897, de 2019)";"25000 - Ministério da Economia";1e+07;0;1e+07
-"5";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"01000 - CAMARA DOS DEPUTADOS";3e+06;0;3e+06
-"6";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"02000 - SENADO FEDERAL";350005;0;350005
-"7";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"03000 - TRIBUNAL DE CONTAS DA UNIAO";741539;0;741539
-"8";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"11000 - SUPERIOR TRIBUNAL DE JUSTICA";120000;0;120000
-"9";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"12000 - JUSTICA FEDERAL";60000;0;60000
-"10";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"13000 - JUSTICA MILITAR";150000;0;150000
-"11";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"15000 - JUSTICA DO TRABALHO";7413755;0;7413755
-"12";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"16000 - JUSTICA DO DISTRITO FEDERAL E DOS TERRITORIOS";410000;0;410000
-"13";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"20000 - Presidência da República";4000;0;4000
-"14";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"22000 - Ministério da Agricultura, Pecuária e Abastecimento";3000;0;3000
-"15";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"24000 - Ministério da Ciência, Tecnologia, Inovações e Comunicações";4000;0;4000
-"16";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"25000 - Ministério da Economia";610310689;0;610310689
-"17";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"26000 - Ministério da Educação";152000;0;152000
-"18";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"29000 - DEFENSORIA PUBLICA DA UNIAO";1e+05;0;1e+05
-"19";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"30000 - Ministério da Justiça e Segurança Pública";5000;0;5000
-"20";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"30211 - Conselho Administrativo de Defesa Econômica - CADE";1000;0;1000
-"21";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"32000 - Ministério de Minas e Energia";1000;0;1000
-"22";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"32265 - Agência Nacional do Petróleo, Gás Natural e Biocombustíveis - ANP";1000;0;1000
-"23";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"32266 - Agência Nacional de Energia Elétrica - ANEEL";1000;0;1000
-"24";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"32396 - Agência Nacional de Mineração - ANM";1000;0;1000
-"25";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"34000 - MINISTERIO PUBLICO DA UNIAO";4166045;0;4166045
-"26";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"35000 - Ministério das Relações Exteriores";2000;0;2000
-"27";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"36000 - Ministério da Saúde";3000;0;3000
-"28";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"36212 - Agência Nacional de Vigilância Sanitária - ANVISA";1000;0;1000
-"29";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"36213 - Agência Nacional de Saúde Suplementar - ANS";1000;0;1000
-"30";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"37000 - Controladoria-Geral da União";1000;0;1000
-"31";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"39000 - Ministério da Infraestrutura";2000;0;2000
-"32";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"39250 - Agência Nacional de Transportes Terrestres - ANTT";1000;0;1000
-"33";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"39251 - Agência Nacional de Transportes Aquaviários - ANTAQ";1000;0;1000
-"34";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"39254 - Agência Nacional de Aviação Civil - ANAC";1000;0;1000
-"35";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"41000 - Ministério das Comunicações";1000;0;1000
-"36";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"41231 - Agência Nacional de Telecomunicações - ANATEL";1000;0;1000
-"37";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"44000 - Ministério do Meio Ambiente";4000;0;4000
-"38";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"52000 - Ministério da Defesa";8000;0;8000
-"39";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"53000 - Ministério do Desenvolvimento Regional";5000;0;5000
-"40";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"53210 - Agência Nacional de Águas - ANA";1000;0;1000
-"41";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"54000 - Ministério do Turismo";7000;0;7000
-"42";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"54207 - Agência Nacional do Cinema - ANCINE";1000;0;1000
-"43";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"55000 - Ministério da Cidadania";1000;0;1000
-"44";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"60000 -Gabinete da Vice-Presidência da República";1000;0;1000
-"45";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"63000 - Advocacia-Geral da União";1000;0;1000
-"46";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";"81000 - Ministério da Mulher, da Família e dos Direitos Humanos";1000;0;1000
-"47";"00SA - Pagamento de honorários periciais nas ações em que o INSS figure como parte e que sejam de competência da Justiça Federal";"25000 - Ministério da Economia";336422195;0;336422195
-"48";"00SB - Complementação da União ao Fundo de Manutenção e Desenvolvimento da Educação Básica e de Valorização dos Profissionais da Educação - Novo FUNDEB";"26000 - Ministério da Educação";19604390150;0;19604390150
-"49";"00SC - Participação da União no Capital de nova Estatal controladora de Itaipu Binacional e a Eletrobras Termonuclear S.A";"32000 - Ministério de Minas e Energia";4e+09;0;4e+09
-"50";"00SE - Transferência Temporária a Estados, Distrito Federal e Municípios nos Termos do Acordo nos Autos da ADO nº 25";"25000 - Ministério da Economia";4e+09;0;4e+09
-"51";"0C37 - Contribuição à Convenção Sobre os Poluentes Orgânicos Persistentes - Convenção de Estocolmo (MRE)";"25000 - Ministério da Economia";2519000;0;2519000
-"52";"0E64 - Subvenção Econômica destinada à Habitação de Interesse Social em Cidades com menos de 50.000 Habitantes";"53000 - Ministério do Desenvolvimento Regional";5e+07;0;5e+07
-"53";"10WS - Construção do Edifício-Sede do Fórum Trabalhista de Manaus - AM";"15000 - JUSTICA DO TRABALHO";4330000;0;4330000
-"54";"123S - Construção de Anel Rodoviário - Município de Campo Grande- na BR-060/163/262 - no Estado do Mato Grosso do Sul";"39000 - Ministério da Infraestrutura";8e+05;0;8e+05
-"55";"123U - Adequação de Trecho Rodoviário - Entr. BR-116 (p/Guaíba) - Entr. BR-471 (Pântano Grande) - na BR-290 - no Estado do Rio Grande do Sul";"39000 - Ministério da Infraestrutura";12300000;0;12300000
-"56";"12KF - Adequação de Trecho Rodoviário - São Miguel do Oeste - Divisa SC/PR - na BR-163 - no Estado de Santa Catarina";"39000 - Ministério da Infraestrutura";16400000;0;16400000
-"57";"12KR - Implantação do Sistema de Gestão de Tráfego de Navios";"39000 - Ministério da Infraestrutura";2e+07;0;2e+07
-"58";"12R9 - Construção do Edifício II Da Seção Judiciária em Salvador - BA (Juizados Especiais Federais)";"12000 - JUSTICA FEDERAL";2e+06;0;2e+06
-"59";"132J - Construção do Edifício-Sede do Fórum Trabalhista de Resende - RJ";"15000 - JUSTICA DO TRABALHO";1e+06;0;1e+06
-"60";"134A - Construção do Edifício-Anexo ao Fórum Trabalhista de São Leopoldo - RS";"15000 - JUSTICA DO TRABALHO";3e+06;0;3e+06
-"61";"134B - Construção do Edifício-Anexo ao Fórum Trabalhista de Rio Grande - RS";"15000 - JUSTICA DO TRABALHO";3e+06;0;3e+06
-"62";"134F - Construção do Edifício-Sede do Fórum Trabalhista de Santa Rosa - RS";"15000 - JUSTICA DO TRABALHO";3e+06;0;3e+06
-"63";"136Y - Ampliação do Depósito de Armazenamento de Urnas no Município de Natal - RN";"14000 - JUSTICA ELEITORAL";1400000;0;1400000
-"64";"13X5 - Adequação de Travessia Urbana - no Município de Imperatriz - na BR-010 - no Estado do Maranhão";"39000 - Ministério da Infraestrutura";1,5e+07;0;1,5e+07
-"65";"13XG - Construção de Trecho Rodoviário - Divisa BA/MG (Salto da Divisa) - Entr.MG-405 (Jacinto) - na BR-367 - no Estado de Minas Gerais";"39000 - Ministério da Infraestrutura";16400000;0;16400000
-"66";"13YK - Construção de Trecho Rodoviário - Laranjal do Jari - Entr. BR-210/AP-030 - na BR-156 - no Estado do Amapá";"39000 - Ministério da Infraestrutura";1e+07;0;1e+07
-"67";"14TH - Implantação e Modernização de Sistemas Bélicos e Equipamentos";"52000 - Ministério da Defesa";4,8e+07;0;4,8e+07
-"68";"14X0 - Adequação de Trecho Rodoviário - Entroncamento BR-232 (São Caetano) - Entroncamento BR-424/PE-218 (Garanhuns) - na BR-423 - No Estado do Pernambuco";"39000 - Ministério da Infraestrutura";4900000;0;4900000
-"69";"14YI - Construção do Edifício-Sede da Justiça Federal em Juína - MT";"12000 - JUSTICA FEDERAL";2e+05;0;2e+05
-"70";"158F - Reforma do Edifício-Sede da Seção Judiciária em Goiânia - GO";"12000 - JUSTICA FEDERAL";1854000;0;1854000
-"71";"15DV - Implantação de Ações para o Desenvolvimento da Agricultura Irrigada";"53000 - Ministério do Desenvolvimento Regional";56262875;0;56262875
-"72";"15G6 - Reforma do Edifício-Sede da Justiça Federal em Campina Grande - PB";"12000 - JUSTICA FEDERAL";2480429;0;2480429
-"73";"15UP - Construção da Delegacia de Ponta Porã/MS";"30000 - Ministério da Justiça e Segurança Pública";2e+06;0;2e+06
-"74";"15UW - Reforma e reaparelhamento do Aeroporto de Maringá/PR";"39000 - Ministério da Infraestrutura";1,8e+07;0;1,8e+07
-"75";"15UX - Reforma e reaparelhamento do Aeroporto de Coari/AM";"39000 - Ministério da Infraestrutura";1,2e+07;0;1,2e+07
-"76";"15UY - Construção do Novo Aeroporto Regional da Serra Gaúcha/RS";"39000 - Ministério da Infraestrutura";1e+05;0;1e+05
-"77";"15UZ - Reforma e reaparelhamento do Aeroporto de Fernando de Noronha/PE";"39000 - Ministério da Infraestrutura";2,5e+07;0;2,5e+07
-"78";"15V1 - Instalação de equipamentos de auxílios à navegação Aérea";"39000 - Ministério da Infraestrutura";6070000;0;6070000
-"79";"15V2 - Reforma e reaparelhamento do Aeroporto Civil de Alcântara/MA";"39000 - Ministério da Infraestrutura";1,3e+07;0;1,3e+07
-"80";"15V3 - Construção da Ferrovia de Integração Centro Oeste - Trecho Mara Rosa (GO) a Porto Velho (RO) EF 354";"39000 - Ministério da Infraestrutura";6520000;0;6520000
-"81";"15V7 - Construção do Edifício-Sede do Conselho Nacional do Ministério Público em Brasília - DF";"59000 - CONSELHO NACIONAL DO MINISTERIO PUBLICO";2e+05;0;2e+05
-"82";"15VQ - Aquisições de Edificios-Sedes para o Ministério Público Federal";"34000 - MINISTERIO PUBLICO DA UNIAO";66554387;0;66554387
-"83";"15VR - Construção do Edifício-Sede da Procuradoria Geral do Trabalho em Brasília - DF";"34000 - MINISTERIO PUBLICO DA UNIAO";1,5e+07;0;1,5e+07
-"84";"15VS - Aquisições de Edificios-Sedes para o Ministério Público do Trabalho";"34000 - MINISTERIO PUBLICO DA UNIAO";56150000;0;56150000
-"85";"15VW - Construção da Fábrica de Plataformas Vegetais de Produção de Imunobiológicos da Fiocruz Ceará";"36000 - Ministério da Saúde";1e+06;0;1e+06
-"86";"15VX - Construção do Centro de Desenvolvimento Tecnológico em Saúde - CDTS";"36000 - Ministério da Saúde";10500000;0;10500000
-"87";"15VY - Construção da Sede da Fiocruz Rondônia";"36000 - Ministério da Saúde";1e+06;0;1e+06
-"88";"15VZ - Construção da Sede da Fiocruz Amazonas";"36000 - Ministério da Saúde";1e+06;0;1e+06
-"89";"15W0 - Construção do Hospital Materno Infantil da Serra - ES";"36000 - Ministério da Saúde";1e+06;0;1e+06
-"90";"15W1 - Construção do Hospital do Sangue do Amazonas";"36000 - Ministério da Saúde";1e+06;0;1e+06
-"91";"15W2 - Construção do Hospital Público Regional de Palmeira das Missões - RS";"36000 - Ministério da Saúde";1e+06;0;1e+06
-"92";"15W3 - Estruturação do Centro de Oncologia e Hematologia do Grupo Hospitalar Conceição";"36000 - Ministério da Saúde";1e+06;0;1e+06
-"93";"15W4 - Aquisição de Helicópteros Leves (Projeto TH-X)";"52000 - Ministério da Defesa";102604158;0;102604158
-"94";"15W5 - Reestruturação do Sistema de Engenharia do Exército";"52000 - Ministério da Defesa";2585034;0;2585034
-"95";"15W6 - Implantação do Programa Estratégico do Exército LUCERNA (Prg EE LUCERNA)";"52000 - Ministério da Defesa";18499793;0;18499793
-"96";"15W8 - Reforma e Adaptação do Galpão da Central de Atendimento ao Eleitor do DF";"14000 - JUSTICA ELEITORAL";6932000;0;6932000
-"97";"15W9 - Ampliação de Cartório Eleitoral no Município de Espigão D'Oeste - RO";"14000 - JUSTICA ELEITORAL";1266000;0;1266000
-"98";"15WA - Ampliação de Cartório Eleitoral no Município de Ouro Preto do Oeste - RO";"14000 - JUSTICA ELEITORAL";990000;0;990000
-"99";"15WB - Ampliação do Edifício-Sede do Tribunal Regional Eleitoral de Sergipe";"14000 - JUSTICA ELEITORAL";350000;0;350000
-"100";"15WC - Ampliação do Edifício-Sede do Tribunal Regional Eleitoral do Tocantins";"14000 - JUSTICA ELEITORAL";4016250;0;4016250
-"101";"15WD - Construção do Edifício-Sede da Vara do Trabalho de Tefé- AM";"15000 - JUSTICA DO TRABALHO";1091087;0;1091087
-"102";"15WF - Reforma da Sede da Superintendência do Rio Grande do Sul";"30000 - Ministério da Justiça e Segurança Pública";14005617;0;14005617
-"103";"15WG - Construção da Sede Regional do Rio Grande do Norte";"30000 - Ministério da Justiça e Segurança Pública";11406000;0;11406000
-"104";"15WH - Construção da Superintendência Regional em Minas Gerais";"30000 - Ministério da Justiça e Segurança Pública";6e+06;0;6e+06
-"105";"15WI - Construção da Superintendência Regional no Piauí-PI";"30000 - Ministério da Justiça e Segurança Pública";6e+06;0;6e+06
-"106";"15WN - Adequação de Trecho Rodoviário - Caxias - Timon - na BR-316/MA";"39000 - Ministério da Infraestrutura";1,5e+07;0;1,5e+07
-"107";"15WO - Adequação de Trecho Rodoviário - Imperatriz - Açailândia - na BR-010/MA";"39000 - Ministério da Infraestrutura";6e+07;0;6e+07
-"108";"15WP - Reforma e Modernização de Nova Unidade do Ministério da Saúde (Bloco “O” da Esplanada dos Ministérios)";"36000 - Ministério da Saúde";7,1e+07;0;7,1e+07
-"109";"1D73 - Apoio à Política Nacional de Desenvolvimento Urbano";"53000 - Ministério do Desenvolvimento Regional";3e+06;0;3e+06
-"110";"20IH - Modernização e Revitalização de Aeronaves";"52000 - Ministério da Defesa";173043387;0;173043387
-"111";"20ZQ - Estudos, Pesquisas e Produção de Indicadores na Área das Comunicações";"41000 - Ministério das Comunicações";1754315;0;1754315
-"112";"210U - Organização da Estrutura Fundiária";"22000 - Ministério da Agricultura, Pecuária e Abastecimento";1,5e+07;0;1,5e+07
-"113";"219L - Serviço Público de Produção de Selos Fiscais Federais";"25000 - Ministério da Economia";10000;0;10000
-"114";"21C5 - Elaboração de Estudos e Avaliação de Projetos de Investimentos do Governo Federal";"25000 - Ministério da Economia";54994843;0;54994843
-"115";"21C9 - Implantação, Ampliação ou Melhoria de Ações e Serviços Sustentáveis de Saneamento Básico em Pequenas Comunidades Rurais (Localidades de Pequeno Porte) ou em Comunidades Tradicionais (Remanescentes de Quilombos)";"36000 - Ministério da Saúde";8e+07;0;8e+07
-"116";"21CA - Implantação, Ampliação e Melhoria de Sistemas Públicos de Abastecimento de Água em Municípios com até 50.000 Habitantes, Exclusive em Regiões Metropolitanas (RM) ou Regiões Integradas de Desenvolvimento Econômico (RIDE)";"36000 - Ministério da Saúde";7e+07;0;7e+07
-"117";"21CB - Implantação, Ampliação e Melhoria de Sistemas Públicos de Esgotamento Sanitário em Municípios com até 50.000 Habitantes, Exclusive em Regiões Metropolitanas (RM) ou Regiões Integradas de Desenvolvimento Econômico (RIDE)";"36000 - Ministério da Saúde";87268000;0;87268000
-"118";"21CC - Implantação e Melhoria de Sistemas Públicos de Manejo de Resíduos Sólidos em Municípios de até 50.000 Habitantes, Exclusive em Regiões Metropolitanas (RM) ou Regiões Integradas de Desenvolvimento Econômico (RIDE)";"36000 - Ministério da Saúde";14100000;0;14100000
-"119";"21CD - Implementação de Políticas de Atenção Especializada à Saúde";"36000 - Ministério da Saúde";47600000;0;47600000
-"120";"21CE - Implementação de Políticas de Atenção Primária à Saúde";"36000 - Ministério da Saúde";243750000;0;243750000
-"121";"21CF - Implantação e Funcionamento da Saúde Digital e Telessaúde no SUS";"36000 - Ministério da Saúde";4e+07;0;4e+07
-"122";"21CG - Implantação e Melhoria de Serviços de Drenagem e Manejo das Águas Pluviais Urbanas para Prevenção e Controle de Doenças e Agravos em Áreas Endêmicas de Malária";"36000 - Ministério da Saúde";1e+06;0;1e+06
-"123";"21CH - Implantação de Melhorias Habitacionais para Controle da Doença de Chagas";"36000 - Ministério da Saúde";2,5e+07;0;2,5e+07
-"124";"21CI - Implantação de Melhorias Sanitárias Domiciliares para Prevenção e Controle de Doenças e Agravos em localidades urbanas de municípios com população até 50.000 habitantes";"36000 - Ministério da Saúde";6,5e+07;0;6,5e+07
-"125";"21CJ - Saneamento Básico em Aldeias Indígenas para Prevenção de doenças e Agravos";"36000 - Ministério da Saúde";3,1e+07;0;3,1e+07
-"126";"21CK - Promoção e Desenvolvimento do Paradesporto Nacional";"55000 - Ministério da Cidadania";5035330;0;5035330
-"127";"21CL - Recomposição do Núcleo do Poder Naval";"52000 - Ministério da Defesa";323294265;0;323294265
-"128";"21CM - Recomposição dos Meios da Força Aérea Brasileira";"52000 - Ministério da Defesa";13000002;0;13000002
-"129";"21CN - Gestão e Manutenção da Identificação Civil Nacional";"14000 - JUSTICA ELEITORAL";4e+07;0;4e+07
-"130";"21CO - Funcionamento das Instituições Federais de Educação Especial";"26000 - Ministério da Educação";41932707;0;41932707
-"131";"2C55 - Disseminação de Conduta Ética no Poder Executivo Federal";"20000 - Presidência da República";1e+06;0;1e+06
-"132";"4640 - Capacitação de Recursos Humanos para a Competitividade";"53000 - Ministério do Desenvolvimento Regional";4e+05;0;4e+05
-"133";"7L92 - Construção de Ponte - no Município de Xambioá - na BR-153 - no Estado do Tocantins";"39000 - Ministério da Infraestrutura";20400000;0;20400000
-"134";"7U07 - Construção de Trecho Rodoviário - Colônia Leopoldina - Ibateguara - na BR-416 - no Estado de Alagoas";"39000 - Ministério da Infraestrutura";1600000;0;1600000
-"135";"7U72 - Adequação, Revitalização e Modernização da Frota de Aeronaves AM-X (Projeto A-1M)";"52000 - Ministério da Defesa";1,1e+08;0;1,1e+08
-"136";"7W07 - Adequação de Trecho Rodoviário - Castanhal - Santa Maria do Pará - Trevo de Salinópolis - Divisa PA/MA - na BR-316/PA";"39000 - Ministério da Infraestrutura";12300000;0;12300000
-"137";"7X42 - Adequação da Travessia Urbana de Petrolina nas BR’s-407/428/PE";"39000 - Ministério da Infraestrutura";1300000;0;1300000
-"138";"7X64 - Construção de Pontes na BR-425";"39000 - Ministério da Infraestrutura";13100000;0;13100000
-"139";"7X75 - Adequação de Trecho Rodoviário - Fim das obras de duplicação - Demerval Lobão - na BR-316/PI";"39000 - Ministério da Infraestrutura";20400000;0;20400000
-"140";"7XK4 - Reforma do Anexo III do Edifício-Sede do Tribunal Regional Eleitoral da Bahia";"14000 - JUSTICA ELEITORAL";3959469;0;3959469
+"";"orgao";"acao_longa";"ploa2021";"ploa2020";"variacao"
+"1";"01000 - CAMARA DOS DEPUTADOS";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";3e+06;0;3e+06
+"2";"02000 - SENADO FEDERAL";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";350005;0;350005
+"3";"03000 - TRIBUNAL DE CONTAS DA UNIAO";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";741539;0;741539
+"4";"11000 - SUPERIOR TRIBUNAL DE JUSTICA";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";120000;0;120000
+"5";"12000 - JUSTICA FEDERAL";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";60000;0;60000
+"6";"12000 - JUSTICA FEDERAL";"12R9 - Construção do Edifício II Da Seção Judiciária em Salvador - BA (Juizados Especiais Federais)";2e+06;0;2e+06
+"7";"12000 - JUSTICA FEDERAL";"14YI - Construção do Edifício-Sede da Justiça Federal em Juína - MT";2e+05;0;2e+05
+"8";"12000 - JUSTICA FEDERAL";"158F - Reforma do Edifício-Sede da Seção Judiciária em Goiânia - GO";1854000;0;1854000
+"9";"12000 - JUSTICA FEDERAL";"15G6 - Reforma do Edifício-Sede da Justiça Federal em Campina Grande - PB";2480429;0;2480429
+"10";"13000 - JUSTICA MILITAR";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";150000;0;150000
+"11";"14000 - JUSTICA ELEITORAL";"136Y - Ampliação do Depósito de Armazenamento de Urnas no Município de Natal - RN";1400000;0;1400000
+"12";"14000 - JUSTICA ELEITORAL";"15W8 - Reforma e Adaptação do Galpão da Central de Atendimento ao Eleitor do DF";6932000;0;6932000
+"13";"14000 - JUSTICA ELEITORAL";"15W9 - Ampliação de Cartório Eleitoral no Município de Espigão D'Oeste - RO";1266000;0;1266000
+"14";"14000 - JUSTICA ELEITORAL";"15WA - Ampliação de Cartório Eleitoral no Município de Ouro Preto do Oeste - RO";990000;0;990000
+"15";"14000 - JUSTICA ELEITORAL";"15WB - Ampliação do Edifício-Sede do Tribunal Regional Eleitoral de Sergipe";350000;0;350000
+"16";"14000 - JUSTICA ELEITORAL";"15WC - Ampliação do Edifício-Sede do Tribunal Regional Eleitoral do Tocantins";4016250;0;4016250
+"17";"14000 - JUSTICA ELEITORAL";"21CN - Gestão e Manutenção da Identificação Civil Nacional";4e+07;0;4e+07
+"18";"14000 - JUSTICA ELEITORAL";"7XK4 - Reforma do Anexo III do Edifício-Sede do Tribunal Regional Eleitoral da Bahia";3959469;0;3959469
+"19";"15000 - JUSTICA DO TRABALHO";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";7413755;0;7413755
+"20";"15000 - JUSTICA DO TRABALHO";"10WS - Construção do Edifício-Sede do Fórum Trabalhista de Manaus - AM";4330000;0;4330000
+"21";"15000 - JUSTICA DO TRABALHO";"132J - Construção do Edifício-Sede do Fórum Trabalhista de Resende - RJ";1e+06;0;1e+06
+"22";"15000 - JUSTICA DO TRABALHO";"134A - Construção do Edifício-Anexo ao Fórum Trabalhista de São Leopoldo - RS";3e+06;0;3e+06
+"23";"15000 - JUSTICA DO TRABALHO";"134B - Construção do Edifício-Anexo ao Fórum Trabalhista de Rio Grande - RS";3e+06;0;3e+06
+"24";"15000 - JUSTICA DO TRABALHO";"134F - Construção do Edifício-Sede do Fórum Trabalhista de Santa Rosa - RS";3e+06;0;3e+06
+"25";"15000 - JUSTICA DO TRABALHO";"15WD - Construção do Edifício-Sede da Vara do Trabalho de Tefé- AM";1091087;0;1091087
+"26";"16000 - JUSTICA DO DISTRITO FEDERAL E DOS TERRITORIOS";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";410000;0;410000
+"27";"20000 - Presidência da República";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";4000;0;4000
+"28";"20000 - Presidência da República";"2C55 - Disseminação de Conduta Ética no Poder Executivo Federal";1e+06;0;1e+06
+"29";"22000 - Ministério da Agricultura, Pecuária e Abastecimento";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";3000;0;3000
+"30";"22000 - Ministério da Agricultura, Pecuária e Abastecimento";"210U - Organização da Estrutura Fundiária";1,5e+07;0;1,5e+07
+"31";"24000 - Ministério da Ciência, Tecnologia, Inovações e Comunicações";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";4000;0;4000
+"32";"25000 - Ministério da Economia";"00QM - Assunção de Riscos das Operações de Recuperação da Lavoura Cacaueira Baiana (Leis nº 9.126, de 1995 e nº 10.186, de 2001)";2,15e+08;0;2,15e+08
+"33";"25000 - Ministério da Economia";"00RA - Assunção de Riscos das Operações do Programa Nacional de Fortalecimento da Agricultura – PRONAF Grupo A (Lei nº 10.186, de 2001)";1e+08;0;1e+08
+"34";"25000 - Ministério da Economia";"00RW - Subvenção Econômica em Operações de Investimento Rural e Agroindustrial destinadas a Empresas Cerealistas (Medida Provisória nº 897, de 2019)";1e+07;0;1e+07
+"35";"25000 - Ministério da Economia";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";610310689;0;610310689
+"36";"25000 - Ministério da Economia";"00SA - Pagamento de honorários periciais nas ações em que o INSS figure como parte e que sejam de competência da Justiça Federal";336422195;0;336422195
+"37";"25000 - Ministério da Economia";"00SE - Transferência Temporária a Estados, Distrito Federal e Municípios nos Termos do Acordo nos Autos da ADO nº 25";4e+09;0;4e+09
+"38";"25000 - Ministério da Economia";"0C37 - Contribuição à Convenção Sobre os Poluentes Orgânicos Persistentes - Convenção de Estocolmo (MRE)";2519000;0;2519000
+"39";"25000 - Ministério da Economia";"219L - Serviço Público de Produção de Selos Fiscais Federais";10000;0;10000
+"40";"25000 - Ministério da Economia";"21C5 - Elaboração de Estudos e Avaliação de Projetos de Investimentos do Governo Federal";54994843;0;54994843
+"41";"26000 - Ministério da Educação";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";152000;0;152000
+"42";"26000 - Ministério da Educação";"00SB - Complementação da União ao Fundo de Manutenção e Desenvolvimento da Educação Básica e de Valorização dos Profissionais da Educação - Novo FUNDEB";19604390150;0;19604390150
+"43";"26000 - Ministério da Educação";"21CO - Funcionamento das Instituições Federais de Educação Especial";41932707;0;41932707
+"44";"29000 - DEFENSORIA PUBLICA DA UNIAO";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1e+05;0;1e+05
+"45";"30000 - Ministério da Justiça e Segurança Pública";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";5000;0;5000
+"46";"30000 - Ministério da Justiça e Segurança Pública";"15UP - Construção da Delegacia de Ponta Porã/MS";2e+06;0;2e+06
+"47";"30000 - Ministério da Justiça e Segurança Pública";"15WF - Reforma da Sede da Superintendência do Rio Grande do Sul";14005617;0;14005617
+"48";"30000 - Ministério da Justiça e Segurança Pública";"15WG - Construção da Sede Regional do Rio Grande do Norte";11406000;0;11406000
+"49";"30000 - Ministério da Justiça e Segurança Pública";"15WH - Construção da Superintendência Regional em Minas Gerais";6e+06;0;6e+06
+"50";"30000 - Ministério da Justiça e Segurança Pública";"15WI - Construção da Superintendência Regional no Piauí-PI";6e+06;0;6e+06
+"51";"30211 - Conselho Administrativo de Defesa Econômica - CADE";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"52";"32000 - Ministério de Minas e Energia";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"53";"32000 - Ministério de Minas e Energia";"00SC - Participação da União no Capital de nova Estatal controladora de Itaipu Binacional e a Eletrobras Termonuclear S.A";4e+09;0;4e+09
+"54";"32265 - Agência Nacional do Petróleo, Gás Natural e Biocombustíveis - ANP";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"55";"32266 - Agência Nacional de Energia Elétrica - ANEEL";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"56";"32396 - Agência Nacional de Mineração - ANM";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"57";"34000 - MINISTERIO PUBLICO DA UNIAO";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";4166045;0;4166045
+"58";"34000 - MINISTERIO PUBLICO DA UNIAO";"15VQ - Aquisições de Edificios-Sedes para o Ministério Público Federal";66554387;0;66554387
+"59";"34000 - MINISTERIO PUBLICO DA UNIAO";"15VR - Construção do Edifício-Sede da Procuradoria Geral do Trabalho em Brasília - DF";1,5e+07;0;1,5e+07
+"60";"34000 - MINISTERIO PUBLICO DA UNIAO";"15VS - Aquisições de Edificios-Sedes para o Ministério Público do Trabalho";56150000;0;56150000
+"61";"35000 - Ministério das Relações Exteriores";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";2000;0;2000
+"62";"36000 - Ministério da Saúde";"00NK - Contribuição à Aliança Global para Vacinas e Imunização - GAVI";4300000;0;4300000
+"63";"36000 - Ministério da Saúde";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";3000;0;3000
+"64";"36000 - Ministério da Saúde";"15VW - Construção da Fábrica de Plataformas Vegetais de Produção de Imunobiológicos da Fiocruz Ceará";1e+06;0;1e+06
+"65";"36000 - Ministério da Saúde";"15VX - Construção do Centro de Desenvolvimento Tecnológico em Saúde - CDTS";10500000;0;10500000
+"66";"36000 - Ministério da Saúde";"15VY - Construção da Sede da Fiocruz Rondônia";1e+06;0;1e+06
+"67";"36000 - Ministério da Saúde";"15VZ - Construção da Sede da Fiocruz Amazonas";1e+06;0;1e+06
+"68";"36000 - Ministério da Saúde";"15W0 - Construção do Hospital Materno Infantil da Serra - ES";1e+06;0;1e+06
+"69";"36000 - Ministério da Saúde";"15W1 - Construção do Hospital do Sangue do Amazonas";1e+06;0;1e+06
+"70";"36000 - Ministério da Saúde";"15W2 - Construção do Hospital Público Regional de Palmeira das Missões - RS";1e+06;0;1e+06
+"71";"36000 - Ministério da Saúde";"15W3 - Estruturação do Centro de Oncologia e Hematologia do Grupo Hospitalar Conceição";1e+06;0;1e+06
+"72";"36000 - Ministério da Saúde";"15WP - Reforma e Modernização de Nova Unidade do Ministério da Saúde (Bloco “O” da Esplanada dos Ministérios)";7,1e+07;0;7,1e+07
+"73";"36000 - Ministério da Saúde";"21C9 - Implantação, Ampliação ou Melhoria de Ações e Serviços Sustentáveis de Saneamento Básico em Pequenas Comunidades Rurais (Localidades de Pequeno Porte) ou em Comunidades Tradicionais (Remanescentes de Quilombos)";8e+07;0;8e+07
+"74";"36000 - Ministério da Saúde";"21CA - Implantação, Ampliação e Melhoria de Sistemas Públicos de Abastecimento de Água em Municípios com até 50.000 Habitantes, Exclusive em Regiões Metropolitanas (RM) ou Regiões Integradas de Desenvolvimento Econômico (RIDE)";7e+07;0;7e+07
+"75";"36000 - Ministério da Saúde";"21CB - Implantação, Ampliação e Melhoria de Sistemas Públicos de Esgotamento Sanitário em Municípios com até 50.000 Habitantes, Exclusive em Regiões Metropolitanas (RM) ou Regiões Integradas de Desenvolvimento Econômico (RIDE)";87268000;0;87268000
+"76";"36000 - Ministério da Saúde";"21CC - Implantação e Melhoria de Sistemas Públicos de Manejo de Resíduos Sólidos em Municípios de até 50.000 Habitantes, Exclusive em Regiões Metropolitanas (RM) ou Regiões Integradas de Desenvolvimento Econômico (RIDE)";14100000;0;14100000
+"77";"36000 - Ministério da Saúde";"21CD - Implementação de Políticas de Atenção Especializada à Saúde";47600000;0;47600000
+"78";"36000 - Ministério da Saúde";"21CE - Implementação de Políticas de Atenção Primária à Saúde";243750000;0;243750000
+"79";"36000 - Ministério da Saúde";"21CF - Implantação e Funcionamento da Saúde Digital e Telessaúde no SUS";4e+07;0;4e+07
+"80";"36000 - Ministério da Saúde";"21CG - Implantação e Melhoria de Serviços de Drenagem e Manejo das Águas Pluviais Urbanas para Prevenção e Controle de Doenças e Agravos em Áreas Endêmicas de Malária";1e+06;0;1e+06
+"81";"36000 - Ministério da Saúde";"21CH - Implantação de Melhorias Habitacionais para Controle da Doença de Chagas";2,5e+07;0;2,5e+07
+"82";"36000 - Ministério da Saúde";"21CI - Implantação de Melhorias Sanitárias Domiciliares para Prevenção e Controle de Doenças e Agravos em localidades urbanas de municípios com população até 50.000 habitantes";6,5e+07;0;6,5e+07
+"83";"36000 - Ministério da Saúde";"21CJ - Saneamento Básico em Aldeias Indígenas para Prevenção de doenças e Agravos";3,1e+07;0;3,1e+07
+"84";"36212 - Agência Nacional de Vigilância Sanitária - ANVISA";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"85";"36213 - Agência Nacional de Saúde Suplementar - ANS";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"86";"37000 - Controladoria-Geral da União";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"87";"39000 - Ministério da Infraestrutura";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";2000;0;2000
+"88";"39000 - Ministério da Infraestrutura";"123S - Construção de Anel Rodoviário - Município de Campo Grande- na BR-060/163/262 - no Estado do Mato Grosso do Sul";8e+05;0;8e+05
+"89";"39000 - Ministério da Infraestrutura";"123U - Adequação de Trecho Rodoviário - Entr. BR-116 (p/Guaíba) - Entr. BR-471 (Pântano Grande) - na BR-290 - no Estado do Rio Grande do Sul";12300000;0;12300000
+"90";"39000 - Ministério da Infraestrutura";"12KF - Adequação de Trecho Rodoviário - São Miguel do Oeste - Divisa SC/PR - na BR-163 - no Estado de Santa Catarina";16400000;0;16400000
+"91";"39000 - Ministério da Infraestrutura";"12KR - Implantação do Sistema de Gestão de Tráfego de Navios";2e+07;0;2e+07
+"92";"39000 - Ministério da Infraestrutura";"13X5 - Adequação de Travessia Urbana - no Município de Imperatriz - na BR-010 - no Estado do Maranhão";1,5e+07;0;1,5e+07
+"93";"39000 - Ministério da Infraestrutura";"13XG - Construção de Trecho Rodoviário - Divisa BA/MG (Salto da Divisa) - Entr.MG-405 (Jacinto) - na BR-367 - no Estado de Minas Gerais";16400000;0;16400000
+"94";"39000 - Ministério da Infraestrutura";"13YK - Construção de Trecho Rodoviário - Laranjal do Jari - Entr. BR-210/AP-030 - na BR-156 - no Estado do Amapá";1e+07;0;1e+07
+"95";"39000 - Ministério da Infraestrutura";"14X0 - Adequação de Trecho Rodoviário - Entroncamento BR-232 (São Caetano) - Entroncamento BR-424/PE-218 (Garanhuns) - na BR-423 - No Estado do Pernambuco";4900000;0;4900000
+"96";"39000 - Ministério da Infraestrutura";"15UW - Reforma e reaparelhamento do Aeroporto de Maringá/PR";1,8e+07;0;1,8e+07
+"97";"39000 - Ministério da Infraestrutura";"15UX - Reforma e reaparelhamento do Aeroporto de Coari/AM";1,2e+07;0;1,2e+07
+"98";"39000 - Ministério da Infraestrutura";"15UY - Construção do Novo Aeroporto Regional da Serra Gaúcha/RS";1e+05;0;1e+05
+"99";"39000 - Ministério da Infraestrutura";"15UZ - Reforma e reaparelhamento do Aeroporto de Fernando de Noronha/PE";2,5e+07;0;2,5e+07
+"100";"39000 - Ministério da Infraestrutura";"15V1 - Instalação de equipamentos de auxílios à navegação Aérea";6070000;0;6070000
+"101";"39000 - Ministério da Infraestrutura";"15V2 - Reforma e reaparelhamento do Aeroporto Civil de Alcântara/MA";1,3e+07;0;1,3e+07
+"102";"39000 - Ministério da Infraestrutura";"15V3 - Construção da Ferrovia de Integração Centro Oeste - Trecho Mara Rosa (GO) a Porto Velho (RO) EF 354";6520000;0;6520000
+"103";"39000 - Ministério da Infraestrutura";"15WN - Adequação de Trecho Rodoviário - Caxias - Timon - na BR-316/MA";1,5e+07;0;1,5e+07
+"104";"39000 - Ministério da Infraestrutura";"15WO - Adequação de Trecho Rodoviário - Imperatriz - Açailândia - na BR-010/MA";6e+07;0;6e+07
+"105";"39000 - Ministério da Infraestrutura";"7L92 - Construção de Ponte - no Município de Xambioá - na BR-153 - no Estado do Tocantins";20400000;0;20400000
+"106";"39000 - Ministério da Infraestrutura";"7U07 - Construção de Trecho Rodoviário - Colônia Leopoldina - Ibateguara - na BR-416 - no Estado de Alagoas";1600000;0;1600000
+"107";"39000 - Ministério da Infraestrutura";"7W07 - Adequação de Trecho Rodoviário - Castanhal - Santa Maria do Pará - Trevo de Salinópolis - Divisa PA/MA - na BR-316/PA";12300000;0;12300000
+"108";"39000 - Ministério da Infraestrutura";"7X42 - Adequação da Travessia Urbana de Petrolina nas BR’s-407/428/PE";1300000;0;1300000
+"109";"39000 - Ministério da Infraestrutura";"7X64 - Construção de Pontes na BR-425";13100000;0;13100000
+"110";"39000 - Ministério da Infraestrutura";"7X75 - Adequação de Trecho Rodoviário - Fim das obras de duplicação - Demerval Lobão - na BR-316/PI";20400000;0;20400000
+"111";"39250 - Agência Nacional de Transportes Terrestres - ANTT";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"112";"39251 - Agência Nacional de Transportes Aquaviários - ANTAQ";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"113";"39254 - Agência Nacional de Aviação Civil - ANAC";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"114";"41000 - Ministério das Comunicações";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"115";"41000 - Ministério das Comunicações";"20ZQ - Estudos, Pesquisas e Produção de Indicadores na Área das Comunicações";1754315;0;1754315
+"116";"41231 - Agência Nacional de Telecomunicações - ANATEL";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"117";"44000 - Ministério do Meio Ambiente";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";4000;0;4000
+"118";"52000 - Ministério da Defesa";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";8000;0;8000
+"119";"52000 - Ministério da Defesa";"14TH - Implantação e Modernização de Sistemas Bélicos e Equipamentos";4,8e+07;0;4,8e+07
+"120";"52000 - Ministério da Defesa";"15W4 - Aquisição de Helicópteros Leves (Projeto TH-X)";102604158;0;102604158
+"121";"52000 - Ministério da Defesa";"15W5 - Reestruturação do Sistema de Engenharia do Exército";2585034;0;2585034
+"122";"52000 - Ministério da Defesa";"15W6 - Implantação do Programa Estratégico do Exército LUCERNA (Prg EE LUCERNA)";18499793;0;18499793
+"123";"52000 - Ministério da Defesa";"20IH - Modernização e Revitalização de Aeronaves";173043387;0;173043387
+"124";"52000 - Ministério da Defesa";"21CL - Recomposição do Núcleo do Poder Naval";323294265;0;323294265
+"125";"52000 - Ministério da Defesa";"21CM - Recomposição dos Meios da Força Aérea Brasileira";13000002;0;13000002
+"126";"52000 - Ministério da Defesa";"7U72 - Adequação, Revitalização e Modernização da Frota de Aeronaves AM-X (Projeto A-1M)";1,1e+08;0;1,1e+08
+"127";"53000 - Ministério do Desenvolvimento Regional";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";5000;0;5000
+"128";"53000 - Ministério do Desenvolvimento Regional";"0E64 - Subvenção Econômica destinada à Habitação de Interesse Social em Cidades com menos de 50.000 Habitantes";5e+07;0;5e+07
+"129";"53000 - Ministério do Desenvolvimento Regional";"15DV - Implantação de Ações para o Desenvolvimento da Agricultura Irrigada";56262875;0;56262875
+"130";"53000 - Ministério do Desenvolvimento Regional";"1D73 - Apoio à Política Nacional de Desenvolvimento Urbano";3e+06;0;3e+06
+"131";"53000 - Ministério do Desenvolvimento Regional";"4640 - Capacitação de Recursos Humanos para a Competitividade";4e+05;0;4e+05
+"132";"53210 - Agência Nacional de Águas - ANA";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"133";"54000 - Ministério do Turismo";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";7000;0;7000
+"134";"54207 - Agência Nacional do Cinema - ANCINE";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"135";"55000 - Ministério da Cidadania";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"136";"55000 - Ministério da Cidadania";"21CK - Promoção e Desenvolvimento do Paradesporto Nacional";5035330;0;5035330
+"137";"59000 - CONSELHO NACIONAL DO MINISTERIO PUBLICO";"15V7 - Construção do Edifício-Sede do Conselho Nacional do Ministério Público em Brasília - DF";2e+05;0;2e+05
+"138";"60000 -Gabinete da Vice-Presidência da República";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"139";"63000 - Advocacia-Geral da União";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
+"140";"81000 - Ministério da Mulher, da Família e dos Direitos Humanos";"00S6 - Benefício Especial e Demais Complementações de Aposentadorias";1000;0;1000
