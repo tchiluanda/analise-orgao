@@ -202,6 +202,29 @@ ggplot(visao_classificador, aes(y = classificador, x = valor)) +
 
 ggsave("./other/analise/doc/visao_geral_classificadores_emissao.png", plot = last_plot(), width = 5, height = 4)
 
+
+# total_emissao -----------------------------------------------------------
+
+ploa_emissao <- ploa %>%
+  filter(classificador != "Dívida", fontes == "Fontes de emissão") %>% 
+  group_by() %>% 
+  summarise_if(is.numeric, sum) %>% 
+  gather(ploa2021, ploa2020, key = "ano", value = "valor")
+
+ggplot(ploa_emissao, aes(y = ano, x = valor)) +
+  geom_col(aes(fill = ano), position = position_dodge(width = .6), width = .5) +
+  geom_text(aes(label = format(round(valor/1e9,0), big.mark = ".", decimal.mark=",", scientific = FALSE), color = ano, x = valor + 1e11), family = "Inter", size = 3, fontface = "bold", position = position_dodge(width = .6), vjust = "center", hjust = "left") +
+  scale_y_discrete(labels = c("ploa2021" = "PLOA 2021", "ploa2020" = "PLOA 2020")) +
+  scale_x_continuous(labels = function(x) {format(x/1e9, big.mark = ".", decimal.mark=",", scientific = FALSE)}) +
+  coord_cartesian(clip = "off") +
+  scale_fill_manual(values = vetor_cor) +
+  scale_color_manual(values = vetor_cor) +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  tema()
+
+ggsave("./other/analise/doc/visao_geral_emissao.png", plot = last_plot(), width = 5, height = 2)
+
+
 # helpers -----------------------------------------------------------------
 
 gera_dataset <- function(data) {
@@ -281,7 +304,7 @@ transf <- ploa %>%
 
 plota(transf)
 
-ggsave("./other/analise/doc/transf.png", plot = last_plot(), width = 9, height = 6)
+ggsave("./other/analise/doc/transf.png", plot = last_plot(), width = 6.5, height = 5)
 
 
 # Demais saude e assistencia -------------------------------
@@ -311,7 +334,7 @@ demais_outras_funcoes <- ploa %>%
 
 plota(demais_outras_funcoes)
 
-ggsave("./other/analise/doc/demais_outras_funcoes.png", plot = last_plot(), width = 7, height = 5.5)
+ggsave("./other/analise/doc/demais_outras_funcoes.png", plot = last_plot(), width = 7, height = 4.5)
 
 
 # beneficios --------------------------------------------------------------
@@ -322,7 +345,7 @@ rgps <- ploa %>%
 
 plota(rgps, distancia = 5e9)
 
-ggsave("./other/analise/doc/rgps.png", plot = last_plot(), width = 7, height = 4)
+ggsave("./other/analise/doc/rgps.png", plot = last_plot(), width = 6, height = 4)
 
 
 # divida ------------------------------------------------------------------
@@ -334,6 +357,83 @@ divida <- ploa %>%
 plota(divida, distancia = 1e10)
 
 ggsave("./other/analise/doc/divida.png", plot = last_plot(), width = 8.6, height = 3.8)
+
+
+# por orgao ---------------------------------------------------------------
+
+ploa %>% filter(classificador %in% c("Dívida", "Transferências Constitucionais", "Benefícios do RGPS")) %>% group_by(orgao) %>% summarise_if(is.numeric, sum) %>% arrange(desc(ploa2021))
+
+por_orgao <- ploa %>%
+  filter(!(classificador %in% c("Dívida", "Transferências Constituicionais", "Benefícios do RGPS"))) %>%
+  filter(as.numeric(str_sub(orgao, 1, 5)) > 20000) %>%
+  filter(!(as.numeric(str_sub(orgao, 1, 5)) %in% c(29000, 34000, 59000))) %>%
+  group_by(orgao) %>% summarise_if(is.numeric, sum) %>% arrange(variacao) %>% 
+  ungroup() %>%
+  mutate(orgao = fct_reorder(orgao, ploa2021),
+         faixa = cut(ploa2021, breaks = c(0, 10e9, 100e9, Inf), labels = c("Até 10bi", "10 a 100bi", "Mais de 100bi"))) %>%
+  gather(ploa2021, ploa2020, key = "ano", value = "valor")
+
+
+ggplot(por_orgao %>% filter(faixa == "10 a 100bi"), aes(y = orgao, x = valor)) +
+  geom_col(aes(fill = ano), position = position_dodge(width = .6), width = .5) +
+  geom_text(aes(label = format(round(valor/1e9,0), big.mark = ".", decimal.mark=",", scientific = FALSE), color = ano, x = valor + 1e9), family = "Inter", size = 3, fontface = "bold", position = position_dodge(width = .6), vjust = "center", hjust = "left") +
+  geom_text(
+    aes(
+      label = paste0(
+        ifelse(variacao>0,"+",""),
+        format(round(variacao/1e9,0), big.mark = ".", decimal.mark=",", scientific = FALSE)), 
+      color = variacao > 0, x = 0), 
+    family = "Inter", 
+    size = 2.5, 
+    fontface = "bold", 
+    vjust = "center", 
+    hjust = "right", 
+    nudge_x = -1e9) +
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 50)) +
+  scale_x_continuous(labels = function(x) {format(x/1e9, big.mark = ".", decimal.mark=",", scientific = FALSE)}) +
+  scale_fill_manual(values = vetor_cor) +
+  scale_color_manual(values = vetor_cor) +
+  coord_cartesian(clip = "off") +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  tema() #+ facet_wrap(~faixa, scales = 'free', ncol = 1)
+
+ggsave("./other/analise/doc/orgaos_ate100.png", plot = last_plot(), width = 6, height = 4)
+
+
+ggplot(por_orgao %>% filter(faixa == "Mais de 100bi"), aes(y = orgao, x = valor)) +
+  geom_col(aes(fill = ano), position = position_dodge(width = .6), width = .5) +
+  geom_text(aes(label = format(round(valor/1e9,0), big.mark = ".", decimal.mark=",", scientific = FALSE), color = ano, x = valor + 1e9), family = "Inter", size = 3, fontface = "bold", position = position_dodge(width = .6), vjust = "center", hjust = "left") +
+  geom_text(
+    aes(
+      label = paste0(
+        ifelse(variacao>0,"+",""),
+        format(round(variacao/1e9,0), big.mark = ".", decimal.mark=",", scientific = FALSE)), 
+      color = variacao > 0, x = 0), 
+    family = "Inter", 
+    size = 2.5, 
+    fontface = "bold", 
+    vjust = "center", 
+    hjust = "right", 
+    nudge_x = -1e9) +
+  scale_y_discrete(labels = function(x) str_wrap(x, width = 50)) +
+  scale_x_continuous(labels = function(x) {format(x/1e9, big.mark = ".", decimal.mark=",", scientific = FALSE)}) +
+  scale_fill_manual(values = vetor_cor) +
+  scale_color_manual(values = vetor_cor) +
+  coord_cartesian(clip = "off") +
+  labs(x = NULL, y = NULL, fill = NULL) +
+  tema() #+ facet_wrap(~faixa, scales = 'free', ncol = 1)
+
+ggsave("./other/analise/doc/orgaos_mais100.png", plot = last_plot(), width = 6, height = 4)
+
+
+
+por_orgao_ME <- ploa %>%
+  filter(!(classificador %in% c("Dívida", "Transferências Constituicionais", "Benefícios do RGPS"))) %>%
+  filter(as.numeric(str_sub(orgao, 1, 5)) > 20000) %>%
+  filter(as.numeric(str_sub(orgao, 1, 5)) == 25000) %>%
+  group_by(orgao, acao_longa) %>% summarise_if(is.numeric, sum) %>% arrange(desc(variacao))
+  
+  
 
 # Planilhona --------------------------------------------------------------
 
@@ -353,9 +453,29 @@ lista_novas <- ploa %>%
 
 novas <- ploa %>%
   filter(acao_longa %in% lista_novas) %>%
-  group_by(acao_longa, orgao) %>%
+  group_by(orgao, acao_longa) %>%
   summarise_if(is.numeric, .funs = ~sum(.))
 
 write.csv2(novas, file = "novas_acoes.csv")
 
 novas %>% ungroup() %>% select(orgao) %>% unique()
+
+
+# variacoes ---------------------------------------------------------------
+
+variacoes <- ploa %>%
+  group_by(orgao, acao_longa) %>%
+  summarise_if(is.numeric, .funs = ~sum(.)) %>%
+  ungroup() %>%
+  filter(ploa2020 > 0 & ploa2021 > 0) %>%
+  mutate(variacao2021_2020 = ploa2021/ploa2020 - 1) %>%
+  mutate(variacao2020_2021 = ploa2020/ploa2021 - 1) %>%
+  filter(variacao2020_2021 > .75 | variacao2021_2020 > .75) %>%
+  mutate(tipo_variacao = ifelse(variacao2021_2020 > 0, "Aumentos", "Reduções"),
+         valor = ifelse(variacao2021_2020 > 0, variacao2021_2020, variacao2020_2021),
+         valor = valor)
+
+variacoes_export <- variacoes %>%
+  select(orgao, acao_longa, tipo_variacao, ploa2021, ploa2020, variacao, valor)
+
+write.csv2(variacoes_export, file = "variacoes.csv")
